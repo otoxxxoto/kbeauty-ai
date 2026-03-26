@@ -18,6 +18,7 @@ export type AffiliateUrlsInput = {
 };
 
 export type AffiliateClickSource = "amazon" | "rakuten" | "qoo10";
+type GaClickLocation = "top" | "detail" | "card";
 
 /** affiliate_click の position（計測用） */
 export type AffiliateClickPosition =
@@ -51,6 +52,8 @@ export function logAffiliateClick(
     ctaPlacement?: AffiliateCtaPlacement;
     /** 画面種別（後方互換: 未指定なら省略） */
     pageType?: AffiliatePageType;
+    /** GA event 用（未指定時は goodsNo を使用） */
+    productName?: string;
   }
 ): void {
   const payload: Record<string, unknown> = {
@@ -62,6 +65,19 @@ export function logAffiliateClick(
   if (ctx?.ctaPlacement) payload.ctaPlacement = ctx.ctaPlacement;
   if (ctx?.pageType) payload.pageType = ctx.pageType;
   console.log("affiliate_click", payload);
+
+  const toGaLocation = (p: AffiliateClickPosition): GaClickLocation => {
+    if (p === "product_detail_first") return "top";
+    if (p === "product_detail_middle" || p === "product_detail_bottom") return "detail";
+    return "card";
+  };
+  if (typeof window !== "undefined" && typeof window.gtag === "function") {
+    window.gtag("event", "affiliate_click", {
+      shop: source,
+      product: (ctx?.productName ?? goodsNo).trim() || goodsNo,
+      location: toGaLocation(position),
+    });
+  }
 }
 
 type ProductAffiliateCtasProps = {
