@@ -1,1 +1,38 @@
-{"name":"web","version":"0.1.0","private":true,"scripts":{"dev":"next dev","build":"next build","start":"next start","lint":"eslint","launch-report":"tsx scripts/oliveyoung-launch-report.ts","launch-report:pretty":"tsx scripts/oliveyoung-launch-report.ts --pretty","diagnose-top-images":"tsx scripts/diagnose-top-page-image-data.ts","flag-nameja-nightly-targets":"tsx scripts/flag-nameja-nightly-targets.ts","flag-nameja-surface-targets":"tsx scripts/flag-nameja-surface-targets.ts"},"dependencies":{"@google-cloud/firestore":"^8.3.0","@google-cloud/storage":"^7.19.0","@kbeauty-ai/core":"workspace:*","firebase-admin":"^13.6.1","next":"16.1.6","react":"19.2.3","react-dom":"19.2.3"},"devDependencies":{"dotenv":"^16.4.7","tsx":"^4.19.3","@tailwindcss/postcss":"^4","@types/node":"^20","@types/react":"^19","@types/react-dom":"^19","eslint":"^9","eslint-config-next":"16.1.6","tailwindcss":"^4","typescript":"^5"}}
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "prebuild": "pnpm --filter @kbeauty-ai/core run build",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "launch-report": "tsx scripts/oliveyoung-launch-report.ts",
+    "launch-report:pretty": "tsx scripts/oliveyoung-launch-report.ts --pretty",
+    "diagnose-top-images": "tsx scripts/diagnose-top-page-image-data.ts",
+    "flag-nameja-nightly-targets": "tsx scripts/flag-nameja-nightly-targets.ts",
+    "flag-nameja-surface-targets": "tsx scripts/flag-nameja-surface-targets.ts"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^8.3.0",
+    "@google-cloud/storage": "^7.19.0",
+    "@kbeauty-ai/core": "workspace:*",
+    "firebase-admin": "^13.6.1",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "dotenv": "^16.4.7",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "tsx": "^4.19.3",
+    "typescript": "^5"
+  }
+}

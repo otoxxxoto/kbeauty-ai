@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "description": "K-Beauty商品情報スクレイピング・成分抽出・名寄せPoC",
+  "packageManager": "pnpm@9.15.4",
   "scripts": {
-    "dev": "pnpm -C apps/crawler dev"
+    "dev": "pnpm -C apps/crawler dev",
+    "build:web": "pnpm --filter @kbeauty-ai/core run build && pnpm --filter web run build"
   },
   "devDependencies": {
     "typescript": "^5.3.3"
