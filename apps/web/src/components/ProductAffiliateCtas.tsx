@@ -90,11 +90,11 @@ const detailCtaClassByShop = {
 
 const cardCtaClassByShop = {
   amazon:
-    "inline-flex w-full items-center justify-center rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 transition-colors",
+    "inline-flex w-full items-center justify-center rounded-lg border border-orange-200 bg-orange-100 px-3 py-2 text-sm font-semibold text-orange-700 hover:bg-orange-200 transition-colors",
   rakuten:
-    "inline-flex w-full items-center justify-center rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 transition-colors",
+    "inline-flex w-full items-center justify-center rounded-lg border border-red-200 bg-red-100 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-200 transition-colors",
   qoo10:
-    "inline-flex w-full items-center justify-center rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 transition-colors",
+    "inline-flex w-full items-center justify-center rounded-lg border border-pink-200 bg-pink-100 px-3 py-2 text-sm font-semibold text-pink-700 hover:bg-pink-200 transition-colors",
 } as const;
 
 /**
