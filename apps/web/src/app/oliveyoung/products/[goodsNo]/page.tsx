@@ -26,6 +26,7 @@ import { CollapsibleText } from "@/components/CollapsibleText";
 import { ProductPrimaryCtaBlock } from "@/components/ProductPrimaryCtaBlock";
 import { ProductCompareCtaBlock } from "@/components/ProductCompareCtaBlock";
 import { buildProductPageSeoMeta } from "@/lib/oliveyoung-product-seo";
+import { buildProductTitle } from "@/lib/seo";
 import { getRankingRunDates } from "@/lib/oliveyoung-rankings";
 import { ProductSeoInternalLinks } from "@/components/ProductSeoInternalLinks";
 import { CATEGORY_CONFIG } from "@/lib/category-config";
@@ -55,7 +56,14 @@ export async function generateMetadata({ params }: PageProps) {
   const product = await getOliveYoungProductByGoodsNo(goodsNo);
   if (!product) return { title: "商品詳細 | 韓国コスメ | Olive Young" };
 
-  const { title, description, selectedPattern } = buildProductPageSeoMeta(product);
+  const { description, selectedPattern } = buildProductPageSeoMeta(product);
+  const displayName = getDisplayProductNameText({
+    nameJa: product.nameJa,
+    name: product.name,
+    brand: product.brand,
+    brandJa: product.brandJa,
+  });
+  const title = buildProductTitle(displayName);
 
   const canonical = `${BASE_URL}/oliveyoung/products/${goodsNo}`;
   if (goodsNo === "A000000141338") {
@@ -465,6 +473,22 @@ export default async function ProductDetailPage({ params }: PageProps) {
           <p className="text-zinc-700 leading-relaxed whitespace-pre-line">
             {summaryText}
           </p>
+        </div>
+      </section>
+      <section className="mb-8" aria-labelledby="recommend-summary-heading">
+        <h2 id="recommend-summary-heading" className="text-lg font-bold text-zinc-900 mb-3">
+          この商品の特徴
+        </h2>
+        <div className="rounded-lg border border-zinc-200 bg-white p-5">
+          <p className="text-zinc-700 leading-relaxed">
+            韓国で人気のスキンケアアイテム。保湿力が高く、乾燥肌・敏感肌の方にもおすすめです。
+          </p>
+          <h3 className="mt-4 text-base font-semibold text-zinc-900">おすすめの人</h3>
+          <ul className="mt-2 list-disc pl-5 text-zinc-700 space-y-1">
+            <li>乾燥肌の方</li>
+            <li>韓国コスメが好きな方</li>
+            <li>コスパ重視の方</li>
+          </ul>
         </div>
       </section>
 

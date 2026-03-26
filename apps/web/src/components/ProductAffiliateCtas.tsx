@@ -80,18 +80,13 @@ type ProductAffiliateCtasProps = {
   amazonOnly?: boolean;
 };
 
-const primaryClassCard =
-  "inline-flex w-full min-h-[40px] items-center justify-center rounded-lg bg-emerald-600 px-3 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition-colors";
-
-const primaryClassDetail =
-  "inline-flex w-full min-h-[48px] items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm sm:text-base font-bold text-white shadow-md shadow-emerald-900/20 hover:bg-emerald-700 transition-colors";
-
-/** カード内は縦積み前提。横並びで狭幅になると文言が2行に割れるため w-full + 短めラベル */
-const subClassCard =
-  "inline-flex w-full min-h-[36px] items-center justify-center rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors whitespace-nowrap";
-
-const subClassDetail =
-  "inline-flex flex-1 min-h-[44px] min-w-[120px] items-center justify-center rounded-lg border-2 border-zinc-300 bg-zinc-50 px-3 py-2.5 text-xs sm:text-sm font-semibold text-zinc-800 hover:bg-white transition-colors";
+const ctaBaseClass =
+  "inline-flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm sm:text-base font-bold text-white transition-colors";
+const ctaClassByShop = {
+  amazon: `${ctaBaseClass} bg-[#ff9900] hover:bg-[#e68a00]`,
+  rakuten: `${ctaBaseClass} bg-[#bf0000] hover:bg-[#a30000]`,
+  qoo10: `${ctaBaseClass} bg-[#ff3366] hover:bg-[#e62e5c]`,
+} as const;
 
 /**
  * Amazon（主CTA・緑）/ 楽天・Qoo10（サブ）。href が空のボタンは出さない。
@@ -112,9 +107,6 @@ export function ProductAffiliateCtas({
   } else if (!amazon && !rakuten && !qoo10) {
     return null;
   }
-
-  const primaryCls = variant === "detail" ? primaryClassDetail : primaryClassCard;
-  const subCls = variant === "detail" ? subClassDetail : subClassCard;
 
   const inferredPlacement: AffiliateCtaPlacement | undefined =
     ctaPlacement ??
@@ -150,7 +142,9 @@ export function ProductAffiliateCtas({
 
   const amazonButtonLabel = amazonOnly
     ? RELATED_PRODUCT_CARD_AMAZON_LABEL
-    : AFFILIATE_CARD_AMAZON_PRIMARY_LABEL;
+    : variant === "detail"
+      ? "🛒 Amazonで最安を見る"
+      : AFFILIATE_CARD_AMAZON_PRIMARY_LABEL;
 
   return (
     <div
@@ -163,43 +157,33 @@ export function ProductAffiliateCtas({
           href={amazon}
           target="_blank"
           rel={AMAZON_AFFILIATE_REL}
-          className={primaryCls}
+          className={ctaClassByShop.amazon}
           onClick={onAmazonClick}
         >
           {amazonButtonLabel}
         </a>
       ) : null}
-      {!amazonOnly && (rakuten || qoo10) ? (
-        <div
-          className={
-            variant === "card"
-              ? "flex w-full flex-col gap-2"
-              : "flex w-full flex-wrap gap-2"
-          }
+      {!amazonOnly && rakuten ? (
+        <a
+          href={rakuten}
+          target="_blank"
+          rel={RAKUTEN_AFFILIATE_REL}
+          className={ctaClassByShop.rakuten}
+          onClick={onRakutenClick}
         >
-          {rakuten ? (
-            <a
-              href={rakuten}
-              target="_blank"
-              rel={RAKUTEN_AFFILIATE_REL}
-              className={subCls}
-              onClick={onRakutenClick}
-            >
-              {variant === "card" ? "楽天で見る" : "楽天で価格をチェック"}
-            </a>
-          ) : null}
-          {qoo10 ? (
-            <a
-              href={qoo10}
-              target="_blank"
-              rel={QOO10_AFFILIATE_REL}
-              className={subCls}
-              onClick={onQoo10Click}
-            >
-              {variant === "card" ? "Qoo10で見る" : "Qoo10で価格をチェック"}
-            </a>
-          ) : null}
-        </div>
+          {variant === "detail" ? "🛒 楽天でポイント還元を見る" : "楽天で見る"}
+        </a>
+      ) : null}
+      {!amazonOnly && qoo10 ? (
+        <a
+          href={qoo10}
+          target="_blank"
+          rel={QOO10_AFFILIATE_REL}
+          className={ctaClassByShop.qoo10}
+          onClick={onQoo10Click}
+        >
+          {variant === "detail" ? "🛒 Qoo10でセールを見る" : "Qoo10で見る"}
+        </a>
       ) : null}
     </div>
   );
