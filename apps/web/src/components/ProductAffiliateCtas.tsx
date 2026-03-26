@@ -80,12 +80,21 @@ type ProductAffiliateCtasProps = {
   amazonOnly?: boolean;
 };
 
-const ctaBaseClass =
+const detailCtaBaseClass =
   "inline-flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm sm:text-base font-bold text-white transition-colors";
-const ctaClassByShop = {
-  amazon: `${ctaBaseClass} bg-[#ff9900] hover:bg-[#e68a00]`,
-  rakuten: `${ctaBaseClass} bg-[#bf0000] hover:bg-[#a30000]`,
-  qoo10: `${ctaBaseClass} bg-[#ff3366] hover:bg-[#e62e5c]`,
+const detailCtaClassByShop = {
+  amazon: `${detailCtaBaseClass} bg-[#ff9900] hover:bg-[#e68a00]`,
+  rakuten: `${detailCtaBaseClass} bg-[#bf0000] hover:bg-[#a30000]`,
+  qoo10: `${detailCtaBaseClass} bg-[#ff3366] hover:bg-[#e62e5c]`,
+} as const;
+
+const cardCtaClassByShop = {
+  amazon:
+    "inline-flex w-full items-center justify-center rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 transition-colors",
+  rakuten:
+    "inline-flex w-full items-center justify-center rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 transition-colors",
+  qoo10:
+    "inline-flex w-full items-center justify-center rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 transition-colors",
 } as const;
 
 /**
@@ -145,6 +154,7 @@ export function ProductAffiliateCtas({
     : variant === "detail"
       ? "🛒 Amazonで最安を見る"
       : AFFILIATE_CARD_AMAZON_PRIMARY_LABEL;
+  const ctaClassByShop = variant === "detail" ? detailCtaClassByShop : cardCtaClassByShop;
 
   return (
     <div

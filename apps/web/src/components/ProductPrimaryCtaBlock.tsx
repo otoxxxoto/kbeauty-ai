@@ -42,10 +42,11 @@ export function ProductPrimaryCtaBlock({
     return null;
   }
 
-  const primaryBtn =
-    "inline-flex w-full min-h-[48px] items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm sm:text-base font-bold text-white shadow-md shadow-emerald-900/20 hover:bg-emerald-700 transition-colors";
-  const subBtn =
-    "inline-flex w-full min-h-[44px] items-center justify-center rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 transition-colors";
+  const ctaBase =
+    "inline-flex w-full min-h-[50px] items-center justify-center rounded-xl px-4 py-3 text-sm sm:text-base font-bold text-white shadow-sm transition-colors";
+  const amazonBtn = `${ctaBase} bg-[#ff9900] hover:bg-[#e68a00]`;
+  const rakutenBtn = `${ctaBase} bg-[#bf0000] hover:bg-[#a30000]`;
+  const qoo10Btn = `${ctaBase} bg-[#ff3366] hover:bg-[#e62e5c]`;
 
   return (
     <section
@@ -59,13 +60,13 @@ export function ProductPrimaryCtaBlock({
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="mt-4 flex flex-col gap-3">
         {urls.amazon ? (
           <a
             href={urls.amazon}
             target="_blank"
             rel={AMAZON_AFFILIATE_REL}
-            className={primaryBtn}
+            className={amazonBtn}
             onClick={() =>
               logAffiliateClick(goodsNo, "amazon", position, urls.amazon, {
                 ctaPlacement: "primary",
@@ -81,7 +82,7 @@ export function ProductPrimaryCtaBlock({
             href={urls.rakuten}
             target="_blank"
             rel={RAKUTEN_AFFILIATE_REL}
-            className={subBtn}
+            className={rakutenBtn}
             onClick={() =>
               logAffiliateClick(goodsNo, "rakuten", position, urls.rakuten, {
                 ctaPlacement: "primary",
@@ -97,7 +98,7 @@ export function ProductPrimaryCtaBlock({
             href={urls.qoo10}
             target="_blank"
             rel={QOO10_AFFILIATE_REL}
-            className={subBtn}
+            className={qoo10Btn}
             onClick={() =>
               logAffiliateClick(goodsNo, "qoo10", position, urls.qoo10, {
                 ctaPlacement: "primary",

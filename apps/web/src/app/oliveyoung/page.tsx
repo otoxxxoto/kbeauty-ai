@@ -20,8 +20,9 @@ import {
   PRODUCT_CARD_CTA_CLASS,
   PRODUCT_CARD_TITLE_CLASS,
 } from "@/lib/product-card-layout";
+import { buildOliveYoungEntryTitle } from "@/lib/seo";
 
-const PAGE_TITLE = "韓国コスメ人気ランキング | Olive Young 人気動向";
+const PAGE_TITLE = buildOliveYoungEntryTitle();
 const PAGE_DESCRIPTION =
   "韓国コスメの人気動向を、Olive Young ランキングで日本語で確認できる入口です。人気商品・急上昇ブランドを毎日更新。";
 

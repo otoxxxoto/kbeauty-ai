@@ -13,6 +13,7 @@ import {
 import { ProductDisplayImage } from "@/components/ProductDisplayImage";
 import { ProductCardCta } from "@/components/ProductCardCta";
 import { getCategoryAppealLabel } from "@/lib/product-card-appeal";
+import { buildCategoryTitle } from "@/lib/seo";
 import {
   getDisplayProductNameText,
   getSafeSummaryBodyOrNull,
@@ -94,7 +95,7 @@ export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   const cat = getCategoryConfigBySlug(slug);
   if (!cat) return { title: "カテゴリ | Olive Young" };
-  const title = cat.title;
+  const title = buildCategoryTitle(cat.label);
   const description = cat.description;
   return {
     title,
