@@ -1,0 +1,5 @@
+# Olive Young 商品URLサンプル（任意）
+# 実際のランキング/ベストページURLをここに記載しても良い
+# 例:
+# https://www.oliveyoung.co.kr/store/goods/getPrdDetail.do?prdCd=A000000123456
+

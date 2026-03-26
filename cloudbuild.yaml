@@ -1,0 +1,13 @@
+steps:
+  - name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: "bash"
+    args:
+      - "-lc"
+      - |
+        echo "---- CHECK SOURCE FILE ----"
+        grep -n "DETAIL_RETURN_DEBUG_V2" apps/crawler/src/jobs/oliveyoungRankingsJob.ts || true
+        sed -n '320,380p' apps/crawler/src/jobs/oliveyoungRankingsJob.ts || true
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-f", "Dockerfile.job", "-t", "gcr.io/kbeauty-ai/kbeauty-oy-rankings:latest", "."]
+images:
+  - "gcr.io/kbeauty-ai/kbeauty-oy-rankings:latest"

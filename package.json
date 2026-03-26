@@ -1,0 +1,15 @@
+{
+  "name": "kbeauty-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "K-Beauty商品情報スクレイピング・成分抽出・名寄せPoC",
+  "scripts": {
+    "dev": "pnpm -C apps/crawler dev"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
+
+
+

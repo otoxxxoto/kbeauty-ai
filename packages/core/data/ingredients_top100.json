@@ -1,0 +1,1004 @@
+[
+  {
+    "id": "FUNC_NIACINAMIDE",
+    "display_ja": "ナイアシンアミド",
+    "aliases": [
+      "niacinamide",
+      "nicotinamide",
+      "나이아신아마이드",
+      "니아신아마이드"
+    ]
+  },
+  {
+    "id": "FUNC_HYALURONIC_ACID",
+    "display_ja": "ヒアルロン酸",
+    "aliases": [
+      "hyaluronic acid",
+      "sodium hyaluronate",
+      "히알루론산",
+      "소듐하이알루로네이트",
+      "sodium hyaluronate",
+      "하이알루론산나트륨"
+    ]
+  },
+  {
+    "id": "FUNC_RETINOL",
+    "display_ja": "レチノール",
+    "aliases": [
+      "retinol",
+      "vitamin a",
+      "레티놀",
+      "비타민a"
+    ]
+  },
+  {
+    "id": "FUNC_VITAMIN_C",
+    "display_ja": "ビタミンC",
+    "aliases": [
+      "vitamin c",
+      "ascorbic acid",
+      "l-ascorbic acid",
+      "비타민c",
+      "아스코르빅애씨드",
+      "아스코르빅애시드"
+    ]
+  },
+  {
+    "id": "FUNC_CERAMIDE",
+    "display_ja": "セラミド",
+    "aliases": [
+      "ceramide",
+      "세라마이드"
+    ]
+  },
+  {
+    "id": "FUNC_PEPTIDE",
+    "display_ja": "ペプチド",
+    "aliases": [
+      "peptide",
+      "펩타이드"
+    ]
+  },
+  {
+    "id": "FUNC_CENTELLA",
+    "display_ja": "ツボクサ",
+    "aliases": [
+      "centella asiatica",
+      "centella",
+      "gotu kola",
+      "센텔라",
+      "센텔라아시아티카",
+      "병풀추출물",
+      "병풀"
+    ]
+  },
+  {
+    "id": "FUNC_SNAIL_MUCIN",
+    "display_ja": "スネイルムチン",
+    "aliases": [
+      "snail mucin",
+      "snail secretion filtrate",
+      "달팽이점액여과물",
+      "달팽이추출물"
+    ]
+  },
+  {
+    "id": "FUNC_PROPOLIS",
+    "display_ja": "プロポリス",
+    "aliases": [
+      "propolis",
+      "프로폴리스"
+    ]
+  },
+  {
+    "id": "FUNC_GINSENG",
+    "display_ja": "高麗人参",
+    "aliases": [
+      "ginseng",
+      "panax ginseng",
+      "인삼",
+      "홍삼"
+    ]
+  },
+  {
+    "id": "FUNC_GREEN_TEA",
+    "display_ja": "緑茶",
+    "aliases": [
+      "green tea",
+      "camellia sinensis",
+      "녹차",
+      "차나무잎추출물"
+    ]
+  },
+  {
+    "id": "FUNC_ADENOSINE",
+    "display_ja": "アデノシン",
+    "aliases": [
+      "adenosine",
+      "아데노신"
+    ]
+  },
+  {
+    "id": "FUNC_ARGIRELINE",
+    "display_ja": "アルギレリン",
+    "aliases": [
+      "argireline",
+      "acetyl hexapeptide-8",
+      "알지렐린"
+    ]
+  },
+  {
+    "id": "FUNC_COLLAGEN",
+    "display_ja": "コラーゲン",
+    "aliases": [
+      "collagen",
+      "콜라겐"
+    ]
+  },
+  {
+    "id": "FUNC_EGCG",
+    "display_ja": "エピガロカテキンガレート",
+    "aliases": [
+      "egcg",
+      "epigallocatechin gallate",
+      "에피갈로카테킨갈레이트"
+    ]
+  },
+  {
+    "id": "FUNC_FERMENTED_INGREDIENTS",
+    "display_ja": "発酵成分",
+    "aliases": [
+      "fermented",
+      "발효",
+      "발효추출물"
+    ]
+  },
+  {
+    "id": "FUNC_LICORICE",
+    "display_ja": "甘草",
+    "aliases": [
+      "licorice",
+      "glycyrrhiza",
+      "감초",
+      "감초추출물"
+    ]
+  },
+  {
+    "id": "FUNC_MADE_CASSOSIDE",
+    "display_ja": "マデカソサイド",
+    "aliases": [
+      "madecassoside",
+      "마데카소사이드"
+    ]
+  },
+  {
+    "id": "FUNC_NATTO_GUM",
+    "display_ja": "ナットウガム",
+    "aliases": [
+      "natto gum",
+      "xanthan gum",
+      "낫토검"
+    ]
+  },
+  {
+    "id": "COMMON_WATER",
+    "display_ja": "水",
+    "aliases": [
+      "water",
+      "aqua",
+      "정제수",
+      "purified water",
+      "증류수"
+    ]
+  },
+  {
+    "id": "COMMON_GLYCERIN",
+    "display_ja": "グリセリン",
+    "aliases": [
+      "glycerin",
+      "glycerol",
+      "글리세린",
+      "글리세롤"
+    ]
+  },
+  {
+    "id": "COMMON_BUTYLENE_GLYCOL",
+    "display_ja": "ブチレングリコール",
+    "aliases": [
+      "butylene glycol",
+      "1,3-butylene glycol",
+      "부틸렌글라이콜",
+      "1,3-부틸렌글라이콜"
+    ]
+  },
+  {
+    "id": "COMMON_PROPANEDIOL",
+    "display_ja": "プロパンジオール",
+    "aliases": [
+      "propanediol",
+      "1,2-propanediol",
+      "프로판다이올",
+      "1,2-프로판다이올"
+    ]
+  },
+  {
+    "id": "COMMON_HEXANEDIOL",
+    "display_ja": "ヘキサンジオール",
+    "aliases": [
+      "hexanediol",
+      "1,2-hexanediol",
+      "1,2-헥산다이올",
+      "헥산다이올"
+    ]
+  },
+  {
+    "id": "COMMON_CAPRYLYL_GLYCOL",
+    "display_ja": "カプリリルグリコール",
+    "aliases": [
+      "caprylyl glycol",
+      "카프릴릴글라이콜"
+    ]
+  },
+  {
+    "id": "COMMON_PANTHENOL",
+    "display_ja": "パンテノール",
+    "aliases": [
+      "panthenol",
+      "provitamin b5",
+      "판테놀",
+      "판테놀",
+      "프로비타민b5"
+    ]
+  },
+  {
+    "id": "COMMON_ALLANTOIN",
+    "display_ja": "アラントイン",
+    "aliases": [
+      "allantoin",
+      "알란토인"
+    ]
+  },
+  {
+    "id": "COMMON_BETA_GLUCAN",
+    "display_ja": "β-グルカン",
+    "aliases": [
+      "beta glucan",
+      "beta-glucan",
+      "베타글루칸",
+      "베타-글루칸"
+    ]
+  },
+  {
+    "id": "FUNC_NATTO_POLYSACCHARIDE",
+    "display_ja": "ナットウ多糖類",
+    "aliases": [
+      "natto polysaccharide",
+      "낫토다당류"
+    ]
+  },
+  {
+    "id": "FUNC_BIFIDA_FERMENT_LYSATE",
+    "display_ja": "ビフィダ発酵液",
+    "aliases": [
+      "bifida ferment lysate",
+      "비피다발효여과물",
+      "비피다발효추출물"
+    ]
+  },
+  {
+    "id": "FUNC_LACTOBACILLUS_FERMENT",
+    "display_ja": "乳酸菌発酵物",
+    "aliases": [
+      "lactobacillus ferment",
+      "락토바실러스발효물",
+      "유산균발효물"
+    ]
+  },
+  {
+    "id": "FUNC_SACCHAROMYCES_FERMENT",
+    "display_ja": "サッカロミセス発酵物",
+    "aliases": [
+      "saccharomyces ferment",
+      "사카로마이세스발효물"
+    ]
+  },
+  {
+    "id": "FUNC_NUCLEOTIDES",
+    "display_ja": "ヌクレオチド",
+    "aliases": [
+      "nucleotides",
+      "뉴클레오티드"
+    ]
+  },
+  {
+    "id": "FUNC_COPPER_TRIPEPTIDE",
+    "display_ja": "銅トリペプチド",
+    "aliases": [
+      "copper tripeptide",
+      "구리트리펩타이드",
+      "copper peptide"
+    ]
+  },
+  {
+    "id": "FUNC_PALMITOYL_PENTAPEPTIDE",
+    "display_ja": "パルミトイルペンタペプチド",
+    "aliases": [
+      "palmitoyl pentapeptide",
+      "팔미토일펜타펩타이드"
+    ]
+  },
+  {
+    "id": "FUNC_PALMITOYL_TETRAPEPTIDE",
+    "display_ja": "パルミトイルテトラペプチド",
+    "aliases": [
+      "palmitoyl tetrapeptide",
+      "팔미토일테트라펩타이드"
+    ]
+  },
+  {
+    "id": "FUNC_ACETYL_HEXAPEPTIDE",
+    "display_ja": "アセチルヘキサペプチド",
+    "aliases": [
+      "acetyl hexapeptide",
+      "아세틸헥사펩타이드"
+    ]
+  },
+  {
+    "id": "FUNC_MATRIXYL",
+    "display_ja": "マトリキシル",
+    "aliases": [
+      "matrixyl",
+      "palmitoyl oligopeptide",
+      "매트릭실"
+    ]
+  },
+  {
+    "id": "FUNC_ARGIRELINE_PEPTIDE",
+    "display_ja": "アルギレリンペプチド",
+    "aliases": [
+      "argireline peptide",
+      "알지렐린펩타이드"
+    ]
+  },
+  {
+    "id": "FUNC_SNAIL_SECRETION",
+    "display_ja": "スネイル分泌液",
+    "aliases": [
+      "snail secretion",
+      "달팽이분비여과물",
+      "snail filtrate"
+    ]
+  },
+  {
+    "id": "FUNC_BEE_VENOM",
+    "display_ja": "ミツバチ毒",
+    "aliases": [
+      "bee venom",
+      "봉독",
+      "벌독"
+    ]
+  },
+  {
+    "id": "FUNC_ROYAL_JELLY",
+    "display_ja": "ローヤルゼリー",
+    "aliases": [
+      "royal jelly",
+      "로얄젤리"
+    ]
+  },
+  {
+    "id": "FUNC_HONEY",
+    "display_ja": "ハチミツ",
+    "aliases": [
+      "honey",
+      "벌꿀",
+      "꿀"
+    ]
+  },
+  {
+    "id": "FUNC_PROPOLIS_EXTRACT",
+    "display_ja": "プロポリス抽出物",
+    "aliases": [
+      "propolis extract",
+      "프로폴리스추출물"
+    ]
+  },
+  {
+    "id": "FUNC_NIANCINAMIDE",
+    "display_ja": "ナイアシンアミド（別表記）",
+    "aliases": [
+      "niacinamide",
+      "니아신아마이드"
+    ]
+  },
+  {
+    "id": "FUNC_NATTO_EXTRACT",
+    "display_ja": "ナットウ抽出物",
+    "aliases": [
+      "natto extract",
+      "낫토추출물"
+    ]
+  },
+  {
+    "id": "FUNC_RICE_FERMENT",
+    "display_ja": "米発酵物",
+    "aliases": [
+      "rice ferment",
+      "쌀발효물",
+      "벼발효물"
+    ]
+  },
+  {
+    "id": "FUNC_SOYBEAN_FERMENT",
+    "display_ja": "大豆発酵物",
+    "aliases": [
+      "soybean ferment",
+      "콩발효물",
+      "대두발효물"
+    ]
+  },
+  {
+    "id": "FUNC_GREEN_TEA_EXTRACT",
+    "display_ja": "緑茶抽出物",
+    "aliases": [
+      "green tea extract",
+      "녹차추출물",
+      "차나무잎추출물"
+    ]
+  },
+  {
+    "id": "FUNC_WHITE_TEA_EXTRACT",
+    "display_ja": "白茶抽出物",
+    "aliases": [
+      "white tea extract",
+      "백차추출물"
+    ]
+  },
+  {
+    "id": "FUNC_CHAMOMILE_EXTRACT",
+    "display_ja": "カモミール抽出物",
+    "aliases": [
+      "chamomile extract",
+      "카모마일추출물"
+    ]
+  },
+  {
+    "id": "FUNC_CALENDULA_EXTRACT",
+    "display_ja": "カレンデュラ抽出物",
+    "aliases": [
+      "calendula extract",
+      "금잔화추출물"
+    ]
+  },
+  {
+    "id": "FUNC_ALOE_VERA",
+    "display_ja": "アロエベラ",
+    "aliases": [
+      "aloe vera",
+      "알로에베라",
+      "알로에"
+    ]
+  },
+  {
+    "id": "FUNC_WITCH_HAZEL",
+    "display_ja": "ウィッチヘーゼル",
+    "aliases": [
+      "witch hazel",
+      "함수수추출물"
+    ]
+  },
+  {
+    "id": "FUNC_ROSE_HIP",
+    "display_ja": "ローズヒップ",
+    "aliases": [
+      "rose hip",
+      "로즈힙",
+      "장미열매"
+    ]
+  },
+  {
+    "id": "FUNC_ARBUTIN",
+    "display_ja": "アルブチン",
+    "aliases": [
+      "arbutin",
+      "알부틴"
+    ]
+  },
+  {
+    "id": "FUNC_KOJIC_ACID",
+    "display_ja": "コウジ酸",
+    "aliases": [
+      "kojic acid",
+      "코지산"
+    ]
+  },
+  {
+    "id": "FUNC_AZELAIC_ACID",
+    "display_ja": "アゼライン酸",
+    "aliases": [
+      "azelaic acid",
+      "아젤라인산"
+    ]
+  },
+  {
+    "id": "FUNC_SALICYLIC_ACID",
+    "display_ja": "サリチル酸",
+    "aliases": [
+      "salicylic acid",
+      "살리실산"
+    ]
+  },
+  {
+    "id": "FUNC_LACTIC_ACID",
+    "display_ja": "乳酸",
+    "aliases": [
+      "lactic acid",
+      "젖산",
+      "락트산"
+    ]
+  },
+  {
+    "id": "FUNC_GLYCOLIC_ACID",
+    "display_ja": "グリコール酸",
+    "aliases": [
+      "glycolic acid",
+      "글리콜산"
+    ]
+  },
+  {
+    "id": "FUNC_MANDELIC_ACID",
+    "display_ja": "マンデル酸",
+    "aliases": [
+      "mandelic acid",
+      "만델산"
+    ]
+  },
+  {
+    "id": "FUNC_FERULIC_ACID",
+    "display_ja": "フェルラ酸",
+    "aliases": [
+      "ferulic acid",
+      "페룰산"
+    ]
+  },
+  {
+    "id": "FUNC_ELLAGIC_ACID",
+    "display_ja": "エラグ酸",
+    "aliases": [
+      "ellagic acid",
+      "엘라그산"
+    ]
+  },
+  {
+    "id": "FUNC_TRANSXAMIC_ACID",
+    "display_ja": "トラネキサム酸",
+    "aliases": [
+      "tranexamic acid",
+      "트라넥삼산"
+    ]
+  },
+  {
+    "id": "FUNC_NICOTINAMIDE",
+    "display_ja": "ニコチンアミド",
+    "aliases": [
+      "nicotinamide",
+      "니코틴아마이드"
+    ]
+  },
+  {
+    "id": "FUNC_ZINC_OXIDE",
+    "display_ja": "酸化亜鉛",
+    "aliases": [
+      "zinc oxide",
+      "산화아연"
+    ]
+  },
+  {
+    "id": "FUNC_TITANIUM_DIOXIDE",
+    "display_ja": "二酸化チタン",
+    "aliases": [
+      "titanium dioxide",
+      "이산화티타늄"
+    ]
+  },
+  {
+    "id": "FUNC_SUNSCREEN_FILTERS",
+    "display_ja": "日焼け止めフィルター",
+    "aliases": [
+      "sunscreen",
+      "자외선차단제",
+      "uv filter"
+    ]
+  },
+  {
+    "id": "FUNC_PHENOXYETHANOL",
+    "display_ja": "フェノキシエタノール",
+    "aliases": [
+      "phenoxyethanol",
+      "페녹시에탄올",
+      "phenoxy ethanol"
+    ]
+  },
+  {
+    "id": "FUNC_ETHYLHEXYL_GLYCERIN",
+    "display_ja": "エチルヘキシルグリセリン",
+    "aliases": [
+      "ethylhexyl glycerin",
+      "에틸헥실글리세린",
+      "octylglycerin"
+    ]
+  },
+  {
+    "id": "FUNC_DISODIUM_EDTA",
+    "display_ja": "EDTA-2Na",
+    "aliases": [
+      "disodium edta",
+      "디소듐에디티에이",
+      "edta disodium",
+      "edta 2na"
+    ]
+  },
+  {
+    "id": "FUNC_CARBOMER",
+    "display_ja": "カルボマー",
+    "aliases": [
+      "carbomer",
+      "카보머",
+      "carbopol",
+      "polyacrylic acid"
+    ]
+  },
+  {
+    "id": "FUNC_DIMETHICONE",
+    "display_ja": "ジメチコン",
+    "aliases": [
+      "dimethicone",
+      "다이메티콘",
+      "dimethylpolysiloxane"
+    ]
+  },
+  {
+    "id": "FUNC_CYCLOPENTASILOXANE",
+    "display_ja": "シクロペンタシロキサン",
+    "aliases": [
+      "cyclopentasiloxane",
+      "사이클로펜타실록산",
+      "cyclomethicone"
+    ]
+  },
+  {
+    "id": "FUNC_CAPRYLIC_CAPRIC_TRIGLYCERIDE",
+    "display_ja": "カプリル酸/カプリン酸トリグリセリド",
+    "aliases": [
+      "caprylic capric triglyceride",
+      "카프릴릭카프릭트리글리세라이드",
+      "cct",
+      "mct oil"
+    ]
+  },
+  {
+    "id": "FUNC_SODIUM_HYALURONATE",
+    "display_ja": "ヒアルロン酸Na",
+    "aliases": [
+      "sodium hyaluronate",
+      "소듐하이알루로네이트",
+      "하이알루론산나트륨",
+      "hyaluronic acid sodium salt"
+    ]
+  },
+  {
+    "id": "FUNC_SODIUM_LAURYL_SULFATE",
+    "display_ja": "ラウリル硫酸Na",
+    "aliases": [
+      "sodium lauryl sulfate",
+      "소듐라우릴설페이트",
+      "sls"
+    ]
+  },
+  {
+    "id": "FUNC_SODIUM_LAURETH_SULFATE",
+    "display_ja": "ラウレス硫酸Na",
+    "aliases": [
+      "sodium laureth sulfate",
+      "소듐라우레스설페이트",
+      "sles"
+    ]
+  },
+  {
+    "id": "FUNC_COCAMIDOPROPYL_BETAINE",
+    "display_ja": "コカミドプロピルベタイン",
+    "aliases": [
+      "cocamidopropyl betaine",
+      "코카미도프로필베타인",
+      "coco betaine"
+    ]
+  },
+  {
+    "id": "COMMON_SODIUM_CHLORIDE",
+    "display_ja": "塩化ナトリウム",
+    "aliases": [
+      "sodium chloride",
+      "소듐클로라이드",
+      "염화나트륨",
+      "salt"
+    ]
+  },
+  {
+    "id": "FUNC_CITRIC_ACID",
+    "display_ja": "クエン酸",
+    "aliases": [
+      "citric acid",
+      "시트릭애씨드",
+      "구연산"
+    ]
+  },
+  {
+    "id": "COMMON_SODIUM_CITRATE",
+    "display_ja": "クエン酸Na",
+    "aliases": [
+      "sodium citrate",
+      "소듐시트레이트",
+      "시트르산나트륨"
+    ]
+  },
+  {
+    "id": "FUNC_TRIETHANOLAMINE",
+    "display_ja": "トリエタノールアミン",
+    "aliases": [
+      "triethanolamine",
+      "트리에탄올아민",
+      "tea"
+    ]
+  },
+  {
+    "id": "FUNC_SODIUM_HYDROXIDE",
+    "display_ja": "水酸化ナトリウム",
+    "aliases": [
+      "sodium hydroxide",
+      "소듐하이드록사이드",
+      "수산화나트륨",
+      "naoh"
+    ]
+  },
+  {
+    "id": "FUNC_POTASSIUM_HYDROXIDE",
+    "display_ja": "水酸化カリウム",
+    "aliases": [
+      "potassium hydroxide",
+      "포타슘하이드록사이드",
+      "수산화칼륨",
+      "koh"
+    ]
+  },
+  {
+    "id": "FUNC_BENZYL_ALCOHOL",
+    "display_ja": "ベンジルアルコール",
+    "aliases": [
+      "benzyl alcohol",
+      "벤질알코올",
+      "벤질알콜"
+    ]
+  },
+  {
+    "id": "FUNC_METHYLPARABEN",
+    "display_ja": "メチルパラベン",
+    "aliases": [
+      "methylparaben",
+      "메틸파라벤",
+      "methyl paraben"
+    ]
+  },
+  {
+    "id": "FUNC_PROPYLPARABEN",
+    "display_ja": "プロピルパラベン",
+    "aliases": [
+      "propylparaben",
+      "프로필파라벤",
+      "propyl paraben"
+    ]
+  },
+  {
+    "id": "FUNC_BUTYLPARABEN",
+    "display_ja": "ブチルパラベン",
+    "aliases": [
+      "butylparaben",
+      "부틸파라벤",
+      "butyl paraben"
+    ]
+  },
+  {
+    "id": "FUNC_ETHYLPARABEN",
+    "display_ja": "エチルパラベン",
+    "aliases": [
+      "ethylparaben",
+      "에틸파라벤",
+      "ethyl paraben"
+    ]
+  },
+  {
+    "id": "FUNC_DIAZOLIDINYL_UREA",
+    "display_ja": "ジアゾリジニル尿素",
+    "aliases": [
+      "diazolidinyl urea",
+      "디아졸리디닐우레아"
+    ]
+  },
+  {
+    "id": "FUNC_IMIDAZOLIDINYL_UREA",
+    "display_ja": "イミダゾリジニル尿素",
+    "aliases": [
+      "imidazolidinyl urea",
+      "이미다졸리디닐우레아"
+    ]
+  },
+  {
+    "id": "FUNC_METHYLISOTHIAZOLINONE",
+    "display_ja": "メチルイソチアゾリノン",
+    "aliases": [
+      "methylisothiazolinone",
+      "메틸이소티아졸리논",
+      "mit"
+    ]
+  },
+  {
+    "id": "FUNC_METHYLCHLOROISOTHIAZOLINONE",
+    "display_ja": "メチルクロロイソチアゾリノン",
+    "aliases": [
+      "methylchloroisothiazolinone",
+      "메틸클로로이소티아졸리논",
+      "mcit"
+    ]
+  },
+  {
+    "id": "FUNC_SODIUM_BENZOATE",
+    "display_ja": "安息香酸Na",
+    "aliases": [
+      "sodium benzoate",
+      "소듐벤조에이트",
+      "벤조산나트륨"
+    ]
+  },
+  {
+    "id": "FUNC_POTASSIUM_SORBATE",
+    "display_ja": "ソルビン酸K",
+    "aliases": [
+      "potassium sorbate",
+      "포타슘소르베이트",
+      "소르빅애씨드칼륨"
+    ]
+  },
+  {
+    "id": "FUNC_SORBIC_ACID",
+    "display_ja": "ソルビン酸",
+    "aliases": [
+      "sorbic acid",
+      "소르빅애씨드",
+      "소르빅산"
+    ]
+  },
+  {
+    "id": "FUNC_BENZOIC_ACID",
+    "display_ja": "安息香酸",
+    "aliases": [
+      "benzoic acid",
+      "벤조익애씨드",
+      "벤조산"
+    ]
+  },
+  {
+    "id": "FUNC_TETRASODIUM_EDTA",
+    "display_ja": "EDTA-4Na",
+    "aliases": [
+      "tetrasodium edta",
+      "테트라소듐에디티에이",
+      "edta tetrasodium"
+    ]
+  },
+  {
+    "id": "FUNC_TRISODIUM_EDTA",
+    "display_ja": "EDTA-3Na",
+    "aliases": [
+      "trisodium edta",
+      "트리소듐에디티에이",
+      "edta trisodium"
+    ]
+  },
+  {
+    "id": "COMMON_SODIUM_ACETATE",
+    "display_ja": "酢酸Na",
+    "aliases": [
+      "sodium acetate",
+      "소듐아세테이트",
+      "아세트산나트륨"
+    ]
+  },
+  {
+    "id": "COMMON_SODIUM_LACTATE",
+    "display_ja": "乳酸Na",
+    "aliases": [
+      "sodium lactate",
+      "소듐락테이트",
+      "락트산나트륨"
+    ]
+  },
+  {
+    "id": "COMMON_SODIUM_GLUCONATE",
+    "display_ja": "グルコン酸Na",
+    "aliases": [
+      "sodium gluconate",
+      "소듐글루코네이트",
+      "글루콘산나트륨"
+    ]
+  },
+  {
+    "id": "FUNC_SODIUM_ASCORBYL_PHOSPHATE",
+    "display_ja": "アスコルビルリン酸Na",
+    "aliases": [
+      "sodium ascorbyl phosphate",
+      "소듐아스코르빌포스페이트",
+      "ビタミンc誘導体"
+    ]
+  },
+  {
+    "id": "FUNC_MAGNESIUM_ASCORBYL_PHOSPHATE",
+    "display_ja": "アスコルビルリン酸Mg",
+    "aliases": [
+      "magnesium ascorbyl phosphate",
+      "마그네슘아스코르빌포스페이트"
+    ]
+  },
+  {
+    "id": "FUNC_TETRAHEXYLDECYL_ASCORBATE",
+    "display_ja": "テトラヘキシルデシルアスコルベート",
+    "aliases": [
+      "tetrahexyldecyl ascorbate",
+      "테트라헥실데실아스코르베이트",
+      "ビタミンc誘導体"
+    ]
+  },
+  {
+    "id": "FUNC_ASCORBYL_GLUCOSIDE",
+    "display_ja": "アスコルビルグルコシド",
+    "aliases": [
+      "ascorbyl glucoside",
+      "아스코르빌글루코사이드",
+      "ビタミンc誘導体"
+    ]
+  },
+  {
+    "id": "FUNC_RETINYL_PALMITATE",
+    "display_ja": "レチニルパルミテート",
+    "aliases": [
+      "retinyl palmitate",
+      "레티닐팔미테이트",
+      "ビタミンa誘導体"
+    ]
+  },
+  {
+    "id": "FUNC_RETINYL_ACETATE",
+    "display_ja": "レチニルアセテート",
+    "aliases": [
+      "retinyl acetate",
+      "레티닐아세테이트",
+      "ビタミンa誘導体"
+    ]
+  },
+  {
+    "id": "FUNC_TOCOPHERYL_ACETATE",
+    "display_ja": "トコフェロールアセテート",
+    "aliases": [
+      "tocopheryl acetate",
+      "토코페릴아세테이트",
+      "ビタミンe誘導体"
+    ]
+  },
+  {
+    "id": "FUNC_TOCOPHERYL_NICOTINATE",
+    "display_ja": "トコフェロールニコチン酸",
+    "aliases": [
+      "tocopheryl nicotinate",
+      "토코페릴니코티네이트",
+      "ビタミンe誘導体"
+    ]
+  }
+]

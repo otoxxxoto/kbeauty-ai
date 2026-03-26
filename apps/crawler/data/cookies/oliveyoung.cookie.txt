@@ -1,0 +1,8 @@
+# Olive Young Cookieファイル
+# ブラウザで取得したCookieをここに貼り付けてください
+# 形式: key1=value1; key2=value2; key3=value3
+# 例:
+# session_id=abc123; csrf_token=xyz789; user_pref=ko
+
+
+

@@ -1,0 +1,31 @@
+rankingPageUrl=https://www.oliveyoung.co.kr/store/display/bestSeller.do
+responseStatus=200
+responseUrl=https://www.oliveyoung.co.kr/store/display/bestSeller.do
+pageUrl=https://www.oliveyoung.co.kr/store/display/bestSeller.do
+pageTitle=
+
+--- HTML first 1000 chars ---
+&lt;!DOCTYPE html&gt;&lt;html lang="ko"&gt;&lt;head&gt;
+	&lt;meta charset="utf-8"&gt;
+	&lt;meta http-equiv="Content-Script-Type" content="text/javascript"&gt;
+	&lt;meta http-equiv="Content-Style-Type" content="text/css"&gt;
+	&lt;meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1"&gt;
+	&lt;meta name="format-detection" content="telephone=no"&gt;
+	&lt;meta property="og:type" content="website"&gt;
+	&lt;meta property="og:title" content=""&gt;
+	&lt;meta property="og:url" content="https://www.oliveyoung.co.kr/store/main/main.do"&gt;&lt;!-- 사이트 URL --&gt;
+	&lt;meta property="og:image" content="https://static.oliveyoung.co.kr/pc-static-root/image/comm/OY_favicon_228.png"&gt;&lt;!-- 대표 이미지 URL --&gt;
+	&lt;meta property="og:description" content=""&gt;&lt;!-- 사이트 설명 --&gt;
+	&lt;title&gt;&lt;/title&gt;
+
+	
+	&lt;link rel="stylesheet" href="https://static.oliveyoung.co.kr/pc-static-root/css/style.css"&gt;
+
+	&lt;script async="" src="https://www.datadoghq-browser-agent.com/datadog-rum.js"&gt;&lt;/script&gt;&lt;script&gt;
+	var _baseUrl = 'https://www.oliveyoung.co.kr/store/';
+	var _plainUrl = 'https://www.oliveyoung.co.kr/s
+
+--- a[href] count=1 ---
+[0] javascript:common.link.moveMainHome();
+
+--- regex extraction candidates=0 ---

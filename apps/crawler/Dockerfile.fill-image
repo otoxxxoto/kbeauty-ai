@@ -1,0 +1,22 @@
+# 画像補完専用イメージ（kbeauty-oy-fill-images Cloud Run Job 用）
+# ランキング(index.ts --rankings)は一切起動しない。
+# ビルド: リポジトリルートで
+#   docker build -f apps/crawler/Dockerfile.fill-image -t <IMAGE> .
+# 実行時: 環境変数 LIMIT で件数指定（例: LIMIT=20）
+FROM mcr.microsoft.com/playwright:v1.49.0-jammy
+
+WORKDIR /repo
+
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+
+COPY . .
+
+RUN pnpm install --frozen-lockfile
+
+RUN cd apps/crawler && pnpm exec tsx --version
+
+WORKDIR /repo/apps/crawler
+
+# 画像補完専用 entry（runFillMissingImageJob.ts → runFillMissingImage のみ）
+# index.ts --rankings は使わない
+CMD ["pnpm","run","oliveyoung:run-fill-image"]

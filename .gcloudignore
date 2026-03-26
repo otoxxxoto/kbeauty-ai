@@ -1,0 +1,25 @@
+# dependencies / build outputs
+**/node_modules/**
+**/.next/**
+**/dist/**
+**/build/**
+**/.turbo/**
+**/.cache/**
+**/.playwright/**
+**/playwright/.cache/**
+
+# repo / misc
+**/.git/**
+**/.DS_Store
+**/*.log
+
+# python / venv (もし混ざってたら)
+**/.venv/**
+**/__pycache__/**
+
+# large artifacts
+**/*.zip
+**/*.tar
+**/*.tgz
+**/*.mp4
+**/*.mov

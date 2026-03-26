@@ -1,0 +1,33 @@
+FROM mcr.microsoft.com/playwright:v1.57.0-jammy
+
+WORKDIR /repo
+
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+
+# 1) まず workspace 定義と lock をコピー
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml tsconfig.json ./
+
+# 2) 各 workspace の package.json をコピー
+COPY apps/crawler/package.json apps/crawler/package.json
+COPY packages/core/package.json packages/core/package.json
+
+# 3) ★ここが肝：workspace の実体も先にコピー（少なくとも core は必要）
+COPY packages/core packages/core
+COPY apps/crawler apps/crawler
+
+# 4) 依存インストール
+RUN pnpm -C apps/crawler install
+
+# 5) ★ core をビルドして dist を作る（これが必須）
+RUN pnpm -C packages/core build
+RUN echo "---- CHECK ----" \
+ && ls -la /repo/apps/crawler \
+ && test -f /repo/apps/crawler/package.json \
+ && node -v && pnpm -v \
+ && ls -la /repo/apps/crawler/node_modules/.bin | head -n 50 \
+ && (test -x /repo/apps/crawler/node_modules/.bin/tsx && echo "tsx OK" || (echo "tsx MISSING" && exit 1))
+
+WORKDIR /repo/apps/crawler
+# JOB_TYPE で分岐: 未設定 or rankings → ランキング、fill-* → 対応する補完ジョブのみ（ランキングは起動しない）
+# in-process: fill-products-enrich, fill-brand-ja（src/index.ts） / spawn: fill-product-name-ja, fill-product-brand-ja, fill-review-summary-ja 等
+CMD ["pnpm","run","oliveyoung:job"]
