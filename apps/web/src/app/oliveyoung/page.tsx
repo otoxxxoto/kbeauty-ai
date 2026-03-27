@@ -12,7 +12,10 @@ import { ProductDisplayImage } from "@/components/ProductDisplayImage";
 import { ProductAffiliateCtas } from "@/components/ProductAffiliateCtas";
 import { getDisplayProductNameText } from "@/lib/oliveyoung-display";
 import { getBrandRankingByDate, getDisplayBrand } from "@/lib/brand-rankings";
-import { CATEGORY_LINKS } from "@/lib/category-config";
+import { CATEGORY_CONFIG, CATEGORY_LINKS } from "@/lib/category-config";
+
+/** 入口ページで目立たせるカテゴリ（内部リンク強化） */
+const SPOTLIGHT_CATEGORY_SLUGS = ["scalp-care", "ceramide", "back-acne"] as const;
 import {
   PRODUCT_CARD_ROOT_CLASS,
   PRODUCT_CARD_IMAGE_FRAME_CLASS,
@@ -89,19 +92,52 @@ export default async function OliveYoungEntryPage() {
           {runDate && (
             <p className="mt-2 text-sm text-zinc-500">対象日: {runDate}（毎日更新）</p>
           )}
-          <div className="mt-4 flex flex-wrap items-center gap-x-1 text-sm text-zinc-600">
-            <span>カテゴリ:</span>
-            {CATEGORY_LINKS.map(({ slug, label }, i) => (
-              <span key={slug} className="inline-flex items-center gap-x-1">
-                {i > 0 && <span aria-hidden>/</span>}
+
+          {/* 人気カテゴリ（目立つ位置・主要3件） */}
+          <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-4 sm:p-5" aria-labelledby="spotlight-categories-heading">
+            <h2 id="spotlight-categories-heading" className="text-sm font-semibold text-zinc-800">
+              人気カテゴリから探す
+            </h2>
+            <p className="mt-1 text-xs text-zinc-500">
+              悩みや成分から、韓国コスメの一覧へすぐ移動できます。
+            </p>
+            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+              {SPOTLIGHT_CATEGORY_SLUGS.map((slug) => {
+                const label = CATEGORY_CONFIG[slug]?.label ?? slug;
+                return (
+                  <Link
+                    key={slug}
+                    href={`/oliveyoung/category/${slug}`}
+                    className="inline-flex items-center justify-center rounded-lg border border-blue-200 bg-blue-50/80 px-4 py-3 text-sm font-medium text-blue-800 hover:bg-blue-100 hover:border-blue-300 transition-colors"
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
+            </div>
+            <p className="mt-3 text-xs text-zinc-500">
+              商品の特徴や価格の目安は、各商品の
+              <Link href={runDate ? `/oliveyoung/rankings/${runDate}` : "/oliveyoung/category"} className="text-blue-600 hover:underline mx-0.5">
+                詳細ページ
+              </Link>
+              からご確認いただけます。
+            </p>
+          </section>
+
+          {/* 全カテゴリ（一覧） */}
+          <div className="mt-5">
+            <p className="text-sm font-medium text-zinc-700 mb-2">すべてのカテゴリ</p>
+            <div className="flex flex-wrap gap-2">
+              {CATEGORY_LINKS.map(({ slug, label }) => (
                 <Link
+                  key={slug}
                   href={`/oliveyoung/category/${slug}`}
-                  className="text-blue-600 hover:underline"
+                  className="inline-flex rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-700 hover:border-blue-300 hover:bg-blue-50/50 hover:text-blue-800 transition-colors"
                 >
                   {label}
                 </Link>
-              </span>
-            ))}
+              ))}
+            </div>
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
             {runDate && (
@@ -152,6 +188,26 @@ export default async function OliveYoungEntryPage() {
                   <p className="text-xs text-zinc-500">NEWブランド数</p>
                   <p className="mt-0.5 font-semibold">{newBrandCount > 0 ? newBrandCount : "-"}</p>
                 </div>
+              </div>
+            </section>
+
+            {/* 中部: カテゴリ導線の再掲（スクロールで見つけやすく） */}
+            <section aria-label="カテゴリから探す（再掲）" className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50/80 px-4 py-3">
+              <p className="text-xs font-medium text-zinc-600 mb-2">悩み・成分から探す</p>
+              <div className="flex flex-wrap gap-2">
+                {SPOTLIGHT_CATEGORY_SLUGS.map((slug) => (
+                  <Link
+                    key={`mid-${slug}`}
+                    href={`/oliveyoung/category/${slug}`}
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    {CATEGORY_CONFIG[slug]?.label ?? slug}
+                  </Link>
+                ))}
+                <span className="text-zinc-300" aria-hidden>|</span>
+                <Link href="/oliveyoung/category" className="text-sm text-blue-600 hover:underline">
+                  カテゴリ一覧
+                </Link>
               </div>
             </section>
 
@@ -213,12 +269,12 @@ export default async function OliveYoungEntryPage() {
                             </div>
                           </div>
                         </Link>
-                        <div className={PRODUCT_CARD_CTA_CLASS}>
+                        <div className={`${PRODUCT_CARD_CTA_CLASS} flex flex-col gap-2`}>
                           <Link
                             href={`/oliveyoung/products/${item.goodsNo}`}
-                            className="text-sm font-medium text-blue-600 hover:underline"
+                            className="inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700"
                           >
-                            商品詳細 →
+                            商品詳細を見る
                           </Link>
                           <ProductAffiliateCtas
                             goodsNo={item.goodsNo}
@@ -288,7 +344,13 @@ export default async function OliveYoungEntryPage() {
                             </div>
                           </Link>
                         </div>
-                        <div className={PRODUCT_CARD_CTA_CLASS}>
+                        <div className={`${PRODUCT_CARD_CTA_CLASS} flex flex-col gap-2`}>
+                          <Link
+                            href={`/oliveyoung/products/${item.goodsNo}`}
+                            className="inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700"
+                          >
+                            商品詳細を見る
+                          </Link>
                           <ProductAffiliateCtas
                             goodsNo={item.goodsNo}
                             urls={getEffectiveAffiliateUrls(item)}
@@ -296,12 +358,6 @@ export default async function OliveYoungEntryPage() {
                             className=""
                             position="featured_card"
                           />
-                          <Link
-                            href={`/oliveyoung/products/${item.goodsNo}`}
-                            className="text-sm font-medium text-blue-600 hover:underline"
-                          >
-                            商品詳細 →
-                          </Link>
                         </div>
                       </div>
                     );

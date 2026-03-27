@@ -11,7 +11,6 @@ import {
   getDisplayBrand,
 } from "@/lib/oliveyoung-products";
 import { ProductDisplayImage } from "@/components/ProductDisplayImage";
-import { ProductCardCta } from "@/components/ProductCardCta";
 import { getCategoryAppealLabel } from "@/lib/product-card-appeal";
 import { buildCategoryTitle } from "@/lib/seo";
 import {
@@ -52,11 +51,12 @@ function CategoryProductCard({
   });
   const displayBrand = getDisplayBrand(p);
   const cardSummary = getSafeSummaryBodyOrNull(p.summaryJa);
+  const detailHref = `/oliveyoung/products/${p.goodsNo}`;
   return (
     <div
       className={`${PRODUCT_CARD_ROOT_CLASS} hover:border-zinc-300 transition-colors`}
     >
-      <div className="flex min-h-0 flex-1 flex-col">
+      <Link href={detailHref} className="group flex min-h-0 flex-1 flex-col text-left outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded-lg">
         <div className={PRODUCT_CARD_IMAGE_FRAME_CLASS}>
           <ProductDisplayImage
             product={serializeProductImageFieldsForClient(p)}
@@ -70,7 +70,7 @@ function CategoryProductCard({
               {appealLabel}
             </span>
           ) : null}
-          <div className={PRODUCT_CARD_TITLE_CLASS}>{displayName}</div>
+          <div className={`${PRODUCT_CARD_TITLE_CLASS} group-hover:text-blue-800`}>{displayName}</div>
           {displayBrand ? (
             <div className="shrink-0 text-xs text-zinc-500">{displayBrand}</div>
           ) : null}
@@ -82,10 +82,18 @@ function CategoryProductCard({
           {typeof p.lastRank === "number" && (
             <div className="shrink-0 text-xs text-zinc-400">順位 #{p.lastRank}</div>
           )}
+          <span className="mt-2 text-xs font-medium text-blue-600 group-hover:underline">
+            商品ページを開く →
+          </span>
         </div>
-      </div>
+      </Link>
       <div className={PRODUCT_CARD_CTA_CLASS}>
-        <ProductCardCta goodsNo={p.goodsNo} />
+        <Link
+          href={detailHref}
+          className="inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700"
+        >
+          商品詳細を見る
+        </Link>
       </div>
     </div>
   );
@@ -347,6 +355,34 @@ export default async function CategoryPage({ params }: PageProps) {
               className="inline-flex rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
             >
               ブランドランキング
+            </Link>
+          </div>
+        </section>
+
+        <section
+          aria-labelledby="more-popular-heading"
+          className="rounded-xl border border-blue-100 bg-blue-50/40 p-5"
+        >
+          <h2 id="more-popular-heading" className="text-base font-bold text-zinc-900">
+            人気商品をもっと見る
+          </h2>
+          <p className="mt-1 text-sm text-zinc-600">
+            ランキング全体や他カテゴリから、気になる商品の詳細ページへ進めます。
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            {latestRunDate ? (
+              <Link
+                href={`/oliveyoung/rankings/${latestRunDate}`}
+                className="inline-flex rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                商品ランキング一覧へ
+              </Link>
+            ) : null}
+            <Link
+              href="/oliveyoung"
+              className="inline-flex rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
+            >
+              Olive Young 一覧（トップ）
             </Link>
           </div>
         </section>

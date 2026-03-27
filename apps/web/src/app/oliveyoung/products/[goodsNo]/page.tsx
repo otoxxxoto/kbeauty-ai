@@ -31,6 +31,7 @@ import { getRankingRunDates } from "@/lib/oliveyoung-rankings";
 import { ProductSeoInternalLinks } from "@/components/ProductSeoInternalLinks";
 import { CATEGORY_CONFIG } from "@/lib/category-config";
 import { getMatchedCategoriesForProduct } from "@/lib/filter-products-by-category";
+import { PRODUCT_SEO_BLOCKS } from "@/lib/product-page-seo-blocks";
 import { notFound } from "next/navigation";
 import {
   PRODUCT_CARD_ROOT_CLASS,
@@ -370,6 +371,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
     (affiliateUrls.qoo10 ? 1 : 0);
   const ctaDebugEnabled = process.env.NEXT_PUBLIC_CTA_DEBUG === "1";
   const matchedCategories = getMatchedCategoriesForProduct(product);
+  const primaryCategorySlug = matchedCategories[0]?.slug ?? "dry-skin";
+  const primaryCategoryLabel =
+    CATEGORY_CONFIG[primaryCategorySlug as keyof typeof CATEGORY_CONFIG]?.label ?? "乾燥肌・保湿";
 
   logClientSerializeDebugForProduct(
     "product-detail",
@@ -475,21 +479,60 @@ export default async function ProductDetailPage({ params }: PageProps) {
           </p>
         </div>
       </section>
-      <section className="mb-8" aria-labelledby="recommend-summary-heading">
-        <h2 id="recommend-summary-heading" className="text-lg font-bold text-zinc-900 mb-3">
-          この商品の特徴
-        </h2>
+
+      <section className="mb-8 space-y-6" aria-label="商品の補足説明">
         <div className="rounded-lg border border-zinc-200 bg-white p-5">
-          <p className="text-zinc-700 leading-relaxed">
-            韓国で人気のスキンケアアイテム。保湿力が高く、乾燥肌・敏感肌の方にもおすすめです。
-          </p>
-          <h3 className="mt-4 text-base font-semibold text-zinc-900">おすすめの人</h3>
-          <ul className="mt-2 list-disc pl-5 text-zinc-700 space-y-1">
-            <li>乾燥肌の方</li>
-            <li>韓国コスメが好きな方</li>
-            <li>コスパ重視の方</li>
-          </ul>
+          <h2 className="text-lg font-bold text-zinc-900 mb-2">{PRODUCT_SEO_BLOCKS.concerns.title}</h2>
+          <p className="text-sm text-zinc-700 leading-relaxed">{PRODUCT_SEO_BLOCKS.concerns.body}</p>
         </div>
+        <div className="rounded-lg border border-zinc-200 bg-white p-5">
+          <h2 className="text-lg font-bold text-zinc-900 mb-2">{PRODUCT_SEO_BLOCKS.reviews.title}</h2>
+          <p className="text-sm text-zinc-700 leading-relaxed">{PRODUCT_SEO_BLOCKS.reviews.body}</p>
+        </div>
+        <div className="rounded-lg border border-zinc-200 bg-white p-5">
+          <h2 className="text-lg font-bold text-zinc-900 mb-2">{PRODUCT_SEO_BLOCKS.usage.title}</h2>
+          <p className="text-sm text-zinc-700 leading-relaxed">{PRODUCT_SEO_BLOCKS.usage.body}</p>
+        </div>
+      </section>
+
+      <section className="mb-8 rounded-lg border border-zinc-100 bg-zinc-50/60 p-4" aria-label="関連一覧への導線">
+        <p className="text-sm text-zinc-700 leading-relaxed">
+          <Link
+            href={`/oliveyoung/category/${primaryCategorySlug}`}
+            className="font-medium text-blue-600 hover:underline"
+          >
+            {primaryCategoryLabel}の商品一覧
+          </Link>
+          もあわせてご覧ください。
+          {related.byBrand.length > 0 ? (
+            <>
+              {" "}
+              <a href="#related-brand-heading" className="font-medium text-blue-600 hover:underline">
+                同ブランドの人気商品
+              </a>
+              もページ下部でチェックできます。
+            </>
+          ) : latestRunDate ? (
+            <>
+              {" "}
+              <Link
+                href={`/oliveyoung/brands/${latestRunDate}`}
+                className="font-medium text-blue-600 hover:underline"
+              >
+                この日付のブランドランキング
+              </Link>
+              も参考にできます。
+            </>
+          ) : (
+            <>
+              {" "}
+              <Link href="/oliveyoung/brands" className="font-medium text-blue-600 hover:underline">
+                ブランドランキング一覧
+              </Link>
+              も参考にできます。
+            </>
+          )}
+        </p>
       </section>
 
       <ProductSeoInternalLinks
@@ -639,7 +682,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
           {related.byCategory.length > 0 && (
             <section aria-labelledby="related-category-heading">
               <h3 id="related-category-heading" className="text-base font-semibold text-zinc-800 mb-3">
-                同カテゴリの商品
+                同カテゴリの人気商品
               </h3>
               <div className="grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {related.byCategory.map((p) => (
