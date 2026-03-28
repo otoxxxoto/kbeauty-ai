@@ -28,6 +28,7 @@ import {
   logCardLayoutDebug,
 } from "@/lib/product-card-layout";
 import { serializeProductImageFieldsForClient } from "@/lib/serialize-product-for-client";
+import { ProductCardOliveYoungLink } from "@/components/ProductCardOliveYoungLink";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -87,13 +88,14 @@ function CategoryProductCard({
           </span>
         </div>
       </Link>
-      <div className={PRODUCT_CARD_CTA_CLASS}>
+      <div className={`${PRODUCT_CARD_CTA_CLASS} flex flex-col gap-1.5`}>
         <Link
           href={detailHref}
           className="inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700"
         >
           商品詳細を見る
         </Link>
+        <ProductCardOliveYoungLink oliveYoungUrl={p.oliveYoungUrl} goodsNo={p.goodsNo} />
       </div>
     </div>
   );

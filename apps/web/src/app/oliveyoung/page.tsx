@@ -14,6 +14,7 @@ import {
 } from "@/lib/getPrimaryShop";
 import { ProductDisplayImage } from "@/components/ProductDisplayImage";
 import { ProductAffiliateCtas } from "@/components/ProductAffiliateCtas";
+import { ProductCardOliveYoungLink } from "@/components/ProductCardOliveYoungLink";
 import { getDisplayProductNameText } from "@/lib/oliveyoung-display";
 import { getBrandRankingByDate, getDisplayBrand } from "@/lib/brand-rankings";
 import { CATEGORY_CONFIG, CATEGORY_LINKS } from "@/lib/category-config";
@@ -282,6 +283,10 @@ export default async function OliveYoungEntryPage() {
                           >
                             商品詳細を見る
                           </Link>
+                          <ProductCardOliveYoungLink
+                            oliveYoungUrl={item.oliveYoungUrl}
+                            goodsNo={item.goodsNo}
+                          />
                           <ProductAffiliateCtas
                             goodsNo={item.goodsNo}
                             urls={getEffectiveAffiliateUrls(item)}
@@ -362,6 +367,10 @@ export default async function OliveYoungEntryPage() {
                           >
                             商品詳細を見る
                           </Link>
+                          <ProductCardOliveYoungLink
+                            oliveYoungUrl={item.oliveYoungUrl}
+                            goodsNo={item.goodsNo}
+                          />
                           <ProductAffiliateCtas
                             goodsNo={item.goodsNo}
                             urls={getEffectiveAffiliateUrls(item)}

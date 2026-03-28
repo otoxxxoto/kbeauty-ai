@@ -17,6 +17,7 @@ import {
   logCardLayoutDebug,
 } from "@/lib/product-card-layout";
 import { serializeProductImageFieldsForClient } from "@/lib/serialize-product-for-client";
+import { ProductCardOliveYoungLink } from "@/components/ProductCardOliveYoungLink";
 import type { RankingItemWithProduct } from "@/lib/oliveyoung-rankings";
 import { notFound } from "next/navigation";
 
@@ -94,8 +95,9 @@ function ProductCard({
           )}
         </div>
       </div>
-      <div className={PRODUCT_CARD_CTA_CLASS}>
+      <div className={`${PRODUCT_CARD_CTA_CLASS} flex flex-col gap-1.5`}>
         <ProductCardCta goodsNo={item.goodsNo} />
+        <ProductCardOliveYoungLink oliveYoungUrl={item.oliveYoungUrl} goodsNo={item.goodsNo} />
       </div>
     </div>
   );
