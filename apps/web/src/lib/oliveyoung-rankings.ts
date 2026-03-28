@@ -6,9 +6,11 @@ import { db } from "@/lib/firestore";
 import { looksLikeOliveYoungGoodsNo, isUnsafeBrandJa } from "@/lib/oliveyoung-display";
 import {
   getOliveYoungProductByGoodsNo,
+  marketplaceExtensionForListItem,
   type ProductImageAnalysisEntry,
   type ProductImageFields,
 } from "@/lib/oliveyoung-products";
+import type { ProductMarketplaceFields } from "@/lib/product-marketplace-types";
 
 /** ランキング行の name と public.name をマージ（行が goodsNo のときは public の実名を優先） */
 function resolveRankingItemName(
@@ -54,7 +56,7 @@ export type RankingItemWithProduct = RankingItemRow & {
   productUrl: string;
   lastRank: number | null;
   lastSeenRunDate: string | null;
-};
+} & ProductMarketplaceFields;
 
 export type RankingMeta = {
   runDate: string;
@@ -171,6 +173,7 @@ export async function getRankingWithProducts(
       productUrl,
       lastRank,
       lastSeenRunDate,
+      ...marketplaceExtensionForListItem(publicProduct ?? null),
     });
   }
 
@@ -260,6 +263,7 @@ export async function getRisingProductsWithProducts(
       lastSeenRunDate: publicProduct?.lastSeenRunDate ?? null,
       rankDiff: typeof rankDiff === "number" ? rankDiff : row.rankDiff,
       isNew,
+      ...marketplaceExtensionForListItem(publicProduct ?? null),
     });
   }
 
@@ -315,6 +319,7 @@ export async function getRankingTopNWithProducts(
       productUrl,
       lastRank,
       lastSeenRunDate,
+      ...marketplaceExtensionForListItem(publicProduct ?? null),
     });
   }
 

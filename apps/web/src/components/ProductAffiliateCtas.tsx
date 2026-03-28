@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import {
   AMAZON_AFFILIATE_REL,
   QOO10_AFFILIATE_REL,
@@ -9,6 +10,8 @@ import {
   AFFILIATE_CARD_AMAZON_PRIMARY_LABEL,
   RELATED_PRODUCT_CARD_AMAZON_LABEL,
 } from "@/lib/ctaCopy";
+import { getAffiliateCtaOrder } from "@/lib/getPrimaryShop";
+import type { PrimaryShop } from "@/lib/product-marketplace-types";
 
 /** oliveyoung-products の getEffectiveAffiliateUrls と同形 */
 export type AffiliateUrlsInput = {
@@ -94,6 +97,18 @@ type ProductAffiliateCtasProps = {
   pageType?: AffiliatePageType;
   /** true のとき Amazon のみ（楽天・Qoo10 は出さない）。関連商品カードの一覧性向上用 */
   amazonOnly?: boolean;
+  /**
+   * 明示URLベースの優先ショップ（getPrimaryShopFromProduct）。
+   * 未指定時は null 扱いで Qoo10→楽天→Amazon のデフォルト順。
+   */
+  primaryShop?: PrimaryShop | null;
+  /**
+   * OY専用導線モード等で外部アフィリエイト行を出さない
+   * （shouldSuppressAffiliateCtasForProduct）
+   */
+  suppressAffiliateCtas?: boolean;
+  /** GA の product パラメータ用 */
+  productNameForGa?: string;
 };
 
 const detailCtaBaseClass =
@@ -114,7 +129,8 @@ const cardCtaClassByShop = {
 } as const;
 
 /**
- * Amazon（主CTA・緑）/ 楽天・Qoo10（サブ）。href が空のボタンは出さない。
+ * Amazon / 楽天・Qoo10。href が空のボタンは出さない。
+ * primaryShop で表示順を変更。
  */
 export function ProductAffiliateCtas({
   goodsNo,
@@ -125,13 +141,13 @@ export function ProductAffiliateCtas({
   ctaPlacement,
   pageType,
   amazonOnly = false,
+  primaryShop = null,
+  suppressAffiliateCtas = false,
+  productNameForGa,
 }: ProductAffiliateCtasProps) {
   const { amazon, rakuten, qoo10 } = urls;
-  if (amazonOnly) {
-    if (!amazon?.trim()) return null;
-  } else if (!amazon && !rakuten && !qoo10) {
-    return null;
-  }
+
+  if (suppressAffiliateCtas) return null;
 
   const inferredPlacement: AffiliateCtaPlacement | undefined =
     ctaPlacement ??
@@ -149,21 +165,18 @@ export function ProductAffiliateCtas({
         ? "category"
         : undefined);
 
+  const gaCtx = {
+    ctaPlacement: inferredPlacement,
+    pageType: inferredPageType,
+    productName: productNameForGa,
+  };
+
   const onAmazonClick = () =>
-    logAffiliateClick(goodsNo, "amazon", position, amazon, {
-      ctaPlacement: inferredPlacement,
-      pageType: inferredPageType,
-    });
+    logAffiliateClick(goodsNo, "amazon", position, amazon, gaCtx);
   const onRakutenClick = () =>
-    logAffiliateClick(goodsNo, "rakuten", position, rakuten, {
-      ctaPlacement: inferredPlacement,
-      pageType: inferredPageType,
-    });
+    logAffiliateClick(goodsNo, "rakuten", position, rakuten, gaCtx);
   const onQoo10Click = () =>
-    logAffiliateClick(goodsNo, "qoo10", position, qoo10, {
-      ctaPlacement: inferredPlacement,
-      pageType: inferredPageType,
-    });
+    logAffiliateClick(goodsNo, "qoo10", position, qoo10, gaCtx);
 
   const amazonButtonLabel = amazonOnly
     ? RELATED_PRODUCT_CARD_AMAZON_LABEL
@@ -172,13 +185,14 @@ export function ProductAffiliateCtas({
       : AFFILIATE_CARD_AMAZON_PRIMARY_LABEL;
   const ctaClassByShop = variant === "detail" ? detailCtaClassByShop : cardCtaClassByShop;
 
-  return (
-    <div
-      className={`flex flex-col gap-2 ${className}`.trim()}
-      data-testid="product-affiliate-ctas"
-      aria-label="外部ショップで見る"
-    >
-      {amazon ? (
+  if (amazonOnly) {
+    if (!amazon?.trim()) return null;
+    return (
+      <div
+        className={`flex flex-col gap-2 ${className}`.trim()}
+        data-testid="product-affiliate-ctas"
+        aria-label="外部ショップで見る"
+      >
         <a
           href={amazon}
           target="_blank"
@@ -188,9 +202,35 @@ export function ProductAffiliateCtas({
         >
           {amazonButtonLabel}
         </a>
-      ) : null}
-      {!amazonOnly && rakuten ? (
+      </div>
+    );
+  }
+
+  if (!amazon && !rakuten && !qoo10) {
+    return null;
+  }
+
+  const order = getAffiliateCtaOrder(primaryShop ?? null);
+
+  const nodes: ReactNode[] = [];
+  for (const shop of order) {
+    if (shop === "amazon" && amazon?.trim()) {
+      nodes.push(
         <a
+          key="amazon"
+          href={amazon}
+          target="_blank"
+          rel={AMAZON_AFFILIATE_REL}
+          className={ctaClassByShop.amazon}
+          onClick={onAmazonClick}
+        >
+          {amazonButtonLabel}
+        </a>
+      );
+    } else if (shop === "rakuten" && rakuten?.trim()) {
+      nodes.push(
+        <a
+          key="rakuten"
           href={rakuten}
           target="_blank"
           rel={RAKUTEN_AFFILIATE_REL}
@@ -199,9 +239,11 @@ export function ProductAffiliateCtas({
         >
           {variant === "detail" ? "🛒 楽天でポイント還元を見る" : "楽天で見る"}
         </a>
-      ) : null}
-      {!amazonOnly && qoo10 ? (
+      );
+    } else if (shop === "qoo10" && qoo10?.trim()) {
+      nodes.push(
         <a
+          key="qoo10"
           href={qoo10}
           target="_blank"
           rel={QOO10_AFFILIATE_REL}
@@ -210,8 +252,19 @@ export function ProductAffiliateCtas({
         >
           {variant === "detail" ? "🛒 Qoo10でセールを見る" : "Qoo10で見る"}
         </a>
-      ) : null}
+      );
+    }
+  }
+
+  if (nodes.length === 0) return null;
+
+  return (
+    <div
+      className={`flex flex-col gap-2 ${className}`.trim()}
+      data-testid="product-affiliate-ctas"
+      aria-label="外部ショップで見る"
+    >
+      {nodes}
     </div>
   );
 }
-

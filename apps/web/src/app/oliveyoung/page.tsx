@@ -8,6 +8,10 @@ import {
   getDisplayBrand as getDisplayBrandProduct,
   getEffectiveAffiliateUrls,
 } from "@/lib/oliveyoung-products";
+import {
+  getPrimaryShopFromProduct,
+  shouldSuppressAffiliateCtasForProduct,
+} from "@/lib/getPrimaryShop";
 import { ProductDisplayImage } from "@/components/ProductDisplayImage";
 import { ProductAffiliateCtas } from "@/components/ProductAffiliateCtas";
 import { getDisplayProductNameText } from "@/lib/oliveyoung-display";
@@ -225,6 +229,8 @@ export default async function OliveYoungEntryPage() {
                       brand: item.brand,
                       brandJa: item.brandJa,
                     });
+                    const primaryShop = getPrimaryShopFromProduct(item);
+                    const suppressAffiliate = shouldSuppressAffiliateCtasForProduct(item);
                     return (
                       <div
                         key={item.goodsNo}
@@ -282,6 +288,9 @@ export default async function OliveYoungEntryPage() {
                             variant="card"
                             className=""
                             position="rising_card"
+                            primaryShop={primaryShop}
+                            suppressAffiliateCtas={suppressAffiliate}
+                            productNameForGa={displayName}
                           />
                         </div>
                       </div>
@@ -303,6 +312,8 @@ export default async function OliveYoungEntryPage() {
                       brand: item.brand,
                       brandJa: item.brandJa,
                     });
+                    const primaryShop = getPrimaryShopFromProduct(item);
+                    const suppressAffiliate = shouldSuppressAffiliateCtasForProduct(item);
                     return (
                       <div
                         key={item.goodsNo}
@@ -357,6 +368,9 @@ export default async function OliveYoungEntryPage() {
                             variant="card"
                             className=""
                             position="featured_card"
+                            primaryShop={primaryShop}
+                            suppressAffiliateCtas={suppressAffiliate}
+                            productNameForGa={displayName}
                           />
                         </div>
                       </div>

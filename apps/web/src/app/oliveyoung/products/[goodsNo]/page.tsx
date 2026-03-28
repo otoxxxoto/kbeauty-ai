@@ -32,6 +32,11 @@ import { ProductSeoInternalLinks } from "@/components/ProductSeoInternalLinks";
 import { CATEGORY_CONFIG } from "@/lib/category-config";
 import { getMatchedCategoriesForProduct } from "@/lib/filter-products-by-category";
 import { PRODUCT_SEO_BLOCKS } from "@/lib/product-page-seo-blocks";
+import {
+  getPrimaryShopFromProduct,
+  orderCompareCtaRows,
+  shouldSuppressAffiliateCtasForProduct,
+} from "@/lib/getPrimaryShop";
 import { notFound } from "next/navigation";
 import {
   PRODUCT_CARD_ROOT_CLASS,
@@ -120,6 +125,8 @@ function RelatedProductCard({ p }: { p: OliveYoungProductMinimal }) {
   });
   const displayBrand = getDisplayBrand(p);
   const affiliateUrls = getEffectiveAffiliateUrls(p);
+  const primaryShop = getPrimaryShopFromProduct(p);
+  const suppressAffiliate = shouldSuppressAffiliateCtasForProduct(p);
   return (
     <div className={PRODUCT_CARD_ROOT_CLASS}>
       <div className="flex min-h-0 flex-1 flex-col">
@@ -168,6 +175,9 @@ function RelatedProductCard({ p }: { p: OliveYoungProductMinimal }) {
           className=""
           position="related_card"
           amazonOnly
+          primaryShop={primaryShop}
+          suppressAffiliateCtas={suppressAffiliate}
+          productNameForGa={displayName}
         />
       </div>
     </div>
@@ -365,6 +375,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
     marketplaceLinks.amazon
   );
   const affiliateUrls = getEffectiveAffiliateUrls(product);
+  const primaryShop = getPrimaryShopFromProduct(product);
+  const suppressAffiliate = shouldSuppressAffiliateCtasForProduct(product);
   const affiliateUrlCount =
     (affiliateUrls.amazon ? 1 : 0) +
     (affiliateUrls.rakuten ? 1 : 0) +
@@ -445,6 +457,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 rakutenUrl={affiliateUrls.rakuten}
                 qoo10Url={affiliateUrls.qoo10}
                 position="product_detail_first"
+                primaryShop={primaryShop}
+                suppressAffiliateCtas={suppressAffiliate}
+                productNameForGa={displayName}
               />
               {ctaDebugEnabled ? (
                 <details className="rounded-xl border border-dashed border-zinc-300 bg-zinc-50/60 px-4 py-3 text-xs text-zinc-600">
@@ -546,17 +561,36 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
       <ProductCompareCtaBlock
         goodsNo={goodsNo}
-        rows={[
-          affiliateUrls.amazon
-            ? { shop: "amazon", label: "Amazonで見る", href: affiliateUrls.amazon }
-            : null,
-          affiliateUrls.rakuten
-            ? { shop: "rakuten", label: "楽天で見る", href: affiliateUrls.rakuten }
-            : null,
-          affiliateUrls.qoo10
-            ? { shop: "qoo10", label: "Qoo10で見る", href: affiliateUrls.qoo10 }
-            : null,
-        ].filter(Boolean) as { shop: "amazon" | "rakuten" | "qoo10"; label: string; href: string }[]}
+        rows={
+          suppressAffiliate
+            ? []
+            : orderCompareCtaRows(
+                [
+                  affiliateUrls.amazon
+                    ? {
+                        shop: "amazon" as const,
+                        label: "Amazonで見る",
+                        href: affiliateUrls.amazon,
+                      }
+                    : null,
+                  affiliateUrls.rakuten
+                    ? {
+                        shop: "rakuten" as const,
+                        label: "楽天で見る",
+                        href: affiliateUrls.rakuten,
+                      }
+                    : null,
+                  affiliateUrls.qoo10
+                    ? {
+                        shop: "qoo10" as const,
+                        label: "Qoo10で見る",
+                        href: affiliateUrls.qoo10,
+                      }
+                    : null,
+                ].filter((r): r is NonNullable<typeof r> => r != null),
+                primaryShop
+              )
+        }
         position="product_detail_middle"
         className="my-10 md:my-12"
       />

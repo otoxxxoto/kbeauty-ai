@@ -14,6 +14,11 @@ import {
   buildRakutenSearchUrl,
 } from "@/lib/affiliate";
 import type { ProductImageAnalysisEntry, ProductImageFields } from "./product-display-image-resolve";
+import type {
+  PrimaryShop,
+  ProductMarketplaceFields,
+  ProductRevenueImageSource,
+} from "@/lib/product-marketplace-types";
 
 export type {
   ProductImageAnalysisEntry,
@@ -116,6 +121,39 @@ function optHrefStr(v: unknown): string | undefined {
   return s || undefined;
 }
 
+function optPlainStr(v: unknown): string | undefined {
+  const s = v != null ? String(v).trim() : "";
+  return s || undefined;
+}
+
+function parsePrimaryShopField(v: unknown): PrimaryShop | null | undefined {
+  if (v === null) return null;
+  if (v === "amazon" || v === "qoo10" || v === "rakuten" || v === "oliveyoung") return v;
+  return undefined;
+}
+
+function parseRevenueImageSource(
+  v: unknown
+): ProductRevenueImageSource | undefined {
+  if (
+    v === "amazon" ||
+    v === "rakuten" ||
+    v === "qoo10" ||
+    v === "oliveyoung" ||
+    v === "fallback_no_image"
+  ) {
+    return v;
+  }
+  return undefined;
+}
+
+function parseMarketScoreField(v: unknown): number | undefined {
+  if (v == null) return undefined;
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+
 export type OliveYoungProductDetail = {
   goodsNo: string;
   name: string;
@@ -156,7 +194,7 @@ export type OliveYoungProductDetail = {
   needsNameJa?: boolean;
   translationPriority?: TranslationPriority;
   lastNameJaTranslatedAt?: string | null;
-};
+} & ProductMarketplaceFields;
 
 /** Firestore Timestamp 等を Client へ渡せる文字列へ（priceComparison.fetchedAt） */
 function serializeFetchedAtForClient(v: unknown): string | undefined {
@@ -258,6 +296,41 @@ export type EffectiveAffiliateUrls = {
   rakuten: string;
   qoo10: string;
 };
+
+/** ランキング補完用: Firestore 拡張フィールドのみ（URL本体は別途マージ済み想定） */
+export function marketplaceExtensionForListItem(
+  p: OliveYoungProductDetail | null | undefined
+): Pick<
+  ProductMarketplaceFields,
+  | "asin"
+  | "amazonImageUrl"
+  | "amazonTitle"
+  | "rakutenImageUrl"
+  | "rakutenTitle"
+  | "qoo10ImageUrl"
+  | "qoo10Title"
+  | "oliveYoungUrl"
+  | "oliveYoungImageUrl"
+  | "primaryShop"
+  | "imageSource"
+  | "marketScore"
+> {
+  if (!p) return {};
+  return {
+    asin: p.asin,
+    amazonImageUrl: p.amazonImageUrl,
+    amazonTitle: p.amazonTitle,
+    rakutenImageUrl: p.rakutenImageUrl,
+    rakutenTitle: p.rakutenTitle,
+    qoo10ImageUrl: p.qoo10ImageUrl,
+    qoo10Title: p.qoo10Title,
+    oliveYoungUrl: p.oliveYoungUrl,
+    oliveYoungImageUrl: p.oliveYoungImageUrl,
+    primaryShop: p.primaryShop,
+    imageSource: p.imageSource,
+    marketScore: p.marketScore,
+  };
+}
 
 export function getEffectiveAffiliateUrls(p: {
   amazonUrl?: string;
@@ -404,6 +477,18 @@ export async function getOliveYoungProductByGoodsNo(
     lastNameJaTranslatedAt: toPlainLastNameJaTranslatedAt(
       data.lastNameJaTranslatedAt
     ),
+    asin: optPlainStr(data.asin),
+    amazonImageUrl: optImageStr(data.amazonImageUrl),
+    amazonTitle: optPlainStr(data.amazonTitle),
+    rakutenImageUrl: optImageStr(data.rakutenImageUrl),
+    rakutenTitle: optPlainStr(data.rakutenTitle),
+    qoo10ImageUrl: optImageStr(data.qoo10ImageUrl),
+    qoo10Title: optPlainStr(data.qoo10Title),
+    oliveYoungUrl: optHrefStr(data.oliveYoungUrl),
+    oliveYoungImageUrl: optImageStr(data.oliveYoungImageUrl),
+    primaryShop: parsePrimaryShopField(data.primaryShop),
+    imageSource: parseRevenueImageSource(data.imageSource),
+    marketScore: parseMarketScoreField(data.marketScore),
   };
 }
 
@@ -432,7 +517,7 @@ export type OliveYoungProductCard = {
   productUrl: string;
   lastRank: number | null;
   lastSeenRunDate: string | null;
-};
+} & ProductMarketplaceFields;
 
 /**
  * goodsNos の順で oliveyoung_products_public から商品をまとめて取得
@@ -469,6 +554,18 @@ export async function getOliveYoungProductsByGoodsNos(
       productUrl: p.productUrl,
       lastRank: p.lastRank ?? p.lastSeenRank,
       lastSeenRunDate: p.lastSeenRunDate,
+      asin: p.asin,
+      amazonImageUrl: p.amazonImageUrl,
+      amazonTitle: p.amazonTitle,
+      rakutenImageUrl: p.rakutenImageUrl,
+      rakutenTitle: p.rakutenTitle,
+      qoo10ImageUrl: p.qoo10ImageUrl,
+      qoo10Title: p.qoo10Title,
+      oliveYoungUrl: p.oliveYoungUrl,
+      oliveYoungImageUrl: p.oliveYoungImageUrl,
+      primaryShop: p.primaryShop,
+      imageSource: p.imageSource,
+      marketScore: p.marketScore,
     });
   }
   return result;
@@ -546,7 +643,7 @@ export type OliveYoungProductMinimal = {
   translationPriority?: TranslationPriority;
   /** nameJa を最後に更新した日時（ISO 文字列推奨） */
   lastNameJaTranslatedAt?: string | null;
-};
+} & ProductMarketplaceFields;
 
 const CATEGORY_PAGE_PRODUCT_LIMIT = 5000;
 
@@ -685,6 +782,18 @@ export async function getAllOliveYoungProductsMinimal(): Promise<
       lastNameJaTranslatedAt: toPlainLastNameJaTranslatedAt(
         data.lastNameJaTranslatedAt
       ),
+      asin: optPlainStr(data.asin),
+      amazonImageUrl: optImageStr(data.amazonImageUrl),
+      amazonTitle: optPlainStr(data.amazonTitle),
+      rakutenImageUrl: optImageStr(data.rakutenImageUrl),
+      rakutenTitle: optPlainStr(data.rakutenTitle),
+      qoo10ImageUrl: optImageStr(data.qoo10ImageUrl),
+      qoo10Title: optPlainStr(data.qoo10Title),
+      oliveYoungUrl: optHrefStr(data.oliveYoungUrl),
+      oliveYoungImageUrl: optImageStr(data.oliveYoungImageUrl),
+      primaryShop: parsePrimaryShopField(data.primaryShop),
+      imageSource: parseRevenueImageSource(data.imageSource),
+      marketScore: parseMarketScoreField(data.marketScore),
     };
   });
 }

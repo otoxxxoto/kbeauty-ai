@@ -1,12 +1,14 @@
 "use client";
 
-import * as React from "react";
+import type { ReactNode } from "react";
 import {
   AMAZON_AFFILIATE_REL,
   QOO10_AFFILIATE_REL,
   RAKUTEN_AFFILIATE_REL,
 } from "@/lib/affiliate";
 import { CTA_COPY } from "@/lib/ctaCopy";
+import { getAffiliateCtaOrder } from "@/lib/getPrimaryShop";
+import type { PrimaryShop } from "@/lib/product-marketplace-types";
 import {
   logAffiliateClick,
   type AffiliateClickPosition,
@@ -19,6 +21,9 @@ export type ProductPrimaryCtaBlockProps = {
   qoo10Url?: string;
   position?: AffiliateClickPosition;
   className?: string;
+  primaryShop?: PrimaryShop | null;
+  suppressAffiliateCtas?: boolean;
+  productNameForGa?: string;
 };
 
 function hasAnyUrl(u: { amazonUrl?: string; rakutenUrl?: string; qoo10Url?: string }): boolean {
@@ -32,12 +37,16 @@ export function ProductPrimaryCtaBlock({
   qoo10Url,
   position = "product_detail_first",
   className = "",
+  primaryShop = null,
+  suppressAffiliateCtas = false,
+  productNameForGa,
 }: ProductPrimaryCtaBlockProps) {
   const urls = {
     amazon: (amazonUrl ?? "").trim(),
     rakuten: (rakutenUrl ?? "").trim(),
     qoo10: (qoo10Url ?? "").trim(),
   };
+  if (suppressAffiliateCtas) return null;
   if (!hasAnyUrl({ amazonUrl: urls.amazon, rakutenUrl: urls.rakuten, qoo10Url: urls.qoo10 })) {
     return null;
   }
@@ -47,6 +56,65 @@ export function ProductPrimaryCtaBlock({
   const amazonBtn = `${ctaBase} bg-[#ff9900] hover:bg-[#e68a00]`;
   const rakutenBtn = `${ctaBase} bg-[#bf0000] hover:bg-[#a30000]`;
   const qoo10Btn = `${ctaBase} bg-[#ff3366] hover:bg-[#e62e5c]`;
+
+  const order = getAffiliateCtaOrder(primaryShop ?? null);
+  const gaCtx = {
+    ctaPlacement: "primary" as const,
+    pageType: "product_detail" as const,
+    productName: productNameForGa,
+  };
+
+  const nodes: ReactNode[] = [];
+  for (const shop of order) {
+    if (shop === "amazon" && urls.amazon) {
+      nodes.push(
+        <a
+          key="amazon"
+          href={urls.amazon}
+          target="_blank"
+          rel={AMAZON_AFFILIATE_REL}
+          className={amazonBtn}
+          onClick={() =>
+            logAffiliateClick(goodsNo, "amazon", position, urls.amazon, gaCtx)
+          }
+        >
+          {CTA_COPY.primary.amazon}
+        </a>
+      );
+    } else if (shop === "rakuten" && urls.rakuten) {
+      nodes.push(
+        <a
+          key="rakuten"
+          href={urls.rakuten}
+          target="_blank"
+          rel={RAKUTEN_AFFILIATE_REL}
+          className={rakutenBtn}
+          onClick={() =>
+            logAffiliateClick(goodsNo, "rakuten", position, urls.rakuten, gaCtx)
+          }
+        >
+          {CTA_COPY.primary.rakuten}
+        </a>
+      );
+    } else if (shop === "qoo10" && urls.qoo10) {
+      nodes.push(
+        <a
+          key="qoo10"
+          href={urls.qoo10}
+          target="_blank"
+          rel={QOO10_AFFILIATE_REL}
+          className={qoo10Btn}
+          onClick={() =>
+            logAffiliateClick(goodsNo, "qoo10", position, urls.qoo10, gaCtx)
+          }
+        >
+          {CTA_COPY.primary.qoo10}
+        </a>
+      );
+    }
+  }
+
+  if (nodes.length === 0) return null;
 
   return (
     <section
@@ -60,57 +128,7 @@ export function ProductPrimaryCtaBlock({
         </div>
       </div>
 
-      <div className="mt-4 flex flex-col gap-3">
-        {urls.amazon ? (
-          <a
-            href={urls.amazon}
-            target="_blank"
-            rel={AMAZON_AFFILIATE_REL}
-            className={amazonBtn}
-            onClick={() =>
-              logAffiliateClick(goodsNo, "amazon", position, urls.amazon, {
-                ctaPlacement: "primary",
-                pageType: "product_detail",
-              })
-            }
-          >
-            {CTA_COPY.primary.amazon}
-          </a>
-        ) : null}
-        {urls.rakuten ? (
-          <a
-            href={urls.rakuten}
-            target="_blank"
-            rel={RAKUTEN_AFFILIATE_REL}
-            className={rakutenBtn}
-            onClick={() =>
-              logAffiliateClick(goodsNo, "rakuten", position, urls.rakuten, {
-                ctaPlacement: "primary",
-                pageType: "product_detail",
-              })
-            }
-          >
-            {CTA_COPY.primary.rakuten}
-          </a>
-        ) : null}
-        {urls.qoo10 ? (
-          <a
-            href={urls.qoo10}
-            target="_blank"
-            rel={QOO10_AFFILIATE_REL}
-            className={qoo10Btn}
-            onClick={() =>
-              logAffiliateClick(goodsNo, "qoo10", position, urls.qoo10, {
-                ctaPlacement: "primary",
-                pageType: "product_detail",
-              })
-            }
-          >
-            {CTA_COPY.primary.qoo10}
-          </a>
-        ) : null}
-      </div>
+      <div className="mt-4 flex flex-col gap-3">{nodes}</div>
     </section>
   );
 }
-
