@@ -21,6 +21,18 @@ pnpm install
 **人物除去（クロップ・inpainting 等）は未実装**。公開時は人物入り画像を出さない安全運用。ルールと post-launch バックログは [docs/IMAGE_POLICY.md](./docs/IMAGE_POLICY.md)。  
 データ投入は `apps/crawler` の `pnpm run oliveyoung:analyze-product-images` を参照してください。
 
+### 画像解析キュー・可視化（本線）
+
+- **未解析 URL の抽出**（ランキング上位 N 件・人物判定バッチ向け NDJSON）:  
+  `pnpm report-ranking-unanalyzed-image-urls -- --limit=100`（`--runDate=` / `--format=goods-block` 可）
+- **公開面 `imagePolicy` 件数**（`safe_person_free` / `unsafe_person_possible` / `mall_image` / `fallback_no_image`、上位 50・100 枠）:  
+  `pnpm report-image-policy-stats`
+- 候補 URL の優先順は `src/lib/image-analysis-queue.ts`（`collectProductImageUrlsForAnalysisQueue` / `getUnanalyzedImageUrlsPrioritized`）。
+
+### Amazon PA-API（画像補完バッチ・任意）
+
+`pnpm backfill-amazon-ranking-images` は **Product Advertising API 5.0** を使います。**PA-API の利用は Amazon アソシエイトアカウントの承認・資格が必要**です。資格がない場合は HTTP 403 等となり、**実装不備ではなくアカウント側の制限**です。資格のあるアカウントでのみ実行してください。当面は上記の OY + `imageAnalysis` を本線にしてください。
+
 ## 開発サーバー
 
 ```bash

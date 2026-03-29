@@ -62,7 +62,8 @@ function allowOyPersonImageFromEnv(): boolean {
   return process.env.ALLOW_OY_PERSON_IMAGE === "true";
 }
 
-function isMarketplaceHostUrl(url: string): boolean {
+/** Amazon / 楽天 / Qoo10 系 CDN とみなすホスト判定（画像フォールバック等で共有） */
+export function isMarketplaceHostUrl(url: string): boolean {
   const u = url.toLowerCase();
   return (
     u.includes("amazon.") ||

@@ -4,6 +4,7 @@ import {
   resolveProductDisplayImage,
   productDisplayImageIsPlaceholder,
   imageAnalysisEntryForProductUrl,
+  isMarketplaceHostUrl,
   type ProductImageFields,
 } from "@/lib/product-display-image-resolve";
 import type { ProductRevenueImageSource } from "@/lib/product-marketplace-types";
@@ -116,21 +117,36 @@ export function buildGetProductImageInputFromFields(
 }
 
 /**
- * 公開面フォールバック用: `imageAnalysis` で URL 一致かつ `containsPerson===false` のものだけ採用。
- * 解析欠如の URL は使わない（保守的）。
+ * 公開面フォールバック用。
+ * - 解析ありかつ `containsPerson===false` → 採用
+ * - 解析なしで URL が Amazon / 楽天 / Qoo10 系 → 採用（暫定。後から解析で精度向上）
+ * - 解析ありかつ人物あり → 不採用（暫定モールでも上書きしない）
+ * - OY 系フィールドは解析なしでは不採用（従来どおり保守的）
  */
-function tryPersonFreeUrl(
+function tryPersonSafeOrMallProvisionalUrl(
   p: ProductImageFields,
   url: string | undefined,
   source: ProductRevenueImageSource
 ): ProductImagePickResult | null {
   const u = pick(url);
   if (!u) return null;
+
   const entry = imageAnalysisEntryForProductUrl(p, u);
-  if (!entry || entry.containsPerson) return null;
-  return { url: u, imageSource: source };
+  if (entry) {
+    if (!entry.containsPerson) return { url: u, imageSource: source };
+    return null;
+  }
+
+  const isMallSlot =
+    source === "amazon" || source === "rakuten" || source === "qoo10";
+  if (isMallSlot && isMarketplaceHostUrl(u)) {
+    return { url: u, imageSource: source };
+  }
+
+  return null;
 }
 
+/** 公開フォールバック。未解析 URL の抽出キューは `getUnanalyzedImageUrlsPrioritized`（`image-analysis-queue.ts`）。 */
 export function getProductImagePersonSafeFromFields(
   p: ProductImageFields,
   goodsNo?: string
@@ -138,27 +154,27 @@ export function getProductImagePersonSafeFromFields(
   const gid = goodsNo != null ? String(goodsNo).trim() : "";
 
   const attempts: Array<() => ProductImagePickResult | null> = [
-    () => tryPersonFreeUrl(p, p.oliveYoungImageUrl, "oliveyoung"),
+    () => tryPersonSafeOrMallProvisionalUrl(p, p.oliveYoungImageUrl, "oliveyoung"),
     () =>
-      tryPersonFreeUrl(
+      tryPersonSafeOrMallProvisionalUrl(
         p,
         pick(p.amazonImageUrl) ?? pick(p.amazonImage),
         "amazon"
       ),
     () =>
-      tryPersonFreeUrl(
+      tryPersonSafeOrMallProvisionalUrl(
         p,
         pick(p.rakutenImageUrl) ?? pick(p.rakutenImage),
         "rakuten"
       ),
     () =>
-      tryPersonFreeUrl(
+      tryPersonSafeOrMallProvisionalUrl(
         p,
         pick(p.qoo10ImageUrl) ?? pick(p.qoo10Image),
         "qoo10"
       ),
-    () => tryPersonFreeUrl(p, p.imageUrl, "oliveyoung"),
-    () => tryPersonFreeUrl(p, p.thumbnailUrl, "oliveyoung"),
+    () => tryPersonSafeOrMallProvisionalUrl(p, p.imageUrl, "oliveyoung"),
+    () => tryPersonSafeOrMallProvisionalUrl(p, p.thumbnailUrl, "oliveyoung"),
   ];
 
   for (const fn of attempts) {

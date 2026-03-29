@@ -2,6 +2,10 @@
  * Amazon Product Advertising API 5.0（SearchItems）で候補を取得する AmazonImageProvider。
  * 署名は aws4（SigV4）。スクレイピングは行わない。
  *
+ * **利用条件**: PA-API は Amazon アソシエイトアカウントの **資格・承認** が必要です。
+ * 未承認・Associate 不備のキーでは HTTP 403 等となります（実装不備ではありません）。
+ * 資格のあるアカウントでのみ `createPaApi5AmazonImageProviderFromEnv` 経由のバッチを有効にしてください。
+ *
  * 環境変数:
  * - PAAPI_ACCESS_KEY / PAAPI_SECRET_KEY / PAAPI_PARTNER_TAG（必須）
  * - PAAPI_HOST（既定: webservices.amazon.co.jp）
@@ -57,6 +61,68 @@ type PaapiSearchResponse = {
   SearchResult?: { Items?: PaapiItem[] };
   Errors?: Array<{ Code?: string; Message?: string }>;
 };
+
+/**
+ * PA-API が「アカウント／Associate 側の資格不足」で拒否したと判断できる場合 true。
+ * （403 / 401 や、メッセージ・Code に eligibility 系が含まれる場合）
+ */
+export function paApiResponseIndicatesAccountIneligible(
+  httpStatus: number,
+  errors?: Array<{ Code?: string; Message?: string }>
+): boolean {
+  if (httpStatus === 403 || httpStatus === 401) return true;
+
+  const list = errors ?? [];
+  for (const e of list) {
+    const code = (e.Code ?? "").trim();
+    const msg = (e.Message ?? "").trim();
+    const combined = `${code} ${msg}`.toLowerCase();
+
+    if (
+      /invalidaccess|accessdenied|ineligible|not eligible|associate|partner.*tag|unauthoriz/i.test(
+        code
+      )
+    ) {
+      return true;
+    }
+    if (
+      /not eligible|ineligible|access denied|invalid.*partner|associate is not|pa-api.*not.*enabled/i.test(
+        combined
+      )
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/** Amazon 側アカウント資格不足（403 等）。実装バグではない想定でバッチが捕捉する。 */
+export class PaApiAccountNotEligibleError extends Error {
+  readonly httpStatus: number;
+  readonly paapiErrorCodes: string[];
+  readonly paapiErrorMessages: string[];
+
+  constructor(
+    message: string,
+    opts: {
+      httpStatus: number;
+      paapiErrorCodes: string[];
+      paapiErrorMessages: string[];
+    }
+  ) {
+    super(message);
+    this.name = "PaApiAccountNotEligibleError";
+    this.httpStatus = opts.httpStatus;
+    this.paapiErrorCodes = opts.paapiErrorCodes;
+    this.paapiErrorMessages = opts.paapiErrorMessages;
+  }
+}
+
+export function isPaApiAccountNotEligibleError(
+  e: unknown
+): e is PaApiAccountNotEligibleError {
+  return e instanceof PaApiAccountNotEligibleError;
+}
 
 function pickImageUrl(item: PaapiItem): string {
   const p = item.Images?.Primary;
@@ -165,8 +231,24 @@ export class PaApi5AmazonImageProvider implements AmazonImageProvider {
     }
 
     if (!res.ok) {
-      const msg = json.Errors?.map((e) => e.Message).join("; ") || text.slice(0, 200);
-      throw new Error(`PA-API HTTP ${res.status}: ${msg}`);
+      const errs = json.Errors ?? [];
+      const codes = errs.map((e) => (e.Code ?? "").trim()).filter(Boolean);
+      const msgs = errs.map((e) => (e.Message ?? "").trim()).filter(Boolean);
+      const summary =
+        msgs.join("; ") || codes.join("; ") || text.slice(0, 200);
+
+      if (paApiResponseIndicatesAccountIneligible(res.status, errs)) {
+        throw new PaApiAccountNotEligibleError(
+          `PA-API: Amazon アカウント／Associate の資格不足により拒否されました（HTTP ${res.status}）。実装不備ではありません。 ${summary}`,
+          {
+            httpStatus: res.status,
+            paapiErrorCodes: codes,
+            paapiErrorMessages: msgs,
+          }
+        );
+      }
+
+      throw new Error(`PA-API HTTP ${res.status}: ${summary}`);
     }
 
     const items = json.SearchResult?.Items ?? [];

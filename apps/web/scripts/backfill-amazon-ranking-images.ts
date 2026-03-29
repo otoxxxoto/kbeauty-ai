@@ -1,6 +1,10 @@
 /**
  * 最新（または指定日）のランキングに載る商品に対し、PA-API 5 で Amazon 画像を補完して Firestore に書き込む。
  *
+ * **PA-API は Amazon アソシエイト側の利用資格が必要**です。403 / 資格不足は想定内であり、
+ * 実装不備ではありません。資格のないアカウントでは本バッチは実行しないでください（1 回目の API 応答で終了し、大量 fail は出しません）。
+ * 公開面の画像は OY + `imageAnalysis`（Vision）を本線にしてください。
+ *
  * 推奨（初回）:
  *   pnpm backfill-amazon-ranking-images -- --dry-run --limit=10 --sleep-ms=1000
  *
@@ -27,7 +31,10 @@ import {
   getRankingByDate,
   getRankingRunDates,
 } from "../src/lib/oliveyoung-rankings";
-import { createPaApi5AmazonImageProviderFromEnv } from "../src/lib/pa-api-5-amazon-image-provider";
+import {
+  createPaApi5AmazonImageProviderFromEnv,
+  isPaApiAccountNotEligibleError,
+} from "../src/lib/pa-api-5-amazon-image-provider";
 
 const PRODUCTS_PUBLIC = "oliveyoung_products_public";
 
@@ -267,6 +274,28 @@ async function main() {
         ok += 1;
       }
     } catch (e) {
+      if (isPaApiAccountNotEligibleError(e)) {
+        const bar = "═".repeat(72);
+        console.error(`\n${bar}`);
+        console.error(
+          "[backfill-amazon] PA-API が利用できません（Amazon アカウント／Associate の資格不足）。"
+        );
+        console.error(
+          "  これは実装不備ではなく、PA-API 利用が許可されたアソシエイトアカウントでのみ有効です。"
+        );
+        console.error(`  HTTP ${e.httpStatus}  PA-API Code(s): ${e.paapiErrorCodes.join(", ") || "(なし)"}`);
+        if (e.paapiErrorMessages.length > 0) {
+          console.error(`  Message(s): ${e.paapiErrorMessages.join(" | ")}`);
+        }
+        console.error(
+          "  → バッチを中断しました（件単位の fail 連打はしません）。再開は資格取得後に同コマンドで。"
+        );
+        console.error(
+          "  → 画像改善の本線: OY 画像 + `pnpm report-ranking-unanalyzed-image-urls` で未解析 URL を Vision バッチへ。"
+        );
+        console.error(`${bar}\n`);
+        process.exit(0);
+      }
       console.error(`    → ERROR goodsNo=${goodsNo}`, e);
       fail += 1;
     }
