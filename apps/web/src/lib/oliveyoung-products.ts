@@ -433,11 +433,24 @@ export async function getOliveYoungProductByGoodsNo(
 
   const data = snap.data() ?? {};
   const productUrl = String(data.productUrl ?? "").trim();
+  const pickedUrlRaw = String(data.pickedUrl ?? "").trim();
   const oliveYoungUrlExplicit = optHrefStr(data.oliveYoungUrl);
   const oliveYoungUrlResolved = resolveNormalizedOliveYoungUrl(
     oliveYoungUrlExplicit,
-    productUrl
+    productUrl,
+    pickedUrlRaw
   );
+
+  if (process.env.DEBUG_OY_URL_RESOLVE === "1") {
+    // eslint-disable-next-line no-console -- 明示的デバッグ用（URLは出さない）
+    console.log("[oy-url-resolve]", {
+      goodsNo: trimmed,
+      hasProductUrl: !!productUrl,
+      hasPickedUrl: !!pickedUrlRaw,
+      hasExplicitOliveYoungUrl: !!oliveYoungUrlExplicit,
+      hasResolvedOliveYoungUrl: !!oliveYoungUrlResolved,
+    });
+  }
 
   return {
     goodsNo: trimmed,
@@ -452,7 +465,7 @@ export async function getOliveYoungProductByGoodsNo(
     brand: String(data.brand ?? "").trim(),
     brandJa: data.brandJa != null ? String(data.brandJa).trim() : undefined,
     productUrl,
-    pickedUrl: String(data.pickedUrl ?? "").trim(),
+    pickedUrl: pickedUrlRaw,
     amazonImage: optImageStr(data.amazonImage),
     rakutenImage: optImageStr(data.rakutenImage),
     qoo10Image: optImageStr(data.qoo10Image),
@@ -747,10 +760,12 @@ export async function getAllOliveYoungProductsMinimal(): Promise<
   return snap.docs.map((doc) => {
     const data = doc.data();
     const productUrl = String(data.productUrl ?? "").trim();
+    const pickedUrlRaw = String(data.pickedUrl ?? "").trim();
     const oliveYoungUrlExplicit = optHrefStr(data.oliveYoungUrl);
     const oliveYoungUrlResolved = resolveNormalizedOliveYoungUrl(
       oliveYoungUrlExplicit,
-      productUrl
+      productUrl,
+      pickedUrlRaw
     );
     return {
       goodsNo: doc.id,

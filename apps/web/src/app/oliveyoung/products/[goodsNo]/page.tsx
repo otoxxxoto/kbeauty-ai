@@ -460,6 +460,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 primaryShop={primaryShop}
                 suppressAffiliateCtas={suppressAffiliate}
                 productNameForGa={displayName}
+                oliveYoungUrl={product.oliveYoungUrl}
               />
               {ctaDebugEnabled ? (
                 <details className="rounded-xl border border-dashed border-zinc-300 bg-zinc-50/60 px-4 py-3 text-xs text-zinc-600">
@@ -471,6 +472,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
                     <div>amazon: {affiliateUrls.amazon ? "yes" : "no"}</div>
                     <div>rakuten: {affiliateUrls.rakuten ? "yes" : "no"}</div>
                     <div>qoo10: {affiliateUrls.qoo10 ? "yes" : "no"}</div>
+                    <div>
+                      OY supplement URL（正規化後）:{" "}
+                      {product.oliveYoungUrl ? "yes" : "no"}
+                    </div>
+                    <div>productUrl フィールド: {product.productUrl ? "yes" : "no"}</div>
+                    <div>pickedUrl フィールド: {product.pickedUrl ? "yes" : "no"}</div>
                     <div>
                       primary/compare:{" "}
                       {affiliateUrlCount > 0 ? "renderable" : "hidden"}

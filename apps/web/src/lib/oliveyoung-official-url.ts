@@ -38,14 +38,18 @@ export function isOliveYoungOfficialProductUrl(raw: string): boolean {
  * 一覧・カード用の正規化済み OY 導線 URL。
  * - Firestore の `oliveYoungUrl` があれば優先（中身はそのまま信頼）
  * - 無ければ `productUrl` が公式 OY ドメインならそれを採用
+ * - それでも無ければ `pickedUrl` が公式 OY なら採用（`productUrl` が空・非公式で `pickedUrl` に公式ページがあるケース向け）
  */
 export function resolveNormalizedOliveYoungUrl(
   oliveYoungUrlFromDb: string | undefined,
-  productUrl: string | undefined
+  productUrl: string | undefined,
+  pickedUrl?: string | undefined
 ): string | undefined {
   const db = oliveYoungUrlFromDb?.trim();
   if (db) return db;
   const pu = productUrl?.trim();
   if (pu && isOliveYoungOfficialProductUrl(pu)) return pu;
+  const pk = pickedUrl?.trim();
+  if (pk && isOliveYoungOfficialProductUrl(pk)) return pk;
   return undefined;
 }
