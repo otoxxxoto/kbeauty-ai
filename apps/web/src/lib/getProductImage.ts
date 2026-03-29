@@ -1,10 +1,16 @@
 import type { ProductImagePickResult } from "@/lib/product-marketplace-types";
+import type { ProductDisplayImageSource } from "@/lib/product-display-image-resolve";
+import {
+  resolveProductDisplayImage,
+  productDisplayImageIsPlaceholder,
+  type ProductImageFields,
+} from "@/lib/product-display-image-resolve";
 
 /** プレースホルダー（public 配下。無い場合はビルド後に配置可能） */
 export const PRODUCT_NO_IMAGE_PATH = "/images/no-image.png";
 
 export type ProductImageInput = {
-  /** デバッグ用。指定時のみ `IMAGE_SOURCE` を console に出す */
+  /** `NEXT_PUBLIC_IMAGE_SOURCE_DEBUG=1` 時に console へ出す用 */
   goodsNo?: string;
   amazonImageUrl?: string;
   rakutenImageUrl?: string;
@@ -66,8 +72,91 @@ export function getProductImage(input: ProductImageInput): ProductImagePickResul
     };
   }
 
-  const { imageSource } = result;
-  console.log("IMAGE_SOURCE", { goodsNo, imageSource });
+  if (
+    process.env.NEXT_PUBLIC_IMAGE_SOURCE_DEBUG === "1" &&
+    (goodsNo || result.imageSource !== "fallback_no_image")
+  ) {
+    // eslint-disable-next-line no-console -- 明示デバッグフラグ時のみ
+    console.log("IMAGE_SOURCE", { goodsNo, imageSource: result.imageSource });
+  }
 
   return result;
+}
+
+export function isProductImagePickFallbackNoImage(
+  pickResult: ProductImagePickResult
+): boolean {
+  return pickResult.imageSource === "fallback_no_image";
+}
+
+export function buildGetProductImageInputFromFields(
+  p: ProductImageFields,
+  goodsNo?: string
+): ProductImageInput {
+  const gid = goodsNo != null ? String(goodsNo).trim() : "";
+  return {
+    goodsNo: gid || undefined,
+    oliveYoungImageUrl: pick(p.oliveYoungImageUrl),
+    amazonImageUrl: pick(p.amazonImageUrl),
+    amazonImage: pick(p.amazonImage),
+    rakutenImageUrl: pick(p.rakutenImageUrl),
+    rakutenImage: pick(p.rakutenImage),
+    qoo10ImageUrl: pick(p.qoo10ImageUrl),
+    qoo10Image: pick(p.qoo10Image),
+    imageUrl: pick(p.imageUrl),
+    thumbnailUrl: pick(p.thumbnailUrl),
+  };
+}
+
+export type ProductDisplayPipelineResult = {
+  url: string;
+  /** 最終表示に効いたソース（display:* または amazon|rakuten|…） */
+  imageSource: string;
+  displaySource: ProductDisplayImageSource;
+  showOfficialImageBadge: boolean;
+};
+
+/**
+ * まず resolveProductDisplayImage（Vision / safe / strong）、
+ * プレースホルダーのときだけ getProductImage でモール URL をフォールバック。
+ */
+export function resolveProductImageForDisplay(
+  plain: ProductImageFields,
+  options?: { goodsNo?: string }
+): ProductDisplayPipelineResult {
+  const resolved = resolveProductDisplayImage(plain);
+  const placeholder = productDisplayImageIsPlaceholder(resolved.url);
+
+  let url = resolved.url;
+  let imageSource = `display:${resolved.source}`;
+  let showOfficialImageBadge =
+    resolved.showOfficialImageBadge && !placeholder;
+
+  if (placeholder) {
+    const gp = getProductImage(
+      buildGetProductImageInputFromFields(plain, options?.goodsNo)
+    );
+    if (gp.imageSource !== "fallback_no_image") {
+      url = gp.url;
+      imageSource = gp.imageSource;
+      showOfficialImageBadge = false;
+    }
+  }
+
+  return {
+    url,
+    imageSource,
+    displaySource: resolved.source,
+    showOfficialImageBadge,
+  };
+}
+
+/** 表示 URL が OY プレースホルダーまたは no-image 相当か */
+export function isResolvedProductImagePlaceholderUrl(url: string): boolean {
+  const t = (url ?? "").trim();
+  return (
+    productDisplayImageIsPlaceholder(t) ||
+    t === PRODUCT_NO_IMAGE_PATH ||
+    t.endsWith("/images/no-image.png")
+  );
 }

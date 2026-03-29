@@ -154,6 +154,30 @@ function parseMarketScoreField(v: unknown): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
+function parseAmazonMatchScoreField(v: unknown): number | undefined {
+  if (v == null) return undefined;
+  const n = typeof v === "number" ? v : Number(v);
+  if (!Number.isFinite(n)) return undefined;
+  return Math.max(0, Math.min(100, n));
+}
+
+function parseAmazonMatchedAt(v: unknown): string | null {
+  if (v == null) return null;
+  if (typeof v === "string") {
+    const t = v.trim();
+    return t || null;
+  }
+  if (
+    typeof v === "object" &&
+    v !== null &&
+    "toDate" in v &&
+    typeof (v as { toDate: () => Date }).toDate === "function"
+  ) {
+    return (v as { toDate: () => Date }).toDate().toISOString();
+  }
+  return null;
+}
+
 
 export type OliveYoungProductDetail = {
   goodsNo: string;
@@ -316,6 +340,8 @@ export function marketplaceExtensionForListItem(
   | "primaryShop"
   | "imageSource"
   | "marketScore"
+  | "amazonMatchScore"
+  | "amazonMatchedAt"
 > {
   if (!p) return {};
   return {
@@ -332,6 +358,8 @@ export function marketplaceExtensionForListItem(
     primaryShop: p.primaryShop,
     imageSource: p.imageSource,
     marketScore: p.marketScore,
+    amazonMatchScore: p.amazonMatchScore,
+    amazonMatchedAt: p.amazonMatchedAt,
   };
 }
 
@@ -512,6 +540,8 @@ export async function getOliveYoungProductByGoodsNo(
     primaryShop: parsePrimaryShopField(data.primaryShop),
     imageSource: parseRevenueImageSource(data.imageSource),
     marketScore: parseMarketScoreField(data.marketScore),
+    amazonMatchScore: parseAmazonMatchScoreField(data.amazonMatchScore),
+    amazonMatchedAt: parseAmazonMatchedAt(data.amazonMatchedAt),
   };
 }
 
@@ -590,6 +620,8 @@ export async function getOliveYoungProductsByGoodsNos(
       primaryShop: p.primaryShop,
       imageSource: p.imageSource,
       marketScore: p.marketScore,
+      amazonMatchScore: p.amazonMatchScore,
+      amazonMatchedAt: p.amazonMatchedAt,
     });
   }
   return result;
@@ -827,6 +859,8 @@ export async function getAllOliveYoungProductsMinimal(): Promise<
       primaryShop: parsePrimaryShopField(data.primaryShop),
       imageSource: parseRevenueImageSource(data.imageSource),
       marketScore: parseMarketScoreField(data.marketScore),
+      amazonMatchScore: parseAmazonMatchScoreField(data.amazonMatchScore),
+      amazonMatchedAt: parseAmazonMatchedAt(data.amazonMatchedAt),
     };
   });
 }

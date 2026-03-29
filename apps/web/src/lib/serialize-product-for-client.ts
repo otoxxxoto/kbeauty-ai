@@ -127,6 +127,18 @@ export function serializeProductImageFieldsForClient(
       rakutenImage: str(p.rakutenImage),
     }),
     ...(str(p.qoo10Image) !== undefined && { qoo10Image: str(p.qoo10Image) }),
+    ...(str(p.oliveYoungImageUrl) !== undefined && {
+      oliveYoungImageUrl: str(p.oliveYoungImageUrl),
+    }),
+    ...(str(p.amazonImageUrl) !== undefined && {
+      amazonImageUrl: str(p.amazonImageUrl),
+    }),
+    ...(str(p.rakutenImageUrl) !== undefined && {
+      rakutenImageUrl: str(p.rakutenImageUrl),
+    }),
+    ...(str(p.qoo10ImageUrl) !== undefined && {
+      qoo10ImageUrl: str(p.qoo10ImageUrl),
+    }),
     ...(imageAnalysis ? { imageAnalysis } : {}),
     ...(marketplaceImageMatchLevels
       ? { marketplaceImageMatchLevels }

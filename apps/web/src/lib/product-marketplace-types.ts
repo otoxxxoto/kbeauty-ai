@@ -24,6 +24,7 @@ export type ProductRevenueImageSource =
  * 商品ごとのマーケット／収益向けフィールド（既存 amazonImage 等と併存可能）
  */
 export type ProductMarketplaceFields = {
+  /** Amazon 商品 ASIN（Firestore キーは `asin`） */
   asin?: string;
   amazonUrl?: string;
   /** 明示的なAmazon商品画像（未設定時は amazonImage へフォールバック可） */
@@ -56,6 +57,12 @@ export type ProductMarketplaceFields = {
   imageSource?: ProductRevenueImageSource;
   /** Job やバッチで付与する売れ筋スコア（任意・ denormalized） */
   marketScore?: number;
+  /**
+   * Amazon 候補照合スコア（0–100）。Creators / PA-API 補完 Job で付与
+   */
+  amazonMatchScore?: number;
+  /** 上記マッチを確定した日時（ISO 文字列） */
+  amazonMatchedAt?: string | null;
 };
 
 export type ProductImagePickResult = {

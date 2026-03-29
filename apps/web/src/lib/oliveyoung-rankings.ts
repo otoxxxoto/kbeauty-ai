@@ -10,7 +10,14 @@ import {
   type ProductImageAnalysisEntry,
   type ProductImageFields,
 } from "@/lib/oliveyoung-products";
-import type { ProductMarketplaceFields } from "@/lib/product-marketplace-types";
+import type {
+  ProductMarketplaceFields,
+  ProductRevenueImageSource,
+} from "@/lib/product-marketplace-types";
+import {
+  getProductImage,
+  buildGetProductImageInputFromFields,
+} from "@/lib/getProductImage";
 
 /** ランキング行の name と public.name をマージ（行が goodsNo のときは public の実名を優先） */
 function resolveRankingItemName(
@@ -26,17 +33,58 @@ function resolveRankingItemName(
 
 const RANKINGS_COLLECTION = "oliveyoung_rankings";
 
-/**
- * 一覧ソート用: `getMarketScore` の rankingScore と同形（max(0, 100 - rank)）。
- * 画像が無い商品は -30 して下位へ寄せる。
- */
-function rankingScoreForSort(rank: number, imageUrl: string): number {
-  const r = Number.isFinite(rank) ? Math.max(0, Number(rank)) : 0;
-  let rankingScore = Math.max(0, 100 - r);
-  if (!imageUrl.trim()) {
-    rankingScore -= 30;
+function rankingItemToImageFields(
+  item: RankingItemWithProduct
+): ProductImageFields {
+  return {
+    imageUrl: item.imageUrl,
+    thumbnailUrl: item.thumbnailUrl,
+    imageUrls: item.imageUrls,
+    safeImageUrl: item.safeImageUrl,
+    hasSafeProductImage: item.hasSafeProductImage,
+    imageAnalysis: item.imageAnalysis,
+    marketplaceImageMatchLevels: item.marketplaceImageMatchLevels,
+    amazonImage: item.amazonImage,
+    rakutenImage: item.rakutenImage,
+    qoo10Image: item.qoo10Image,
+    oliveYoungImageUrl: item.oliveYoungImageUrl,
+    amazonImageUrl: item.amazonImageUrl,
+    rakutenImageUrl: item.rakutenImageUrl,
+    qoo10ImageUrl: item.qoo10ImageUrl,
+  };
+}
+
+function revenueImageSourceSortBoost(s: ProductRevenueImageSource): number {
+  switch (s) {
+    case "amazon":
+      return 100;
+    case "rakuten":
+    case "qoo10":
+      return 80;
+    case "oliveyoung":
+      return 60;
+    case "fallback_no_image":
+      return -40;
+    default:
+      return 0;
   }
-  return rankingScore;
+}
+
+/**
+ * 一覧ソート: ベースは max(0, 100 - rank)。
+ * getProductImage のチャネルで加点（amazon > 楽天/Qoo10 > OY）、fallback_no_image は減点。
+ */
+function rankingSortScore(item: RankingItemWithProduct): number {
+  const r = Number.isFinite(item.rank) ? Math.max(0, Number(item.rank)) : 0;
+  let score = Math.max(0, 100 - r);
+  const { imageSource } = getProductImage(
+    buildGetProductImageInputFromFields(
+      rankingItemToImageFields(item),
+      item.goodsNo
+    )
+  );
+  score += revenueImageSourceSortBoost(imageSource);
+  return score;
 }
 
 /** 補完後のランキング行を「画像あり優先＋実効 rankingScore」で並べ替え（同点は元順位） */
@@ -44,8 +92,8 @@ function sortEnrichedRankingItems(
   items: RankingItemWithProduct[]
 ): RankingItemWithProduct[] {
   return [...items].sort((a, b) => {
-    const sa = rankingScoreForSort(a.rank, a.imageUrl);
-    const sb = rankingScoreForSort(b.rank, b.imageUrl);
+    const sa = rankingSortScore(a);
+    const sb = rankingSortScore(b);
     if (sb !== sa) return sb - sa;
     return a.rank - b.rank;
   });

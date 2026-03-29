@@ -242,7 +242,11 @@ export default async function OliveYoungEntryPage() {
                           className="group flex min-h-0 flex-1 flex-col"
                         >
                           <div className={PRODUCT_CARD_IMAGE_FRAME_CLASS}>
-                            <ProductDisplayImage product={item} alt={displayName} />
+                            <ProductDisplayImage
+                              product={item}
+                              alt={displayName}
+                              goodsNo={item.goodsNo}
+                            />
                           </div>
                           <div className={PRODUCT_CARD_INFO_CLASS}>
                             <div className="shrink-0">
@@ -346,7 +350,11 @@ export default async function OliveYoungEntryPage() {
                             className="group flex min-h-0 flex-1 flex-col"
                           >
                             <div className={PRODUCT_CARD_IMAGE_FRAME_CLASS}>
-                              <ProductDisplayImage product={item} alt={displayName} />
+                              <ProductDisplayImage
+                                product={item}
+                                alt={displayName}
+                                goodsNo={item.goodsNo}
+                              />
                             </div>
                             <div className={PRODUCT_CARD_INFO_CLASS}>
                               <div className="shrink-0">

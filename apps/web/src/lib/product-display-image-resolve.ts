@@ -23,6 +23,12 @@ export type ProductMarketplaceImages = {
 export type ProductImageFields = ProductMarketplaceImages & {
   imageUrl?: string;
   thumbnailUrl?: string;
+  /** OY 専用画像 URL（getProductImage チェーン用） */
+  oliveYoungImageUrl?: string;
+  /** 明示モール画像（Vision strong パスとは別。収益フォールバックで利用） */
+  amazonImageUrl?: string;
+  rakutenImageUrl?: string;
+  qoo10ImageUrl?: string;
   imageUrls?: string[];
   /** Vision Job: 公式系など人物なしと判定した表示用URL */
   safeImageUrl?: string;
