@@ -112,7 +112,8 @@ function marketplaceChannelAllowed(
   return levels[channel] === "strong";
 }
 
-function analysisForUrl(
+/** 公開面の人物判定に利用（URL 完全一致で imageAnalysis を引く） */
+export function imageAnalysisEntryForProductUrl(
   p: Pick<ProductImageFields, "imageAnalysis">,
   url: string
 ): ProductImageAnalysisEntry | undefined {
@@ -145,7 +146,7 @@ export function resolveProductDisplayImage(
 
   const allowOyPerson = allowOyPersonImageFromEnv();
   for (const u of collectOyOrderedImageUrls(p)) {
-    const a = analysisForUrl(p, u);
+    const a = imageAnalysisEntryForProductUrl(p, u);
     if (a && !a.containsPerson) {
       return {
         url: u,
@@ -170,7 +171,7 @@ export function resolveProductDisplayImage(
     if (!url) return "";
     if (!marketplaceChannelAllowed(p.marketplaceImageMatchLevels, channel))
       return "";
-    const a = analysisForUrl(p, url);
+    const a = imageAnalysisEntryForProductUrl(p, url);
     if (!a) return "";
     if (a.containsPerson) return "";
     return url;
@@ -242,7 +243,7 @@ export function isOyPersonAnalyzedAllContainPersonAndPlaceholder(
   const oy = collectOyOrderedImageUrls(p);
   if (oy.length === 0) return false;
   for (const u of oy) {
-    const a = analysisForUrl(p, u);
+    const a = imageAnalysisEntryForProductUrl(p, u);
     if (!a) return false;
     if (!a.containsPerson) return false;
   }

@@ -143,6 +143,7 @@ export function ProductDisplayImage({
         event: "load",
         goodsNo: goodsNo ?? "",
         imageSource: pipelineRef.current.imageSource,
+        imagePolicy: pipelineRef.current.imagePolicy,
         displaySource: pipelineRef.current.displaySource,
         srcHost: imageSrcHostForDebug(src),
         displayedUrl: src,
@@ -164,6 +165,7 @@ export function ProductDisplayImage({
         event: "error",
         goodsNo: goodsNo ?? "",
         imageSource: pip.imageSource,
+        imagePolicy: pip.imagePolicy,
         displaySource: pip.displaySource,
         srcHost: imageSrcHostForDebug(failedUrl),
         /** 失敗したリクエスト URL（プレースホルダー切替前） */
@@ -191,6 +193,7 @@ export function ProductDisplayImage({
       pipelineUrl: pipeline.url,
       finalDisplayedUrl: displaySrc,
       imageSource: pipeline.imageSource,
+      imagePolicy: pipeline.imagePolicy,
       usedFallback,
     });
   }, [goodsNo, pipeline.url, pipeline.imageSource, displaySrc]);
@@ -201,9 +204,10 @@ export function ProductDisplayImage({
     console.log("[IMAGE_SOURCE_DEBUG]", {
       goodsNo: goodsNo ?? "",
       imageSource: pipeline.imageSource,
+      imagePolicy: pipeline.imagePolicy,
       displaySource: pipeline.displaySource,
     });
-  }, [goodsNo, pipeline.imageSource, pipeline.displaySource]);
+  }, [goodsNo, pipeline.imageSource, pipeline.imagePolicy, pipeline.displaySource]);
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_ONE_PERSON_IMAGE_DEBUG !== "1") return;
@@ -213,6 +217,7 @@ export function ProductDisplayImage({
       chosenDisplayUrl: displaySrc,
       displaySource: pipeline.displaySource,
       imageSource: pipeline.imageSource,
+      imagePolicy: pipeline.imagePolicy,
       safeImageUrl: plain.safeImageUrl ?? null,
       hasSafeProductImage: plain.hasSafeProductImage === true,
       matchedAnalysisContainsPerson: matchedAnalysis?.containsPerson ?? null,
@@ -222,6 +227,7 @@ export function ProductDisplayImage({
     displaySrc,
     pipeline.displaySource,
     pipeline.imageSource,
+    pipeline.imagePolicy,
     plain.safeImageUrl,
     plain.hasSafeProductImage,
     matchedAnalysis?.containsPerson,
@@ -235,6 +241,7 @@ export function ProductDisplayImage({
       role="img"
       aria-label={alt}
       data-image-source={pipeline.imageSource}
+      data-image-policy={isDev ? pipeline.imagePolicy : undefined}
       data-image-pipeline-url={pipelineUrlNorm || undefined}
       data-image-display-url={dataUrl || undefined}
       data-image-display-host={dataHost || undefined}
@@ -267,6 +274,7 @@ export function ProductDisplayImage({
           onLoad={handleLoad}
           onError={onError}
           data-image-source={pipeline.imageSource}
+          data-image-policy={isDev ? pipeline.imagePolicy : undefined}
           data-image-host={dataHost || undefined}
           data-image-url={dataUrl || undefined}
           data-image-pipeline-url={pipelineUrlNorm || undefined}

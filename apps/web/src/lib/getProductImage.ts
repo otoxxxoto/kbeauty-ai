@@ -3,11 +3,19 @@ import type { ProductDisplayImageSource } from "@/lib/product-display-image-reso
 import {
   resolveProductDisplayImage,
   productDisplayImageIsPlaceholder,
+  imageAnalysisEntryForProductUrl,
   type ProductImageFields,
 } from "@/lib/product-display-image-resolve";
+import type { ProductRevenueImageSource } from "@/lib/product-marketplace-types";
 
 /** プレースホルダー（public 配下。無い場合はビルド後に配置可能） */
 export const PRODUCT_NO_IMAGE_PATH = "/images/no-image.png";
+
+export type PublicImageDisplayPolicy =
+  | "safe_person_free"
+  | "unsafe_person_possible"
+  | "mall_image"
+  | "fallback_no_image";
 
 export type ProductImageInput = {
   /** `NEXT_PUBLIC_IMAGE_SOURCE_DEBUG=1` 時に console へ出す用 */
@@ -31,16 +39,22 @@ function pick(u?: string): string | undefined {
   return t || undefined;
 }
 
+function logImagePickDebug(
+  goodsNo: string,
+  result: ProductImagePickResult
+): void {
+  if (
+    process.env.NEXT_PUBLIC_IMAGE_SOURCE_DEBUG === "1" &&
+    (goodsNo || result.imageSource !== "fallback_no_image")
+  ) {
+    // eslint-disable-next-line no-console -- 明示デバッグフラグ時のみ
+    console.log("IMAGE_SOURCE", { goodsNo, imageSource: result.imageSource });
+  }
+}
+
 /**
- * 収益・一覧用の画像優先順（フォールバックチェーン）
- *
- * 1. oliveYoungImageUrl
- * 2. amazonImageUrl（なければ amazonImage）
- * 3. rakutenImageUrl（なければ rakutenImage）
- * 4. qoo10ImageUrl（なければ qoo10Image）
- * 5. imageUrl
- * 6. thumbnailUrl
- * 7. /images/no-image.png
+ * 収益・バッチ向けの画像優先チェーン（人物判定なし）。
+ * 公開カードでは `getProductImagePersonSafeFromFields` / `resolveProductImageForDisplay` を使うこと。
  */
 export function getProductImage(input: ProductImageInput): ProductImagePickResult {
   const goodsNo = pick(input.goodsNo) ?? "";
@@ -72,14 +86,7 @@ export function getProductImage(input: ProductImageInput): ProductImagePickResul
     };
   }
 
-  if (
-    process.env.NEXT_PUBLIC_IMAGE_SOURCE_DEBUG === "1" &&
-    (goodsNo || result.imageSource !== "fallback_no_image")
-  ) {
-    // eslint-disable-next-line no-console -- 明示デバッグフラグ時のみ
-    console.log("IMAGE_SOURCE", { goodsNo, imageSource: result.imageSource });
-  }
-
+  logImagePickDebug(goodsNo, result);
   return result;
 }
 
@@ -108,17 +115,119 @@ export function buildGetProductImageInputFromFields(
   };
 }
 
+/**
+ * 公開面フォールバック用: `imageAnalysis` で URL 一致かつ `containsPerson===false` のものだけ採用。
+ * 解析欠如の URL は使わない（保守的）。
+ */
+function tryPersonFreeUrl(
+  p: ProductImageFields,
+  url: string | undefined,
+  source: ProductRevenueImageSource
+): ProductImagePickResult | null {
+  const u = pick(url);
+  if (!u) return null;
+  const entry = imageAnalysisEntryForProductUrl(p, u);
+  if (!entry || entry.containsPerson) return null;
+  return { url: u, imageSource: source };
+}
+
+export function getProductImagePersonSafeFromFields(
+  p: ProductImageFields,
+  goodsNo?: string
+): ProductImagePickResult {
+  const gid = goodsNo != null ? String(goodsNo).trim() : "";
+
+  const attempts: Array<() => ProductImagePickResult | null> = [
+    () => tryPersonFreeUrl(p, p.oliveYoungImageUrl, "oliveyoung"),
+    () =>
+      tryPersonFreeUrl(
+        p,
+        pick(p.amazonImageUrl) ?? pick(p.amazonImage),
+        "amazon"
+      ),
+    () =>
+      tryPersonFreeUrl(
+        p,
+        pick(p.rakutenImageUrl) ?? pick(p.rakutenImage),
+        "rakuten"
+      ),
+    () =>
+      tryPersonFreeUrl(
+        p,
+        pick(p.qoo10ImageUrl) ?? pick(p.qoo10Image),
+        "qoo10"
+      ),
+    () => tryPersonFreeUrl(p, p.imageUrl, "oliveyoung"),
+    () => tryPersonFreeUrl(p, p.thumbnailUrl, "oliveyoung"),
+  ];
+
+  for (const fn of attempts) {
+    const r = fn();
+    if (r) {
+      logImagePickDebug(gid, r);
+      return r;
+    }
+  }
+
+  const fallback: ProductImagePickResult = {
+    url: PRODUCT_NO_IMAGE_PATH,
+    imageSource: "fallback_no_image",
+  };
+  logImagePickDebug(gid, fallback);
+  return fallback;
+}
+
+export function computePublicImagePolicy(
+  url: string,
+  imageSource: string,
+  displaySource: ProductDisplayImageSource,
+  showOfficialImageBadge: boolean
+): PublicImageDisplayPolicy {
+  const t = (url ?? "").trim();
+  if (
+    productDisplayImageIsPlaceholder(t) ||
+    t === PRODUCT_NO_IMAGE_PATH ||
+    t.endsWith("/images/no-image.png") ||
+    imageSource === "fallback_no_image"
+  ) {
+    return "fallback_no_image";
+  }
+
+  if (imageSource.startsWith("display:")) {
+    if (displaySource === "safe_image") return "safe_person_free";
+    if (displaySource === "oy_official_safe") {
+      return showOfficialImageBadge
+        ? "safe_person_free"
+        : "unsafe_person_possible";
+    }
+    if (displaySource === "marketplace_strong") return "mall_image";
+    return "fallback_no_image";
+  }
+
+  if (
+    imageSource === "amazon" ||
+    imageSource === "rakuten" ||
+    imageSource === "qoo10"
+  ) {
+    return "mall_image";
+  }
+  if (imageSource === "oliveyoung") return "safe_person_free";
+
+  return "fallback_no_image";
+}
+
 export type ProductDisplayPipelineResult = {
   url: string;
   /** 最終表示に効いたソース（display:* または amazon|rakuten|…） */
   imageSource: string;
   displaySource: ProductDisplayImageSource;
   showOfficialImageBadge: boolean;
+  imagePolicy: PublicImageDisplayPolicy;
 };
 
 /**
  * まず resolveProductDisplayImage（Vision / safe / strong）、
- * プレースホルダーのときだけ getProductImage でモール URL をフォールバック。
+ * プレースホルダーのときだけ人物なし検証済みモール URL をフォールバック。
  */
 export function resolveProductImageForDisplay(
   plain: ProductImageFields,
@@ -133,9 +242,7 @@ export function resolveProductImageForDisplay(
     resolved.showOfficialImageBadge && !placeholder;
 
   if (placeholder) {
-    const gp = getProductImage(
-      buildGetProductImageInputFromFields(plain, options?.goodsNo)
-    );
+    const gp = getProductImagePersonSafeFromFields(plain, options?.goodsNo);
     if (gp.imageSource !== "fallback_no_image") {
       url = gp.url;
       imageSource = gp.imageSource;
@@ -143,11 +250,19 @@ export function resolveProductImageForDisplay(
     }
   }
 
+  const imagePolicy = computePublicImagePolicy(
+    url,
+    imageSource,
+    resolved.source,
+    showOfficialImageBadge
+  );
+
   return {
     url,
     imageSource,
     displaySource: resolved.source,
     showOfficialImageBadge,
+    imagePolicy,
   };
 }
 

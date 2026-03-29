@@ -19,6 +19,7 @@ import {
   getRankingWithProducts,
   getRisingProductsWithProducts,
   getRankingTopNWithProducts,
+  sortRankingItemsByImageVisualBoost,
 } from "../src/lib/oliveyoung-rankings";
 import {
   dominantImageSourceBucket,
@@ -76,12 +77,18 @@ async function main() {
   const officialCounts = tallyImageSourcesForProducts(officialProducts);
   printBlock(`ランキング公式1〜50位（${runDate}）`, officialCounts);
 
-  // --- 一覧ページと同じ「表示順」先頭50件（画像ブースト後ソート）---
+  // --- 注目・おすすめ枠向け「画像ブースト」順の先頭50件（公開一覧は公式 rank 順）---
   const withProducts = await getRankingWithProducts(runDate);
   if (withProducts) {
-    const display50 = withProducts.items.slice(0, 50);
+    const display50 = sortRankingItemsByImageVisualBoost(withProducts.items).slice(
+      0,
+      50
+    );
     const displayCounts = tallyImageSourcesForProducts(display50);
-    printBlock(`ランキング表示順・先頭50件（${runDate}）`, displayCounts);
+    printBlock(
+      `画像ブースト順・先頭50件（${runDate}・レポート用）`,
+      displayCounts
+    );
   }
 
   // --- トップ: 急上昇 + 注目TOP3 ---

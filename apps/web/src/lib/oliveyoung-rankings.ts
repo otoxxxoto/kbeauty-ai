@@ -54,10 +54,10 @@ function rankingItemToImageFields(
 }
 
 /**
- * 一覧ソート: ベースは max(0, 100 - rank)。
- * カードに実際に出る画像のバケットで加点（`rankingVisualBoostForDisplayedBucket`）。
+ * 注目・おすすめ枠向け: ベースは max(0, 100 - rank) + 表示画像バケット加点。
+ * 公開ランキング一覧の並びには使わない。
  */
-function rankingSortScore(item: RankingItemWithProduct): number {
+function rankingVisualSortScore(item: RankingItemWithProduct): number {
   const r = Number.isFinite(item.rank) ? Math.max(0, Number(item.rank)) : 0;
   let score = Math.max(0, 100 - r);
   const plain = serializeProductImageFieldsForClient(
@@ -69,13 +69,16 @@ function rankingSortScore(item: RankingItemWithProduct): number {
   return score;
 }
 
-/** 補完後のランキング行を「画像あり優先＋実効 rankingScore」で並べ替え（同点は元順位） */
-function sortEnrichedRankingItems(
+/**
+ * 画像ブースト付きソート（同点は公式 rank 昇順）。
+ * トップの「注目」枠やレポートの「表示順シミュレーション」向け。
+ */
+export function sortRankingItemsByImageVisualBoost(
   items: RankingItemWithProduct[]
 ): RankingItemWithProduct[] {
   return [...items].sort((a, b) => {
-    const sa = rankingSortScore(a);
-    const sb = rankingSortScore(b);
+    const sa = rankingVisualSortScore(a);
+    const sb = rankingVisualSortScore(b);
     if (sb !== sa) return sb - sa;
     return a.rank - b.rank;
   });
@@ -183,7 +186,7 @@ export async function getRankingByDate(
 
 /**
  * 指定日のランキングを取得し、oliveyoung_products_public で画像・URL を補完
- * 順序は rank 昇順のまま
+ * 順序は公式 rank 昇順（画像ブーストによる並び替えはしない）
  */
 export async function getRankingWithProducts(
   runDate: string
@@ -232,7 +235,7 @@ export async function getRankingWithProducts(
     });
   }
 
-  return { meta: ranking.meta, items: sortEnrichedRankingItems(enriched) };
+  return { meta: ranking.meta, items: enriched };
 }
 
 /** 急上昇商品1件（順位上昇 or 新規ランクイン）。rankDiff は正の値＝上昇幅（Firestore由来 or 前日比計算）。isNew は新規ランクイン */
@@ -262,7 +265,8 @@ export async function getRisingProductsWithProducts(
     if (row.goodsNo) prevRankByGoodsNo.set(row.goodsNo, row.rank);
   }
 
-  const candidates: { row: RankingItemRow; rankDiff?: number; isNew: boolean }[] = [];
+  const candidates: { row: RankingItemRow; rankDiff?: number; isNew: boolean }[] =
+    [];
   for (const row of rankingLatest.items) {
     const prevRank = prevRankByGoodsNo.get(row.goodsNo);
     if (prevRank === undefined) {
