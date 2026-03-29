@@ -26,6 +26,31 @@ function resolveRankingItemName(
 
 const RANKINGS_COLLECTION = "oliveyoung_rankings";
 
+/**
+ * 一覧ソート用: `getMarketScore` の rankingScore と同形（max(0, 100 - rank)）。
+ * 画像が無い商品は -30 して下位へ寄せる。
+ */
+function rankingScoreForSort(rank: number, imageUrl: string): number {
+  const r = Number.isFinite(rank) ? Math.max(0, Number(rank)) : 0;
+  let rankingScore = Math.max(0, 100 - r);
+  if (!imageUrl.trim()) {
+    rankingScore -= 30;
+  }
+  return rankingScore;
+}
+
+/** 補完後のランキング行を「画像あり優先＋実効 rankingScore」で並べ替え（同点は元順位） */
+function sortEnrichedRankingItems(
+  items: RankingItemWithProduct[]
+): RankingItemWithProduct[] {
+  return [...items].sort((a, b) => {
+    const sa = rankingScoreForSort(a.rank, a.imageUrl);
+    const sb = rankingScoreForSort(b.rank, b.imageUrl);
+    if (sb !== sa) return sb - sa;
+    return a.rank - b.rank;
+  });
+}
+
 export type RankingItemRow = {
   rank: number;
   goodsNo: string;
@@ -177,7 +202,7 @@ export async function getRankingWithProducts(
     });
   }
 
-  return { meta: ranking.meta, items: enriched };
+  return { meta: ranking.meta, items: sortEnrichedRankingItems(enriched) };
 }
 
 /** 急上昇商品1件（順位上昇 or 新規ランクイン）。rankDiff は正の値＝上昇幅（Firestore由来 or 前日比計算）。isNew は新規ランクイン */
@@ -277,51 +302,11 @@ export async function getRankingTopNWithProducts(
   runDate: string,
   n: number
 ): Promise<{ meta: RankingMeta; items: RankingItemWithProduct[] } | null> {
-  const ranking = await getRankingByDate(runDate);
-  if (!ranking) return null;
-
-  const topRows = ranking.items.slice(0, n);
-  const enriched: RankingItemWithProduct[] = [];
-
-  for (const row of topRows) {
-    const publicProduct = await getOliveYoungProductByGoodsNo(row.goodsNo);
-    const imageUrl = publicProduct?.imageUrl ?? "";
-    const thumbnailUrl = publicProduct?.thumbnailUrl ?? "";
-    const productUrl = publicProduct?.productUrl ?? "";
-    const lastRank = publicProduct?.lastRank ?? publicProduct?.lastSeenRank ?? null;
-    const lastSeenRunDate = publicProduct?.lastSeenRunDate ?? null;
-    const name = resolveRankingItemName(row.name, publicProduct?.name);
-    const brand = (row.brand || publicProduct?.brand || "").trim();
-    const nameJa = publicProduct?.nameJa?.trim();
-    const brandJaRaw = publicProduct?.brandJa?.trim();
-    const brandJa =
-      brandJaRaw && !isUnsafeBrandJa(brandJaRaw) ? brandJaRaw : undefined;
-
-    enriched.push({
-      ...row,
-      name,
-      nameJa: nameJa || undefined,
-      brand: brand || "",
-      brandJa,
-      amazonImage: publicProduct?.amazonImage,
-      rakutenImage: publicProduct?.rakutenImage,
-      qoo10Image: publicProduct?.qoo10Image,
-      amazonUrl: publicProduct?.amazonUrl,
-      rakutenUrl: publicProduct?.rakutenUrl,
-      qoo10Url: publicProduct?.qoo10Url,
-      imageUrl,
-      thumbnailUrl,
-      imageUrls: publicProduct?.imageUrls,
-      safeImageUrl: publicProduct?.safeImageUrl,
-      hasSafeProductImage: publicProduct?.hasSafeProductImage,
-      imageAnalysis: publicProduct?.imageAnalysis,
-      marketplaceImageMatchLevels: publicProduct?.marketplaceImageMatchLevels,
-      productUrl,
-      lastRank,
-      lastSeenRunDate,
-      ...marketplaceExtensionForListItem(publicProduct ?? null),
-    });
-  }
-
-  return { meta: ranking.meta, items: enriched };
+  const full = await getRankingWithProducts(runDate);
+  if (!full) return null;
+  const cap = Math.max(0, Math.floor(n));
+  return {
+    meta: full.meta,
+    items: full.items.slice(0, cap),
+  };
 }
