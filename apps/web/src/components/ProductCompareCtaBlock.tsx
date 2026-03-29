@@ -72,9 +72,15 @@ export function ProductCompareCtaBlock({
               rel={relForShop(r.shop)}
               className="flex items-center justify-between gap-3 rounded-xl border border-zinc-200 bg-zinc-50/40 px-4 py-3 hover:bg-zinc-50 transition-colors"
               onClick={() =>
-                logAffiliateClick(goodsNo, r.shop, position, r.href, {
-                  ctaPlacement: "compare",
-                  pageType: "product_detail",
+                logAffiliateClick({
+                  goodsNo,
+                  shop: r.shop,
+                  position,
+                  href: r.href,
+                  ctx: {
+                    ctaPlacement: "compare",
+                    pageType: "product_detail",
+                  },
                 })
               }
             >

@@ -286,6 +286,11 @@ export default async function OliveYoungEntryPage() {
                           <ProductCardOliveYoungLink
                             oliveYoungUrl={item.oliveYoungUrl}
                             goodsNo={item.goodsNo}
+                            gaAffiliate={{
+                              position: "rising_card",
+                              productName: displayName,
+                              pageType: "ranking",
+                            }}
                           />
                           <ProductAffiliateCtas
                             goodsNo={item.goodsNo}
@@ -370,6 +375,11 @@ export default async function OliveYoungEntryPage() {
                           <ProductCardOliveYoungLink
                             oliveYoungUrl={item.oliveYoungUrl}
                             goodsNo={item.goodsNo}
+                            gaAffiliate={{
+                              position: "featured_card",
+                              productName: displayName,
+                              pageType: "ranking",
+                            }}
                           />
                           <ProductAffiliateCtas
                             goodsNo={item.goodsNo}

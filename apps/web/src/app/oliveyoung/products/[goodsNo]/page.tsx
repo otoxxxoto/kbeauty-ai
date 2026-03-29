@@ -267,6 +267,7 @@ function ShopCtaBlock({
   showFetchedAt,
   sectionId,
   goodsNo,
+  productNameForGa,
 }: {
   rows: PriceRow[];
   cheapestIndex: number | null;
@@ -274,6 +275,8 @@ function ShopCtaBlock({
   showFetchedAt?: boolean;
   sectionId?: string;
   goodsNo: string;
+  /** GA affiliate_click の product 用 */
+  productNameForGa?: string;
 }) {
   const id = sectionId ?? "shop-cta-heading";
   return (
@@ -316,6 +319,11 @@ function ShopCtaBlock({
                   shop={row.shop}
                   goodsNo={goodsNo}
                   className={btnClass}
+                  gaAffiliateClick={{
+                    position: "product_detail_bottom",
+                    productName: productNameForGa,
+                    pageType: "product_detail",
+                  }}
                 >
                   {isCheapest ? "最安価格で見る" : "このショップで見る"}
                 </LoggedShopLink>
@@ -626,6 +634,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
             showFetchedAt
             sectionId="shop-cta-price"
             goodsNo={goodsNo}
+            productNameForGa={displayName}
           />
         </section>
       )}

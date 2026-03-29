@@ -84,7 +84,13 @@ export function ProductPrimaryCtaBlock({
           rel={AMAZON_AFFILIATE_REL}
           className={amazonBtn}
           onClick={() =>
-            logAffiliateClick(goodsNo, "amazon", position, urls.amazon, gaCtx)
+            logAffiliateClick({
+              goodsNo,
+              shop: "amazon",
+              position,
+              href: urls.amazon,
+              ctx: gaCtx,
+            })
           }
         >
           {CTA_COPY.primary.amazon}
@@ -99,7 +105,13 @@ export function ProductPrimaryCtaBlock({
           rel={RAKUTEN_AFFILIATE_REL}
           className={rakutenBtn}
           onClick={() =>
-            logAffiliateClick(goodsNo, "rakuten", position, urls.rakuten, gaCtx)
+            logAffiliateClick({
+              goodsNo,
+              shop: "rakuten",
+              position,
+              href: urls.rakuten,
+              ctx: gaCtx,
+            })
           }
         >
           {CTA_COPY.primary.rakuten}
@@ -114,7 +126,13 @@ export function ProductPrimaryCtaBlock({
           rel={QOO10_AFFILIATE_REL}
           className={qoo10Btn}
           onClick={() =>
-            logAffiliateClick(goodsNo, "qoo10", position, urls.qoo10, gaCtx)
+            logAffiliateClick({
+              goodsNo,
+              shop: "qoo10",
+              position,
+              href: urls.qoo10,
+              ctx: gaCtx,
+            })
           }
         >
           {CTA_COPY.primary.qoo10}
@@ -147,6 +165,12 @@ export function ProductPrimaryCtaBlock({
             goodsNo={goodsNo}
             linkLabel={CTA_COPY.primary.oliveYoungSupplement}
             className="max-w-full"
+            gaAffiliate={{
+              position,
+              productName: productNameForGa,
+              ctaPlacement: "primary",
+              pageType: "product_detail",
+            }}
           />
         </div>
       ) : null}

@@ -20,7 +20,8 @@ export type AffiliateUrlsInput = {
   qoo10: string;
 };
 
-export type AffiliateClickSource = "amazon" | "rakuten" | "qoo10";
+/** GA `affiliate_click` の shop と API ログ用のショップ識別子 */
+export type AffiliateGaShop = "amazon" | "rakuten" | "qoo10" | "oliveyoung";
 type GaClickLocation = "top" | "detail" | "card";
 
 /** affiliate_click の position（計測用） */
@@ -44,24 +45,32 @@ export type AffiliateCtaPlacement =
 
 export type AffiliatePageType = "product_detail" | "ranking" | "category";
 
-/** 将来DB保存用。現状は console のみ */
-export function logAffiliateClick(
-  goodsNo: string,
-  source: AffiliateClickSource,
-  position: AffiliateClickPosition,
-  href?: string,
+export type LogAffiliateClickArgs = {
+  goodsNo: string;
+  /** GA の shop パラメータ（位置引数ミスを防ぐため必須） */
+  shop: AffiliateGaShop;
+  position: AffiliateClickPosition;
+  href?: string;
   ctx?: {
-    /** CTA の役割/配置（後方互換: 未指定なら省略） */
     ctaPlacement?: AffiliateCtaPlacement;
-    /** 画面種別（後方互換: 未指定なら省略） */
     pageType?: AffiliatePageType;
     /** GA event 用（未指定時は goodsNo を使用） */
     productName?: string;
-  }
-): void {
+  };
+};
+
+function toGaLocation(p: AffiliateClickPosition): GaClickLocation {
+  if (p === "product_detail_first") return "top";
+  if (p === "product_detail_middle" || p === "product_detail_bottom") return "detail";
+  return "card";
+}
+
+/** GA4 `affiliate_click` とコンソールログ（将来DB保存用） */
+export function logAffiliateClick(args: LogAffiliateClickArgs): void {
+  const { goodsNo, shop, position, href, ctx } = args;
   const payload: Record<string, unknown> = {
     goodsNo,
-    source,
+    shop,
     position,
   };
   if (href != null && href !== "") payload.href = href;
@@ -69,18 +78,22 @@ export function logAffiliateClick(
   if (ctx?.pageType) payload.pageType = ctx.pageType;
   console.log("affiliate_click", payload);
 
-  const toGaLocation = (p: AffiliateClickPosition): GaClickLocation => {
-    if (p === "product_detail_first") return "top";
-    if (p === "product_detail_middle" || p === "product_detail_bottom") return "detail";
-    return "card";
-  };
   if (typeof window !== "undefined" && typeof window.gtag === "function") {
     window.gtag("event", "affiliate_click", {
-      shop: source,
+      shop,
       product: (ctx?.productName ?? goodsNo).trim() || goodsNo,
       location: toGaLocation(position),
     });
   }
+}
+
+export function isAffiliateGaShop(value: string): value is AffiliateGaShop {
+  return (
+    value === "amazon" ||
+    value === "rakuten" ||
+    value === "qoo10" ||
+    value === "oliveyoung"
+  );
 }
 
 type ProductAffiliateCtasProps = {
@@ -172,11 +185,29 @@ export function ProductAffiliateCtas({
   };
 
   const onAmazonClick = () =>
-    logAffiliateClick(goodsNo, "amazon", position, amazon, gaCtx);
+    logAffiliateClick({
+      goodsNo,
+      shop: "amazon",
+      position,
+      href: amazon,
+      ctx: gaCtx,
+    });
   const onRakutenClick = () =>
-    logAffiliateClick(goodsNo, "rakuten", position, rakuten, gaCtx);
+    logAffiliateClick({
+      goodsNo,
+      shop: "rakuten",
+      position,
+      href: rakuten,
+      ctx: gaCtx,
+    });
   const onQoo10Click = () =>
-    logAffiliateClick(goodsNo, "qoo10", position, qoo10, gaCtx);
+    logAffiliateClick({
+      goodsNo,
+      shop: "qoo10",
+      position,
+      href: qoo10,
+      ctx: gaCtx,
+    });
 
   const amazonButtonLabel = amazonOnly
     ? RELATED_PRODUCT_CARD_AMAZON_LABEL

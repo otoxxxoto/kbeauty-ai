@@ -97,7 +97,14 @@ function ProductCard({
       </div>
       <div className={`${PRODUCT_CARD_CTA_CLASS} flex flex-col gap-1.5`}>
         <ProductCardCta goodsNo={item.goodsNo} />
-        <ProductCardOliveYoungLink oliveYoungUrl={item.oliveYoungUrl} goodsNo={item.goodsNo} />
+        <ProductCardOliveYoungLink
+          oliveYoungUrl={item.oliveYoungUrl}
+          goodsNo={item.goodsNo}
+          gaAffiliate={{
+            position: "ranking_card",
+            pageType: "ranking",
+          }}
+        />
       </div>
     </div>
   );

@@ -95,7 +95,14 @@ function CategoryProductCard({
         >
           商品詳細を見る
         </Link>
-        <ProductCardOliveYoungLink oliveYoungUrl={p.oliveYoungUrl} goodsNo={p.goodsNo} />
+        <ProductCardOliveYoungLink
+          oliveYoungUrl={p.oliveYoungUrl}
+          goodsNo={p.goodsNo}
+          gaAffiliate={{
+            position: "category_card",
+            pageType: "category",
+          }}
+        />
       </div>
     </div>
   );
