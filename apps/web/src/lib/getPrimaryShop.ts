@@ -76,34 +76,35 @@ export function shouldSuppressAffiliateCtasForProduct(p: {
   amazonUrl?: string;
   rakutenUrl?: string;
   qoo10Url?: string;
-  /** Firestore 専用。未設定なら primaryShop のみで判定 */
-  oliveYoungUrl?: string;
+  /** Firestore の oliveYoungUrl のみ（補完済み oliveYoungUrl は使わない） */
+  oliveYoungUrlExplicit?: string | null;
 }): boolean {
   if (hasExplicitAffiliateUrl(p)) return false;
   const explicit = resolvePrimaryShop(p.primaryShop, {
     amazonUrl: p.amazonUrl,
     qoo10Url: p.qoo10Url,
     rakutenUrl: p.rakutenUrl,
-    oliveYoungUrl: p.oliveYoungUrl?.trim() || undefined,
+    oliveYoungUrl: p.oliveYoungUrlExplicit?.trim() || undefined,
   });
   return explicit === "oliveyoung";
 }
 
 /**
  * CTA 並び用。productUrl は渡さない（常にセットのため primary が歪む）。
+ * oliveYoungUrl（補完後）は使わず explicit のみ。
  */
 export function getPrimaryShopFromProduct(p: {
   primaryShop?: PrimaryShop | null;
   amazonUrl?: string;
   rakutenUrl?: string;
   qoo10Url?: string;
-  oliveYoungUrl?: string;
+  oliveYoungUrlExplicit?: string | null;
 }): PrimaryShop | null {
   return resolvePrimaryShop(p.primaryShop, {
     amazonUrl: p.amazonUrl,
     qoo10Url: p.qoo10Url,
     rakutenUrl: p.rakutenUrl,
-    oliveYoungUrl: p.oliveYoungUrl?.trim() || undefined,
+    oliveYoungUrl: p.oliveYoungUrlExplicit?.trim() || undefined,
   });
 }
 

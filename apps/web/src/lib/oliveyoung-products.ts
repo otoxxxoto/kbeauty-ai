@@ -19,6 +19,7 @@ import type {
   ProductMarketplaceFields,
   ProductRevenueImageSource,
 } from "@/lib/product-marketplace-types";
+import { resolveNormalizedOliveYoungUrl } from "@/lib/oliveyoung-official-url";
 
 export type {
   ProductImageAnalysisEntry,
@@ -310,6 +311,7 @@ export function marketplaceExtensionForListItem(
   | "qoo10ImageUrl"
   | "qoo10Title"
   | "oliveYoungUrl"
+  | "oliveYoungUrlExplicit"
   | "oliveYoungImageUrl"
   | "primaryShop"
   | "imageSource"
@@ -325,6 +327,7 @@ export function marketplaceExtensionForListItem(
     qoo10ImageUrl: p.qoo10ImageUrl,
     qoo10Title: p.qoo10Title,
     oliveYoungUrl: p.oliveYoungUrl,
+    oliveYoungUrlExplicit: p.oliveYoungUrlExplicit,
     oliveYoungImageUrl: p.oliveYoungImageUrl,
     primaryShop: p.primaryShop,
     imageSource: p.imageSource,
@@ -429,6 +432,12 @@ export async function getOliveYoungProductByGoodsNo(
   if (!snap.exists) return null;
 
   const data = snap.data() ?? {};
+  const productUrl = String(data.productUrl ?? "").trim();
+  const oliveYoungUrlExplicit = optHrefStr(data.oliveYoungUrl);
+  const oliveYoungUrlResolved = resolveNormalizedOliveYoungUrl(
+    oliveYoungUrlExplicit,
+    productUrl
+  );
 
   return {
     goodsNo: trimmed,
@@ -442,7 +451,7 @@ export async function getOliveYoungProductByGoodsNo(
     priceComparison: mapPriceComparisonFromFirestore(data.priceComparison),
     brand: String(data.brand ?? "").trim(),
     brandJa: data.brandJa != null ? String(data.brandJa).trim() : undefined,
-    productUrl: String(data.productUrl ?? "").trim(),
+    productUrl,
     pickedUrl: String(data.pickedUrl ?? "").trim(),
     amazonImage: optImageStr(data.amazonImage),
     rakutenImage: optImageStr(data.rakutenImage),
@@ -484,7 +493,8 @@ export async function getOliveYoungProductByGoodsNo(
     rakutenTitle: optPlainStr(data.rakutenTitle),
     qoo10ImageUrl: optImageStr(data.qoo10ImageUrl),
     qoo10Title: optPlainStr(data.qoo10Title),
-    oliveYoungUrl: optHrefStr(data.oliveYoungUrl),
+    oliveYoungUrl: oliveYoungUrlResolved,
+    oliveYoungUrlExplicit,
     oliveYoungImageUrl: optImageStr(data.oliveYoungImageUrl),
     primaryShop: parsePrimaryShopField(data.primaryShop),
     imageSource: parseRevenueImageSource(data.imageSource),
@@ -562,6 +572,7 @@ export async function getOliveYoungProductsByGoodsNos(
       qoo10ImageUrl: p.qoo10ImageUrl,
       qoo10Title: p.qoo10Title,
       oliveYoungUrl: p.oliveYoungUrl,
+      oliveYoungUrlExplicit: p.oliveYoungUrlExplicit,
       oliveYoungImageUrl: p.oliveYoungImageUrl,
       primaryShop: p.primaryShop,
       imageSource: p.imageSource,
@@ -735,6 +746,12 @@ export async function getAllOliveYoungProductsMinimal(): Promise<
     .get();
   return snap.docs.map((doc) => {
     const data = doc.data();
+    const productUrl = String(data.productUrl ?? "").trim();
+    const oliveYoungUrlExplicit = optHrefStr(data.oliveYoungUrl);
+    const oliveYoungUrlResolved = resolveNormalizedOliveYoungUrl(
+      oliveYoungUrlExplicit,
+      productUrl
+    );
     return {
       goodsNo: doc.id,
       name: String(data.name ?? "").trim(),
@@ -766,7 +783,7 @@ export async function getAllOliveYoungProductsMinimal(): Promise<
       marketplaceImageMatchLevels: mapMarketplaceImageMatchLevelsFromFirestore(
         data.marketplaceImageMatchLevels
       ),
-      productUrl: String(data.productUrl ?? "").trim(),
+      productUrl,
       lastRank:
         data.lastRank != null && typeof data.lastRank === "number"
           ? data.lastRank
@@ -789,7 +806,8 @@ export async function getAllOliveYoungProductsMinimal(): Promise<
       rakutenTitle: optPlainStr(data.rakutenTitle),
       qoo10ImageUrl: optImageStr(data.qoo10ImageUrl),
       qoo10Title: optPlainStr(data.qoo10Title),
-      oliveYoungUrl: optHrefStr(data.oliveYoungUrl),
+      oliveYoungUrl: oliveYoungUrlResolved,
+      oliveYoungUrlExplicit,
       oliveYoungImageUrl: optImageStr(data.oliveYoungImageUrl),
       primaryShop: parsePrimaryShopField(data.primaryShop),
       imageSource: parseRevenueImageSource(data.imageSource),

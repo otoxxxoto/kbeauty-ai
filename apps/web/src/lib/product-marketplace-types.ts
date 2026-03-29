@@ -35,8 +35,15 @@ export type ProductMarketplaceFields = {
   qoo10Url?: string;
   qoo10ImageUrl?: string;
   qoo10Title?: string;
-  /** OY公式商品URL（未設定時は productUrl を利用する想定） */
+  /**
+   * カード・出典導線用の OY URL（マッピング時に productUrl から補完可）
+   */
   oliveYoungUrl?: string;
+  /**
+   * Firestore `oliveYoungUrl` の素値のみ（productUrl フォールバック前）。
+   * primaryShop / アフィ抑制判定はこちらを使う（補完で全件 OY 扱いにならないよう分離）
+   */
+  oliveYoungUrlExplicit?: string;
   oliveYoungImageUrl?: string;
   /**
    * Firestore での優先ショップ上書き。
