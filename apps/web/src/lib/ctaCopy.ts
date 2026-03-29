@@ -17,6 +17,8 @@ export const CTA_COPY_VARIANTS = {
       amazon: "Amazonで最安をチェック",
       rakuten: "楽天で価格を見る",
       qoo10: "Qoo10で在庫を確認",
+      /** ファーストビュー主CTA直下の OY 補助導線（一覧カードの「Olive Youngで見る」と役割分担） */
+      oliveYoungSupplement: "公式ページ（Olive Young）で確認",
     },
     /** パターンB（価格訴求） */
     B: {
@@ -25,6 +27,7 @@ export const CTA_COPY_VARIANTS = {
       amazon: "Amazonで最安をチェック",
       rakuten: "楽天で価格を見る",
       qoo10: "Qoo10で在庫を確認",
+      oliveYoungSupplement: "公式ページ（Olive Young）で確認",
     },
     /** パターンC（購買行動促進） */
     C: {
@@ -33,6 +36,7 @@ export const CTA_COPY_VARIANTS = {
       amazon: "Amazonで最安をチェック",
       rakuten: "楽天で価格を見る",
       qoo10: "Qoo10で在庫を確認",
+      oliveYoungSupplement: "公式ページ（Olive Young）で確認",
     },
   },
   compare: {

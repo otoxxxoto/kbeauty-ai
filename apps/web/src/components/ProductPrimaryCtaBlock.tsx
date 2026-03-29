@@ -13,6 +13,8 @@ import {
   logAffiliateClick,
   type AffiliateClickPosition,
 } from "@/components/ProductAffiliateCtas";
+import { ProductCardOliveYoungLink } from "@/components/ProductCardOliveYoungLink";
+import { isOliveYoungOfficialProductUrl } from "@/lib/oliveyoung-official-url";
 
 export type ProductPrimaryCtaBlockProps = {
   goodsNo: string;
@@ -24,6 +26,8 @@ export type ProductPrimaryCtaBlockProps = {
   primaryShop?: PrimaryShop | null;
   suppressAffiliateCtas?: boolean;
   productNameForGa?: string;
+  /** 正規化済み `oliveYoungUrl`（`getOliveYoungProductByGoodsNo` 由来） */
+  oliveYoungUrl?: string | null;
 };
 
 function hasAnyUrl(u: { amazonUrl?: string; rakutenUrl?: string; qoo10Url?: string }): boolean {
@@ -40,6 +44,7 @@ export function ProductPrimaryCtaBlock({
   primaryShop = null,
   suppressAffiliateCtas = false,
   productNameForGa,
+  oliveYoungUrl,
 }: ProductPrimaryCtaBlockProps) {
   const urls = {
     amazon: (amazonUrl ?? "").trim(),
@@ -50,6 +55,10 @@ export function ProductPrimaryCtaBlock({
   if (!hasAnyUrl({ amazonUrl: urls.amazon, rakutenUrl: urls.rakuten, qoo10Url: urls.qoo10 })) {
     return null;
   }
+
+  const oyTrim = oliveYoungUrl?.trim();
+  const showOySupplement =
+    !!oyTrim && isOliveYoungOfficialProductUrl(oyTrim);
 
   const ctaBase =
     "inline-flex w-full min-h-[50px] items-center justify-center rounded-xl px-4 py-3 text-sm sm:text-base font-bold text-white shadow-sm transition-colors";
@@ -129,6 +138,18 @@ export function ProductPrimaryCtaBlock({
       </div>
 
       <div className="mt-4 flex flex-col gap-3">{nodes}</div>
+
+      {showOySupplement ? (
+        <div className="mt-3 border-t border-zinc-100 pt-3">
+          <ProductCardOliveYoungLink
+            variant="detail"
+            oliveYoungUrl={oliveYoungUrl}
+            goodsNo={goodsNo}
+            linkLabel={CTA_COPY.primary.oliveYoungSupplement}
+            className="max-w-full"
+          />
+        </div>
+      ) : null}
     </section>
   );
 }
