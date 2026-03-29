@@ -12,6 +12,12 @@ import {
   PRODUCT_NO_IMAGE_PATH,
   isResolvedProductImagePlaceholderUrl,
 } from "@/lib/getProductImage";
+import {
+  imageSrcHostForDebug,
+  isOliveYoungCdnUrl,
+  isProductImageLoadDebugEnabled,
+  normalizeImageDataUrl,
+} from "@/lib/image-display-debug";
 
 type Props = {
   product: ProductImageFields;
@@ -22,6 +28,8 @@ type Props = {
   /** 一時デバッグ用（IMG_RESOLVE_DEBUG / IMAGE_SOURCE） */
   goodsNo?: string;
 };
+
+const isDev = isProductImageLoadDebugEnabled();
 
 function productImageStableKey(
   p: ProductImageFields,
@@ -56,7 +64,6 @@ function productImageStableKey(
 function sanitizeInitialSrc(url: string): string {
   const t = (url ?? "").trim();
   if (!t) return OLIVEYOUNG_PRODUCT_IMAGE_FALLBACK_PATH;
-  // プロトコル相対 URL（//cdn...）は img で有効
   if (t.startsWith("//")) return t;
   if (
     t.startsWith("/") ||
@@ -71,6 +78,9 @@ function sanitizeInitialSrc(url: string): string {
 /**
  * 商品画像表示: 枠いっぱいに contain、読み込み失敗時はプレースホルダーへ1回だけ切替。
  * alt テキストの露出・broken icon を避けるため img は alt="" とし、親に aria-label を付与。
+ *
+ * 診断: `data-image-source` / `data-image-host` / `data-image-url`（img に付与）。
+ * development のみ onLoad/onError で [PRODUCT_IMAGE_LOAD] を console 出力。
  */
 export function ProductDisplayImage({
   product,
@@ -100,8 +110,9 @@ export function ProductDisplayImage({
     )
   );
   const swappedToPlaceholderRef = useRef(false);
+  const pipelineRef = useRef(pipeline);
+  pipelineRef.current = pipeline;
 
-  // stableKey のみ: 親の object 参照が毎レンダー変わっても画像 URL が同じならリセットしない
   useEffect(() => {
     const next = resolveProductImageForDisplay(plain, { goodsNo });
     setDisplaySrc(sanitizeInitialSrc(next.url));
@@ -118,12 +129,55 @@ export function ProductDisplayImage({
     (e) => e.url === pipeline.url
   );
 
+  const dataUrl = normalizeImageDataUrl(displaySrc);
+  const dataHost = imageSrcHostForDebug(displaySrc);
+  const pipelineUrlNorm = normalizeImageDataUrl(pipeline.url);
+
+  const handleLoad = useCallback(
+    (e: React.SyntheticEvent<HTMLImageElement>) => {
+      if (!isDev) return;
+      const el = e.currentTarget;
+      const src = el.currentSrc || el.src;
+      // eslint-disable-next-line no-console -- development のみ
+      console.log("[PRODUCT_IMAGE_LOAD]", {
+        event: "load",
+        goodsNo: goodsNo ?? "",
+        imageSource: pipelineRef.current.imageSource,
+        displaySource: pipelineRef.current.displaySource,
+        srcHost: imageSrcHostForDebug(src),
+        displayedUrl: src,
+        pipelineUrl: pipelineRef.current.url,
+        naturalWidth: el.naturalWidth,
+        naturalHeight: el.naturalHeight,
+        isOliveYoungCdn: isOliveYoungCdnUrl(src),
+      });
+    },
+    [goodsNo]
+  );
+
   const onError = useCallback(() => {
+    const failedUrl = displaySrc;
+    const pip = pipelineRef.current;
+    if (isDev) {
+      // eslint-disable-next-line no-console -- development のみ
+      console.warn("[PRODUCT_IMAGE_LOAD]", {
+        event: "error",
+        goodsNo: goodsNo ?? "",
+        imageSource: pip.imageSource,
+        displaySource: pip.displaySource,
+        srcHost: imageSrcHostForDebug(failedUrl),
+        /** 失敗したリクエスト URL（プレースホルダー切替前） */
+        failedUrl: normalizeImageDataUrl(failedUrl) || failedUrl,
+        pipelineUrl: pip.url,
+        isOliveYoungCdn: isOliveYoungCdnUrl(failedUrl),
+        note: "次フレームで OY プレースホルダーへ切替（1回のみ）",
+      });
+    }
     if (swappedToPlaceholderRef.current) return;
     if (displaySrc === OLIVEYOUNG_PRODUCT_IMAGE_FALLBACK_PATH) return;
     swappedToPlaceholderRef.current = true;
     setDisplaySrc(OLIVEYOUNG_PRODUCT_IMAGE_FALLBACK_PATH);
-  }, [displaySrc]);
+  }, [displaySrc, goodsNo]);
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_IMG_RESOLVE_DEBUG !== "1") return;
@@ -173,21 +227,52 @@ export function ProductDisplayImage({
     matchedAnalysis?.containsPerson,
   ]);
 
+  const devOpenHref =
+    isDev && /^https?:\/\//i.test(dataUrl) ? dataUrl : undefined;
+
   return (
     <div
       role="img"
       aria-label={alt}
       data-image-source={pipeline.imageSource}
+      data-image-pipeline-url={pipelineUrlNorm || undefined}
+      data-image-display-url={dataUrl || undefined}
+      data-image-display-host={dataHost || undefined}
+      title={
+        isDev
+          ? `${pipeline.imageSource} | ${truncateForTitle(pipeline.url)}`
+          : undefined
+      }
       className={`relative flex h-full w-full min-h-0 items-center justify-center ${className}`}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element -- 外部 CDN 動的 URL */}
-      <img
-        src={displaySrc}
-        alt=""
-        decoding="async"
-        onError={onError}
-        className="h-full w-full object-contain object-center"
-      />
+      {devOpenHref && !showingPlaceholder ? (
+        <a
+          href={devOpenHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute right-1 top-1 z-20 rounded bg-white/95 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700 shadow-sm ring-1 ring-zinc-200 hover:bg-blue-50"
+          title="画像URLを新規タブで開く（development のみ表示）"
+          onClick={(ev) => ev.stopPropagation()}
+        >
+          開く
+        </a>
+      ) : null}
+      {/* 薄い背景＋内側リングで object-contain の余白を把握しやすく（小さいサムネでも「枠だけ」に見えにくくする） */}
+      <div className="flex h-full w-full min-h-0 items-center justify-center overflow-hidden rounded-[inherit] bg-gradient-to-b from-zinc-100 to-zinc-200/80 ring-1 ring-inset ring-zinc-200/70">
+        {/* eslint-disable-next-line @next/next/no-img-element -- 外部 CDN 動的 URL */}
+        <img
+          src={displaySrc}
+          alt=""
+          decoding="async"
+          onLoad={handleLoad}
+          onError={onError}
+          data-image-source={pipeline.imageSource}
+          data-image-host={dataHost || undefined}
+          data-image-url={dataUrl || undefined}
+          data-image-pipeline-url={pipelineUrlNorm || undefined}
+          className="h-full w-full object-contain object-center"
+        />
+      </div>
       {showBadge ? (
         <>
           <div
@@ -201,4 +286,10 @@ export function ProductDisplayImage({
       ) : null}
     </div>
   );
+}
+
+function truncateForTitle(s: string, max = 120): string {
+  const t = s.trim();
+  if (t.length <= max) return t;
+  return `${t.slice(0, max)}…`;
 }

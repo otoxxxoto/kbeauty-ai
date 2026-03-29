@@ -29,6 +29,10 @@ import {
   PRODUCT_CARD_TITLE_CLASS,
 } from "@/lib/product-card-layout";
 import { buildOliveYoungEntryTitle } from "@/lib/seo";
+import {
+  logImageSourceStatsIfEnabled,
+  tallyImageSourcesForProducts,
+} from "@/lib/image-source-stats";
 
 const PAGE_TITLE = buildOliveYoungEntryTitle();
 const PAGE_DESCRIPTION =
@@ -64,6 +68,14 @@ export default async function OliveYoungEntryPage() {
     runDate ? getBrandRankingByDate(runDate) : null,
     getRisingProductsWithProducts(5),
   ]);
+
+  logImageSourceStatsIfEnabled(
+    "/oliveyoung (急上昇+注目TOP3)",
+    tallyImageSourcesForProducts([
+      ...(risingData?.items ?? []),
+      ...(productData?.items ?? []),
+    ])
+  );
 
   const totalProducts = productData?.meta.totalItems ?? 0;
   const totalBrands = brandData?.totalBrands ?? 0;

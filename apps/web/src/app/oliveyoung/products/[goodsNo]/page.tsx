@@ -19,6 +19,10 @@ import {
 } from "@/lib/oliveyoung-display";
 import { getRelatedProducts } from "@/lib/oliveyoung-related";
 import type { OliveYoungProductMinimal } from "@/lib/oliveyoung-related";
+import {
+  logImageSourceStatsIfEnabled,
+  tallyImageSourcesForRelatedGroups,
+} from "@/lib/image-source-stats";
 import { LoggedShopLink } from "@/components/LoggedShopLink";
 import { ProductAffiliateCtas } from "@/components/ProductAffiliateCtas";
 import { BottomStickyCta } from "@/components/BottomStickyCta";
@@ -349,6 +353,10 @@ export default async function ProductDetailPage({ params }: PageProps) {
     }),
     getRankingRunDates(),
   ]);
+  logImageSourceStatsIfEnabled(
+    `/oliveyoung/products/${goodsNo} (関連・重複除去)`,
+    tallyImageSourcesForRelatedGroups(related)
+  );
   const latestRunDate = rankingRunDates[0] ?? null;
 
   const displayName = getDisplayProductNameText({

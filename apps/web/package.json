@@ -12,12 +12,16 @@
     "launch-report:pretty": "tsx scripts/oliveyoung-launch-report.ts --pretty",
     "diagnose-top-images": "tsx scripts/diagnose-top-page-image-data.ts",
     "flag-nameja-nightly-targets": "tsx scripts/flag-nameja-nightly-targets.ts",
-    "flag-nameja-surface-targets": "tsx scripts/flag-nameja-surface-targets.ts"
+    "flag-nameja-surface-targets": "tsx scripts/flag-nameja-surface-targets.ts",
+    "report-image-source-stats": "tsx scripts/report-image-source-stats.ts",
+    "backfill-amazon-ranking-images": "tsx scripts/backfill-amazon-ranking-images.ts",
+    "diagnose-display-safe-image": "tsx scripts/diagnose-display-safe-image.ts"
   },
   "dependencies": {
     "@google-cloud/firestore": "^8.3.0",
     "@google-cloud/storage": "^7.19.0",
     "@kbeauty-ai/core": "workspace:*",
+    "aws4": "^1.13.2",
     "firebase-admin": "^13.6.1",
     "next": "16.1.6",
     "react": "19.2.3",
@@ -25,6 +29,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/aws4": "^1.11.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -10,14 +10,13 @@ import {
   type ProductImageAnalysisEntry,
   type ProductImageFields,
 } from "@/lib/oliveyoung-products";
-import type {
-  ProductMarketplaceFields,
-  ProductRevenueImageSource,
-} from "@/lib/product-marketplace-types";
+import type { ProductMarketplaceFields } from "@/lib/product-marketplace-types";
+import { resolveProductImageForDisplay } from "@/lib/getProductImage";
+import { serializeProductImageFieldsForClient } from "@/lib/serialize-product-for-client";
 import {
-  getProductImage,
-  buildGetProductImageInputFromFields,
-} from "@/lib/getProductImage";
+  classifyImageSourceForStats,
+  rankingVisualBoostForDisplayedBucket,
+} from "@/lib/image-source-stats";
 
 /** ランキング行の name と public.name をマージ（行が goodsNo のときは public の実名を優先） */
 function resolveRankingItemName(
@@ -54,36 +53,19 @@ function rankingItemToImageFields(
   };
 }
 
-function revenueImageSourceSortBoost(s: ProductRevenueImageSource): number {
-  switch (s) {
-    case "amazon":
-      return 100;
-    case "rakuten":
-    case "qoo10":
-      return 80;
-    case "oliveyoung":
-      return 60;
-    case "fallback_no_image":
-      return -40;
-    default:
-      return 0;
-  }
-}
-
 /**
  * 一覧ソート: ベースは max(0, 100 - rank)。
- * getProductImage のチャネルで加点（amazon > 楽天/Qoo10 > OY）、fallback_no_image は減点。
+ * カードに実際に出る画像のバケットで加点（`rankingVisualBoostForDisplayedBucket`）。
  */
 function rankingSortScore(item: RankingItemWithProduct): number {
   const r = Number.isFinite(item.rank) ? Math.max(0, Number(item.rank)) : 0;
   let score = Math.max(0, 100 - r);
-  const { imageSource } = getProductImage(
-    buildGetProductImageInputFromFields(
-      rankingItemToImageFields(item),
-      item.goodsNo
-    )
+  const plain = serializeProductImageFieldsForClient(
+    rankingItemToImageFields(item)
   );
-  score += revenueImageSourceSortBoost(imageSource);
+  const pipe = resolveProductImageForDisplay(plain, { goodsNo: item.goodsNo });
+  const bucket = classifyImageSourceForStats(pipe.imageSource, pipe.url);
+  score += rankingVisualBoostForDisplayedBucket(bucket);
   return score;
 }
 

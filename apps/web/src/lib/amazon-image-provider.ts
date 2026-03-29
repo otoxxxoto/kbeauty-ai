@@ -30,7 +30,7 @@ export interface AmazonImageProvider {
 
 /**
  * 認証未設定時・ローカル用。常に null。
- * TODO: `CreatorsAmazonImageProvider` / `PaApi5AmazonImageProvider` を別ファイルで実装
+ * PA-API 5 実装: `pa-api-5-amazon-image-provider.ts` の `PaApi5AmazonImageProvider`。
  */
 export class MockAmazonImageProvider implements AmazonImageProvider {
   async matchProduct(

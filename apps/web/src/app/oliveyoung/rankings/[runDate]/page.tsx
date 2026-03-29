@@ -20,6 +20,10 @@ import { serializeProductImageFieldsForClient } from "@/lib/serialize-product-fo
 import { ProductCardOliveYoungLink } from "@/components/ProductCardOliveYoungLink";
 import type { RankingItemWithProduct } from "@/lib/oliveyoung-rankings";
 import { notFound } from "next/navigation";
+import {
+  logImageSourceStatsIfEnabled,
+  tallyImageSourcesForProducts,
+} from "@/lib/image-source-stats";
 
 type PageProps = {
   params: Promise<{ runDate: string }>;
@@ -137,6 +141,11 @@ export default async function RankingByDatePage({ params }: PageProps) {
 
   const top3 = data.items.filter((i) => i.rank <= 3);
   const newCount = data.items.filter((i) => i.isNew).length;
+
+  logImageSourceStatsIfEnabled(
+    `/oliveyoung/rankings/${runDate} (表示順・先頭50件)`,
+    tallyImageSourcesForProducts(data.items.slice(0, 50))
+  );
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
