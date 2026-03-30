@@ -5,6 +5,8 @@
  *   pnpm report-ranking-unanalyzed-image-urls -- --runDate=2025-03-01 --limit=100
  *   pnpm report-ranking-unanalyzed-image-urls -- --limit=100 --format=goods-block
  *
+ * 取り込み: `cd ../crawler && pnpm run oliveyoung:ingest-ranking-ndjson-vision -- --file=...`
+ *
  * format:
  *   - ndjson (既定): {"goodsNo","rank","url"} を URL ごとに 1 行
  *   - goods-block: 商品ごとに JSON ブロック（人間向け）

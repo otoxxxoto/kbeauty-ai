@@ -21,13 +21,42 @@ pnpm install
 **人物除去（クロップ・inpainting 等）は未実装**。公開時は人物入り画像を出さない安全運用。ルールと post-launch バックログは [docs/IMAGE_POLICY.md](./docs/IMAGE_POLICY.md)。  
 データ投入は `apps/crawler` の `pnpm run oliveyoung:analyze-product-images` を参照してください。
 
-### 画像解析キュー・可視化（本線）
+### ランキング上位100・未解析 URL → Vision（本線パイプライン）
 
-- **未解析 URL の抽出**（ランキング上位 N 件・人物判定バッチ向け NDJSON）:  
-  `pnpm report-ranking-unanalyzed-image-urls -- --limit=100`（`--runDate=` / `--format=goods-block` 可）
-- **公開面 `imagePolicy` 件数**（`safe_person_free` / `unsafe_person_possible` / `mall_image` / `fallback_no_image`、上位 50・100 枠）:  
-  `pnpm report-image-policy-stats`
-- 候補 URL の優先順は `src/lib/image-analysis-queue.ts`（`collectProductImageUrlsForAnalysisQueue` / `getUnanalyzedImageUrlsPrioritized`）。
+候補 URL の優先順は `src/lib/image-analysis-queue.ts`（`getUnanalyzedImageUrlsPrioritized`）。  
+**NDJSON 契約（1 行）:** `{"goodsNo":"A…","rank":1,"url":"https://…"}` — `apps/crawler` の `oliveyoung:ingest-ranking-ndjson-vision` がそのまま読み込みます。
+
+**1. 解析前スナップショット（比較用・stdout に JSON のみ）**
+
+```bash
+pnpm report-image-policy-stats -- --snapshot-json --label=before > policy-before.json
+```
+（人間向けの表は stderr に出ます。）
+
+**2. 上位 100 枠の未解析 URL 抽出（stdout = NDJSON、メタは stderr）**
+
+```bash
+pnpm report-ranking-unanalyzed-image-urls -- --limit=100 2>ranking-unanalyzed.meta.log > ranking-unanalyzed.ndjson
+```
+
+**3. Vision 解析 → Firestore `imageAnalysis` 追記**（`GEMINI_API_KEY` と Firestore 認証が必要）
+
+```bash
+cd ../crawler
+pnpm run oliveyoung:ingest-ranking-ndjson-vision -- --file=../web/ranking-unanalyzed.ndjson
+```
+
+**4. 解析後スナップショット**
+
+```bash
+cd ../web
+pnpm report-image-policy-stats -- --snapshot-json --label=after > policy-after.json
+pnpm compare-image-policy-snapshots policy-before.json policy-after.json
+```
+
+**5. ざっくり確認**（表のみ）: `pnpm report-image-policy-stats`（`--runDate=` 可）
+
+- **見る指標:** `safe_person_free` の増加、`fallback_no_image` の減少（上位 50 / 100 枠のどちらも `compare-image-policy-snapshots` に表示）。
 
 ### Amazon PA-API（画像補完バッチ・任意）
 

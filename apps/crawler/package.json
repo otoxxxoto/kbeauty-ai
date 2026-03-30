@@ -30,6 +30,7 @@
         "oliveyoung:fill-price-comparison-oliveyoung": "tsx src/jobs/fillPriceComparisonOliveYoungJob.ts",
         "oliveyoung:fill-marketplace-images": "tsx src/jobs/fillMarketplaceImagesJob.ts",
         "oliveyoung:analyze-product-images": "tsx src/jobs/analyzeProductImagesVisionJob.ts",
+        "oliveyoung:ingest-ranking-ndjson-vision": "tsx src/jobs/ingestRankingNdjsonVisionJob.ts",
         "oliveyoung:image-analysis:stats": "tsx src/jobs/oliveyoungImageAnalysisStatsJob.ts",
         "oliveyoung:diag-top-images": "tsx src/jobs/diagTopPageProductImagesJob.ts",
         "oliveyoung:diag-top-missing-images": "tsx src/jobs/diagTopMissingProductImagesJob.ts",

@@ -44,3 +44,26 @@ export async function mergeProductImageVisionFields(
     { merge: true }
   );
 }
+
+/**
+ * NDJSON 等からの 1 URL ずつ追記用。`imageVisionAnalyzedAt` は付けない（全件一括ジョブと併用可）。
+ */
+export async function mergeProductImageVisionFieldsPartial(
+  goodsNo: string,
+  payload: {
+    imageAnalysis: ProductImageAnalysisFirestoreRow[];
+    safeImageUrl: string;
+    hasSafeProductImage: boolean;
+  }
+): Promise<void> {
+  const ref = getDb().collection(COLLECTION).doc(goodsNo);
+  await ref.set(
+    {
+      imageAnalysis: payload.imageAnalysis,
+      safeImageUrl: payload.safeImageUrl,
+      hasSafeProductImage: payload.hasSafeProductImage,
+      updatedAt: FieldValue.serverTimestamp(),
+    },
+    { merge: true }
+  );
+}

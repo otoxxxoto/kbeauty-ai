@@ -92,6 +92,27 @@ pnpm run oliveyoung:analyze-product-images -- --top=20
 pnpm run oliveyoung:analyze-product-images -- --top=20 50
 ```
 
+### ランキング上位の未解析 URL（Web NDJSON）→ Vision 追記
+
+`apps/web` の `report-ranking-unanalyzed-image-urls` が **stdout** に出す 1 行 1 JSON（`goodsNo` / `rank` / `url`）を読み、行ごとに Gemini で解析して `oliveyoung_products_public.imageAnalysis` へ **マージ**します。  
+**同一 URL の行が既にあればスキップ**。`imageVisionAnalyzedAt` は付けません（部分追記。全件のし直しは上記 `oliveyoung:analyze-product-images`）。
+
+```bash
+# 例: Web で NDJSON をファイルに保存してから実行（メタは stderr）
+cd apps/web
+pnpm report-ranking-unanalyzed-image-urls -- --limit=100 2>ranking-unanalyzed.meta.log > ../crawler/ranking-unanalyzed.ndjson
+cd ../crawler
+pnpm run oliveyoung:ingest-ranking-ndjson-vision -- --file=ranking-unanalyzed.ndjson
+
+# stdin パイプ（Unix 系）
+# pnpm report-ranking-unanalyzed-image-urls -- --limit=100 2>/dev/null | (cd ../crawler && pnpm exec tsx src/jobs/ingestRankingNdjsonVisionJob.ts)
+
+# ドライラン・先頭 20 行だけ
+pnpm run oliveyoung:ingest-ranking-ndjson-vision -- --dry-run --file=ranking-unanalyzed.ndjson --limit=20
+```
+
+オプション: `--sleep-ms=450`（API 間隔）、`--limit=N`（処理する **有効 NDJSON 行**の上限）。
+
 Web 表示は **Vision 済み** のみ（未解析の raw `imageUrl` は使いません）。本ジョブ実行後に画像が出ます。
 
 ### TOP ページ専用診断（Firestore vs 表示 URL）

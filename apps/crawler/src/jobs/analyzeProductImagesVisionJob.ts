@@ -22,6 +22,11 @@ import {
   mergeProductImageVisionFields,
   type ProductImageAnalysisFirestoreRow,
 } from "../services/productImageVisionFirestore";
+import {
+  buildProductImageUrlOrderFromDocData,
+  isOyStyleProductImageUrlForVision,
+  pickSafeImageUrlFromVisionAnalysis,
+} from "../services/productImageVisionUrlHelpers";
 import { collectTopPageGoodsNos } from "../lib/topPageGoodsNosFirestore";
 
 const COLLECTION = "oliveyoung_products_public";
@@ -88,82 +93,16 @@ function parseTopMaxFromArgv(argv: string[]): number | null {
   return null;
 }
 
-function isMarketplaceHost(url: string): boolean {
-  const u = url.toLowerCase();
-  return (
-    u.includes("amazon.") ||
-    u.includes("media-amazon") ||
-    u.includes("ssl-images-amazon") ||
-    u.includes("rakuten.") ||
-    u.includes("qoo10") ||
-    u.includes("qoo-img.com")
-  );
-}
-
-/** safeImageUrl の候補: モール画像以外（主に OY 公式） */
-function isOyStyleProductImageUrl(url: string): boolean {
-  return url.trim() !== "" && !isMarketplaceHost(url);
-}
-
-function uniqueUrlsInOrder(urls: string[]): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const u of urls) {
-    const t = u.trim();
-    if (!t || seen.has(t)) continue;
-    seen.add(t);
-    out.push(t);
-  }
-  return out;
-}
-
 /** Firestore に imageVisionAnalyzedAt が入っていれば「解析済み」とみなす */
 function isImageVisionAlreadyAnalyzed(data: Record<string, unknown>): boolean {
   return data.imageVisionAnalyzedAt != null;
-}
-
-function pickSafeImageUrl(
-  analysis: ProductImageAnalysisFirestoreRow[],
-  urlOrder: string[]
-): string {
-  const idx = new Map(urlOrder.map((u, i) => [u, i]));
-  const candidates = analysis.filter(
-    (a) => !a.containsPerson && isOyStyleProductImageUrl(a.url)
-  );
-  candidates.sort((a, b) => {
-    const ap = a.isPreferredProductImage ? 1 : 0;
-    const bp = b.isPreferredProductImage ? 1 : 0;
-    if (bp !== ap) return bp - ap;
-    const ac = a.confidence ?? 0;
-    const bc = b.confidence ?? 0;
-    if (bc !== ac) return bc - ac;
-    return (idx.get(a.url) ?? 999) - (idx.get(b.url) ?? 999);
-  });
-  return candidates[0]?.url?.trim() ?? "";
 }
 
 async function analyzeOneProduct(
   goodsNo: string,
   data: Record<string, unknown>
 ): Promise<void> {
-  const pushStr = (v: unknown) => {
-    if (v == null) return "";
-    const s = String(v).trim();
-    return s || "";
-  };
-
-  const urls: string[] = [];
-  urls.push(pushStr(data.amazonImage));
-  urls.push(pushStr(data.rakutenImage));
-  urls.push(pushStr(data.qoo10Image));
-  urls.push(pushStr(data.imageUrl));
-  urls.push(pushStr(data.thumbnailUrl));
-  const arr = data.imageUrls;
-  if (Array.isArray(arr)) {
-    for (const x of arr) urls.push(pushStr(x));
-  }
-
-  const urlOrder = uniqueUrlsInOrder(urls);
+  const urlOrder = buildProductImageUrlOrderFromDocData(data);
   if (urlOrder.length === 0) {
     await mergeProductImageVisionFields(goodsNo, {
       imageAnalysis: [],
@@ -183,12 +122,15 @@ async function analyzeOneProduct(
       containsPerson: r.containsPerson,
       confidence: r.confidence,
       isPreferredProductImage: r.isPreferredProductImage,
-      isOliveYoungOriginal: isOyStyleProductImageUrl(r.url),
+      isOliveYoungOriginal: isOyStyleProductImageUrlForVision(r.url),
     });
     await sleep(SLEEP_MS);
   }
 
-  const safeImageUrl = pickSafeImageUrl(imageAnalysis, urlOrder);
+  const safeImageUrl = pickSafeImageUrlFromVisionAnalysis(
+    imageAnalysis,
+    urlOrder
+  );
   const hasSafeProductImage = safeImageUrl !== "";
 
   await mergeProductImageVisionFields(goodsNo, {
