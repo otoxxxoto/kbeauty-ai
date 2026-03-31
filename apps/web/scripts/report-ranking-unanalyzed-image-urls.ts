@@ -1,15 +1,20 @@
 /**
  * 指定 runDate のランキング上位 N 件について、人物判定（imageAnalysis）が未登録の画像 URL を列挙する。
- * 出力は NDJSON（1 行 1 URL）を既定とし、`apps/crawler` の Vision バッチ等へパイプ可能。
+ *
+ * **入出力契約**
+ * - **stdout** … `format=ndjson`（既定）時のみ **JSON 1 行 = 1 レコード**（リダイレクト先ファイルにはこれだけが入る想定）
+ * - **stderr** … 人間向けメタ・エラー・Firestore 初期化ログ（`src/lib/firestore.ts` は stderr）
  *
  *   pnpm report-ranking-unanalyzed-image-urls -- --runDate=2025-03-01 --limit=100
- *   pnpm report-ranking-unanalyzed-image-urls -- --limit=100 --format=goods-block
+ *   # リダイレクト時は pnpm のスクリプト表記が stdout に混ざるのを防ぐため --silent を推奨:
+ *   pnpm --silent run report-ranking-unanalyzed-image-urls -- --limit=100 2>meta.log >urls.ndjson
+ *   # または: pnpm exec tsx scripts/report-ranking-unanalyzed-image-urls.ts -- --limit=100 2>meta.log >urls.ndjson
  *
  * 取り込み: `cd ../crawler && pnpm run oliveyoung:ingest-ranking-ndjson-vision -- --file=...`
  *
  * format:
- *   - ndjson (既定): {"goodsNo","rank","url"} を URL ごとに 1 行
- *   - goods-block: 商品ごとに JSON ブロック（人間向け）
+ *   - ndjson (既定): { goodsNo, rank, url, sourceField } を URL ごとに 1 行（stdout）
+ *   - goods-block: 集計用 JSON を stdout に 1 本出力（メタは stderr）
  *
  * 前提: `.env.local` に Firestore（Next と同じ）
  */
@@ -25,7 +30,7 @@ import {
   getRankingRunDates,
 } from "../src/lib/oliveyoung-rankings";
 import {
-  getUnanalyzedImageUrlsPrioritized,
+  getUnanalyzedImageEntriesPrioritized,
   type VisionBatchImageLine,
 } from "../src/lib/image-analysis-queue";
 
@@ -75,17 +80,33 @@ async function main() {
   const slice = ranking.items.slice(0, limit);
   const lines: VisionBatchImageLine[] = [];
   let goodsWithAnyUnanalyzed = 0;
-  const goodsBlocks: { rank: number; goodsNo: string; urls: string[] }[] = [];
+  const goodsBlocks: {
+    rank: number;
+    goodsNo: string;
+    entries: Array<{ url: string; sourceField: string }>;
+  }[] = [];
 
   for (const row of slice) {
     const p = await getOliveYoungProductByGoodsNo(row.goodsNo);
     if (!p) continue;
-    const urls = getUnanalyzedImageUrlsPrioritized(p);
-    if (urls.length === 0) continue;
+    const entries = getUnanalyzedImageEntriesPrioritized(p);
+    if (entries.length === 0) continue;
     goodsWithAnyUnanalyzed += 1;
-    goodsBlocks.push({ rank: row.rank, goodsNo: row.goodsNo, urls });
-    for (const url of urls) {
-      lines.push({ goodsNo: row.goodsNo, rank: row.rank, url });
+    goodsBlocks.push({
+      rank: row.rank,
+      goodsNo: row.goodsNo,
+      entries: entries.map((e) => ({
+        url: e.url,
+        sourceField: e.sourceField,
+      })),
+    });
+    for (const e of entries) {
+      lines.push({
+        goodsNo: row.goodsNo,
+        rank: row.rank,
+        url: e.url,
+        sourceField: e.sourceField,
+      });
     }
   }
 
@@ -96,11 +117,14 @@ async function main() {
 
   if (format === "ndjson") {
     for (const row of lines) {
-      console.log(JSON.stringify(row));
+      process.stdout.write(`${JSON.stringify(row)}\n`);
     }
   } else {
-    console.log(
-      JSON.stringify(
+    console.error(
+      "[unanalyzed-urls] format=goods-block → stdout に JSON 1 本、メタは stderr 済み"
+    );
+    process.stdout.write(
+      `${JSON.stringify(
         {
           runDate,
           limit,
@@ -113,7 +137,7 @@ async function main() {
         },
         null,
         2
-      )
+      )}\n`
     );
   }
 }

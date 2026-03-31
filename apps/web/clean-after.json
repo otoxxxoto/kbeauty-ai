@@ -1,0 +1,22 @@
+{
+  "runDate": "2026-03-31",
+  "label": "after",
+  "top50": {
+    "safe_person_free": 34,
+    "unsafe_person_possible": 0,
+    "mall_image": 6,
+    "fallback_no_image": 10
+  },
+  "top100": {
+    "safe_person_free": 63,
+    "unsafe_person_possible": 0,
+    "mall_image": 9,
+    "fallback_no_image": 26
+  },
+  "meta": {
+    "tallied50": 50,
+    "tallied100": 98,
+    "rankSlots50": 50,
+    "rankSlots100": 98
+  }
+}

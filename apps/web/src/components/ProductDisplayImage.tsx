@@ -82,7 +82,7 @@ function sanitizeInitialSrc(url: string): string {
  * 診断: `data-image-source` / `data-image-host` / `data-image-url`（img に付与）。
  * development のみ onLoad/onError で [PRODUCT_IMAGE_LOAD] を console 出力。
  *
- * バックフィル: 未解析 URL の列挙は `getUnanalyzedImageUrlsPrioritized`（`pnpm report-ranking-unanalyzed-image-urls`）。
+ * バックフィル: 未解析 URL の列挙は `getUnanalyzedImageUrlsPrioritized`（`pnpm report-ranking-unanalyzed-image-urls`、stdout は NDJSON のみ）。
  */
 export function ProductDisplayImage({
   product,

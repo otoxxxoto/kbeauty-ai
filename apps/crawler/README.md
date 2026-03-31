@@ -94,13 +94,13 @@ pnpm run oliveyoung:analyze-product-images -- --top=20 50
 
 ### ランキング上位の未解析 URL（Web NDJSON）→ Vision 追記
 
-`apps/web` の `report-ranking-unanalyzed-image-urls` が **stdout** に出す 1 行 1 JSON（`goodsNo` / `rank` / `url`）を読み、行ごとに Gemini で解析して `oliveyoung_products_public.imageAnalysis` へ **マージ**します。  
+`apps/web` の `report-ranking-unanalyzed-image-urls` が **stdout** に出す 1 行 1 JSON（`goodsNo` / `rank` / `url` / `sourceField`。**メタ・Firestore 初期化は stderr**）を読み、行ごとに Gemini で解析して `oliveyoung_products_public.imageAnalysis` へ **マージ**します。  
 **同一 URL の行が既にあればスキップ**。`imageVisionAnalyzedAt` は付けません（部分追記。全件のし直しは上記 `oliveyoung:analyze-product-images`）。
 
 ```bash
 # 例: Web で NDJSON をファイルに保存してから実行（メタは stderr）
 cd apps/web
-pnpm report-ranking-unanalyzed-image-urls -- --limit=100 2>ranking-unanalyzed.meta.log > ../crawler/ranking-unanalyzed.ndjson
+pnpm --silent run report-ranking-unanalyzed-image-urls -- --limit=100 2>ranking-unanalyzed.meta.log > ../crawler/ranking-unanalyzed.ndjson
 cd ../crawler
 pnpm run oliveyoung:ingest-ranking-ndjson-vision -- --file=ranking-unanalyzed.ndjson
 

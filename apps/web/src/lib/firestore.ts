@@ -25,7 +25,8 @@ function init() {
       })
     : applicationDefault();
 
-  console.log("[firestore] init", {
+  // stdout を汚さない（CLI の NDJSON リダイレクト等で混線しないよう stderr）
+  console.error("[firestore] init", {
     projectIdSet: Boolean(projectId),
     clientEmailSet: Boolean(clientEmail),
     privateKeySet: Boolean(privateKey),

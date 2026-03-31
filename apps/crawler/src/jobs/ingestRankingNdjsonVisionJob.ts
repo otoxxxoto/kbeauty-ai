@@ -1,5 +1,5 @@
 /**
- * `apps/web` の `report-ranking-unanalyzed-image-urls` が出す NDJSON（1 行 { goodsNo, rank, url }）を読み、
+ * `apps/web` の `report-ranking-unanalyzed-image-urls` が出す NDJSON（1 行 { goodsNo, rank, url, sourceField? }）を読み、
  * 各行を Gemini Vision（getOrAnalyzeImageUrl）で解析して `imageAnalysis` にマージ保存する。
  *
  * 既に同一 URL の imageAnalysis 行がある場合はスキップ。

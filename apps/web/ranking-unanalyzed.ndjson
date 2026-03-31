@@ -1,0 +1,4 @@
+
+> web@0.1.0 report-ranking-unanalyzed-image-urls C:\Users\otoxx\kbeauty-ai\apps\web
+> tsx scripts/report-ranking-unanalyzed-image-urls.ts "--" "--limit=200"
+

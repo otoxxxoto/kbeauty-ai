@@ -24,7 +24,8 @@ pnpm install
 ### ランキング上位100・未解析 URL → Vision（本線パイプライン）
 
 候補 URL の優先順は `src/lib/image-analysis-queue.ts`（`getUnanalyzedImageUrlsPrioritized`）。  
-**NDJSON 契約（1 行）:** `{"goodsNo":"A…","rank":1,"url":"https://…"}` — `apps/crawler` の `oliveyoung:ingest-ranking-ndjson-vision` がそのまま読み込みます。
+**リダイレクト時の入出力:** **`stdout` = NDJSON のみ（JSON 行だけ）** / **`stderr` = メタ・エラー・Firestore 初期化**（`pnpm … 2>meta.log >urls.ndjson` でファイルが汚れない）。  
+**NDJSON 契約（1 行）:** `{"goodsNo":"A…","rank":1,"url":"https://…","sourceField":"imageUrl"}` — crawler の ingest は `sourceField` 省略行も受け付けます。
 
 **1. 解析前スナップショット（比較用・stdout に JSON のみ）**
 
@@ -33,10 +34,11 @@ pnpm report-image-policy-stats -- --snapshot-json --label=before > policy-before
 ```
 （人間向けの表は stderr に出ます。）
 
-**2. 上位 100 枠の未解析 URL 抽出（stdout = NDJSON、メタは stderr）**
+**2. 上位 100 枠の未解析 URL 抽出（stdout = NDJSON のみ、メタは stderr）**
 
 ```bash
-pnpm report-ranking-unanalyzed-image-urls -- --limit=100 2>ranking-unanalyzed.meta.log > ranking-unanalyzed.ndjson
+# pnpm のスクリプト行が混ざらないよう --silent 推奨
+pnpm --silent run report-ranking-unanalyzed-image-urls -- --limit=100 2>ranking-unanalyzed.meta.log > ranking-unanalyzed.ndjson
 ```
 
 **3. Vision 解析 → Firestore `imageAnalysis` 追記**（`GEMINI_API_KEY` と Firestore 認証が必要）
