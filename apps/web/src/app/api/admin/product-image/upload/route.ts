@@ -40,8 +40,9 @@ export async function POST(request: Request) {
     await gcsFile.save(buffer, {
       contentType: file.type || "image/jpeg",
       resumable: false,
-      public: true,
     });
+
+    // バケット側の公開設定を前提とし、公開URLは従来どおりに組み立てる
 
     const imageUrl = `https://storage.googleapis.com/${BUCKET}/${destination}`;
 
@@ -57,9 +58,20 @@ export async function POST(request: Request) {
         { merge: true }
       );
 
+    console.error("[UPLOAD_TO_GCS_OK]", {
+      bucket: BUCKET,
+      path: destination,
+      goodsNo,
+    });
+
     return NextResponse.json({ ok: true, imageUrl });
   } catch (err) {
-    console.error("[admin/product-image/upload]", err);
+    const e = err as { message?: string };
+    console.error("[admin/product-image/upload]", {
+      bucket: BUCKET,
+      path: (err as any)?.path ?? null,
+      error: e?.message ?? String(err),
+    });
     return NextResponse.json(
       { ok: false, error: "upload_failed" },
       { status: 500 }
