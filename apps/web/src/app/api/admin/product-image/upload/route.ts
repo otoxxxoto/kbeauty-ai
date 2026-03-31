@@ -1,7 +1,9 @@
 import { Storage } from "@google-cloud/storage";
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import * as admin from "firebase-admin";
 import { db } from "@/lib/firestore";
+import { getRankingRunDates } from "@/lib/oliveyoung-rankings";
 
 const BUCKET = process.env.GCS_BUCKET ?? "";
 
@@ -58,10 +60,43 @@ export async function POST(request: Request) {
         { merge: true }
       );
 
+    let runDate: string | null = null;
+    try {
+      const runDates = await getRankingRunDates();
+      runDate = runDates[0] ?? null;
+    } catch (e) {
+      console.error("[REVALIDATE_START] failed to load runDates", {
+        bucket: BUCKET,
+        goodsNo,
+        error: (e as any)?.message ?? String(e),
+      });
+    }
+
+    const paths: string[] = ["/oliveyoung", `/oliveyoung/products/${goodsNo}`];
+    if (runDate) {
+      paths.push(`/oliveyoung/rankings/${runDate}`);
+    }
+
+    console.error("[REVALIDATE_START]", { goodsNo, runDate, paths });
+    for (const pth of paths) {
+      try {
+        revalidatePath(pth);
+        console.error("[REVALIDATE_OK]", { path: pth, goodsNo, runDate });
+      } catch (e) {
+        console.error("[REVALIDATE_ERROR]", {
+          path: pth,
+          goodsNo,
+          runDate,
+          error: (e as any)?.message ?? String(e),
+        });
+      }
+    }
+
     console.error("[UPLOAD_TO_GCS_OK]", {
       bucket: BUCKET,
       path: destination,
       goodsNo,
+      runDate,
     });
 
     return NextResponse.json({ ok: true, imageUrl });

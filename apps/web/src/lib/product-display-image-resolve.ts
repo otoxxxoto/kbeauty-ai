@@ -133,16 +133,26 @@ export function imageAnalysisEntryForProductUrl(
  * 表示用画像の解決（詳細・一覧・API 共通）。
  *
  * 優先順:
- * 1. safeImageUrl
- * 2. OY 公式 URL（モール以外）のうち imageAnalysis で containsPerson===false と判定できるもののみ
- * 3. マーケット画像（imageAnalysis で人物なし、かつ marketplaceImageMatchLevels が strong またはメタ未設定）
- * 4. 静的プレースホルダー SVG
+ * 1. manualImageUrl（管理画面からの手動画像）
+ * 2. safeImageUrl
+ * 3. OY 公式 URL（モール以外）のうち imageAnalysis で containsPerson===false と判定できるもののみ
+ * 4. マーケット画像（imageAnalysis で人物なし、かつ marketplaceImageMatchLevels が strong またはメタ未設定）
+ * 5. 静的プレースホルダー SVG
  *
  * ALLOW_OY_PERSON_IMAGE=true のときのみ (2) で解析欠如・人物ありも表示可（バッジなし・通常運用では使わない）。
  */
 export function resolveProductDisplayImage(
   p: ProductImageFields
 ): ProductDisplayImageResolution {
+  const manual = (p.manualImageUrl ?? "").trim();
+  if (manual) {
+    return {
+      url: manual,
+      source: "manual_image",
+      showOfficialImageBadge: false,
+    };
+  }
+
   const safe = (p.safeImageUrl ?? "").trim();
   if (safe) {
     return {
