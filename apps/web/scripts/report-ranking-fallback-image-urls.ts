@@ -22,6 +22,12 @@ import { resolveProductImageForDisplay } from "../src/lib/getProductImage";
 import { serializeProductImageFieldsForClient } from "../src/lib/serialize-product-for-client";
 
 type SourceTri = "oliveYoungImageUrl" | "imageUrl" | "thumbnailUrl";
+type Candidate = {
+  sourceField: SourceTri;
+  rawValue: string | undefined;
+  normalizedUrl: string;
+  urlLength: number;
+};
 
 function parseArgs(argv: string[]): { runDate: string | null; limit: number } {
   let runDate: string | null = null;
@@ -38,21 +44,66 @@ function parseArgs(argv: string[]): { runDate: string | null; limit: number } {
   return { runDate, limit };
 }
 
-function collectOyRefetchUrlEntries(
+function sourcePriority(s: SourceTri): number {
+  if (s === "oliveYoungImageUrl") return 3;
+  if (s === "imageUrl") return 2;
+  return 1;
+}
+
+function getSourceRawFields(
   p: OliveYoungProductDetail
-): Array<{ url: string; sourceField: SourceTri }> {
-  const seen = new Set<string>();
-  const out: Array<{ url: string; sourceField: SourceTri }> = [];
-  const push = (u: string | undefined, sourceField: SourceTri) => {
-    const t = (u ?? "").trim();
-    if (!t || seen.has(t)) return;
-    seen.add(t);
-    out.push({ url: t, sourceField });
-  };
-  push(p.oliveYoungImageUrl, "oliveYoungImageUrl");
-  push(p.imageUrl, "imageUrl");
-  push(p.thumbnailUrl, "thumbnailUrl");
-  return out;
+): Array<{ sourceField: SourceTri; rawValue: string | undefined }> {
+  return [
+    { sourceField: "oliveYoungImageUrl", rawValue: p.oliveYoungImageUrl },
+    { sourceField: "imageUrl", rawValue: p.imageUrl },
+    { sourceField: "thumbnailUrl", rawValue: p.thumbnailUrl },
+  ];
+}
+
+function normalizeUrl(raw: string | undefined): string {
+  return (raw ?? "").trim();
+}
+
+function validateCandidateUrl(
+  url: string,
+  sourceField: SourceTri
+): { ok: true } | { ok: false; reason: string } {
+  if (!url) return { ok: false, reason: "empty" };
+  if (!/^https?:\/\//i.test(url)) return { ok: false, reason: "not_http_https" };
+  if (url.length < 40) return { ok: false, reason: "too_short_global" };
+
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return { ok: false, reason: "url_parse_failed" };
+  }
+
+  if (!parsed.hostname) return { ok: false, reason: "missing_hostname" };
+
+  const looksLikeImage = /\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(url);
+  if (!looksLikeImage) return { ok: false, reason: "no_image_extension" };
+
+  const isOliveYoungHost = /oliveyoung\.co\.kr$/i.test(parsed.hostname);
+  if (isOliveYoungHost && url.length < 80) {
+    return { ok: false, reason: "too_short_oliveyoung_url" };
+  }
+
+  if (sourceField === "oliveYoungImageUrl" && url.length < 80) {
+    return { ok: false, reason: "too_short_for_oliveYoungImageUrl" };
+  }
+
+  return { ok: true };
+}
+
+function chooseBestCandidate(candidates: Candidate[]): Candidate | null {
+  if (candidates.length === 0) return null;
+  const sorted = [...candidates].sort((a, b) => {
+    const p = sourcePriority(b.sourceField) - sourcePriority(a.sourceField);
+    if (p !== 0) return p;
+    return b.urlLength - a.urlLength;
+  });
+  return sorted[0] ?? null;
 }
 
 async function main() {
@@ -86,8 +137,12 @@ async function main() {
     rank: number;
     url: string;
     sourceField: SourceTri;
+    urlLength: number;
   };
   const lines: Line[] = [];
+  const seenOutputUrls = new Set<string>();
+  let badUrlSkips = 0;
+  let dupUrlSkips = 0;
 
   for (const row of slice) {
     const p = await getOliveYoungProductByGoodsNo(row.goodsNo);
@@ -98,20 +153,70 @@ async function main() {
     if (pipe.imagePolicy !== "fallback_no_image") continue;
 
     fallbackGoods += 1;
-    for (const e of collectOyRefetchUrlEntries(p)) {
-      urlByField[e.sourceField] += 1;
-      lines.push({
-        goodsNo: p.goodsNo,
-        rank: row.rank,
-        url: e.url,
-        sourceField: e.sourceField,
-      });
+    const sourceFields = getSourceRawFields(p);
+    console.error(
+      `[TRACE_GOODS_URL_FIELDS] goodsNo=${p.goodsNo} rank=${row.rank} ` +
+        `oliveYoungImageUrl=${JSON.stringify(sourceFields[0]?.rawValue ?? "")} ` +
+        `imageUrl=${JSON.stringify(sourceFields[1]?.rawValue ?? "")} ` +
+        `thumbnailUrl=${JSON.stringify(sourceFields[2]?.rawValue ?? "")}`
+    );
+
+    const candidateByUrl = new Map<string, Candidate>();
+    for (const f of sourceFields) {
+      const normalizedUrl = normalizeUrl(f.rawValue);
+      const validity = validateCandidateUrl(normalizedUrl, f.sourceField);
+      if (!validity.ok) {
+        badUrlSkips += 1;
+        console.error(
+          `[SKIP_BAD_URL] goodsNo=${p.goodsNo} rank=${row.rank} sourceField=${f.sourceField} ` +
+            `reason=${validity.reason} raw=${JSON.stringify(f.rawValue ?? "")}`
+        );
+        continue;
+      }
+      const prev = candidateByUrl.get(normalizedUrl);
+      const candidate: Candidate = {
+        sourceField: f.sourceField,
+        rawValue: f.rawValue,
+        normalizedUrl,
+        urlLength: normalizedUrl.length,
+      };
+      if (!prev || sourcePriority(candidate.sourceField) > sourcePriority(prev.sourceField)) {
+        candidateByUrl.set(normalizedUrl, candidate);
+      }
     }
+
+    const best = chooseBestCandidate([...candidateByUrl.values()]);
+    if (!best) continue;
+
+    if (seenOutputUrls.has(best.normalizedUrl)) {
+      dupUrlSkips += 1;
+      console.error(
+        `[SKIP_DUP_URL] goodsNo=${p.goodsNo} rank=${row.rank} sourceField=${best.sourceField} ` +
+          `url=${JSON.stringify(best.normalizedUrl)}`
+      );
+      continue;
+    }
+
+    seenOutputUrls.add(best.normalizedUrl);
+    console.error(
+      `[SELECT_URL] goodsNo=${p.goodsNo} rank=${row.rank} sourceField=${best.sourceField} ` +
+        `urlLength=${best.urlLength} raw=${JSON.stringify(best.rawValue ?? "")}`
+    );
+
+    urlByField[best.sourceField] += 1;
+    lines.push({
+      goodsNo: p.goodsNo,
+      rank: row.rank,
+      url: best.normalizedUrl,
+      sourceField: best.sourceField,
+      urlLength: best.urlLength,
+    });
   }
 
   console.error(
     `[fallback-image-urls] runDate=${runDate}  rank_slots=${rankSlots}  loaded_products=${loaded}  ` +
-      `fallback_no_image_goods=${fallbackGoods}  ndjson_rows=${lines.length}`
+      `fallback_no_image_goods=${fallbackGoods}  ndjson_rows=${lines.length}  ` +
+      `skip_bad_url=${badUrlSkips} skip_dup_url=${dupUrlSkips}`
   );
   console.error(
     `[fallback-image-urls] url_rows_by_field oliveYoungImageUrl=${urlByField.oliveYoungImageUrl} ` +
