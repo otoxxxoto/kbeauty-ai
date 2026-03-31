@@ -76,7 +76,7 @@ function BrandProductCard({ p }: { p: OliveYoungProductCard }) {
       <div className="flex min-h-0 flex-1 flex-col">
         <div className={PRODUCT_CARD_IMAGE_FRAME_CLASS}>
           <ProductDisplayImage
-            product={serializeProductImageFieldsForClient(p)}
+            product={serializeProductImageFieldsForClient(p as any)}
             alt={displayName}
             goodsNo={p.goodsNo}
           />

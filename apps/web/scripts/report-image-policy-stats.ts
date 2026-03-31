@@ -111,11 +111,11 @@ async function main() {
 
   const counts50 =
     slice50.length > 0
-      ? tallyImagePolicyForProducts(slice50)
+      ? tallyImagePolicyForProducts(slice50 as any)
       : emptyImagePolicyCounts();
   const counts100 =
     slice100.length > 0
-      ? tallyImagePolicyForProducts(slice100)
+      ? tallyImagePolicyForProducts(slice100 as any)
       : emptyImagePolicyCounts();
 
   printPolicyBlock(

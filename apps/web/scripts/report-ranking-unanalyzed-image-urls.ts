@@ -89,7 +89,7 @@ async function main() {
   for (const row of slice) {
     const p = await getOliveYoungProductByGoodsNo(row.goodsNo);
     if (!p) continue;
-    const entries = getUnanalyzedImageEntriesPrioritized(p);
+    const entries = getUnanalyzedImageEntriesPrioritized(p as any);
     if (entries.length === 0) continue;
     goodsWithAnyUnanalyzed += 1;
     goodsBlocks.push({

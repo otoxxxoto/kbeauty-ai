@@ -426,7 +426,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
           <div className="rounded-xl border border-zinc-200 bg-white p-4">
             <div className="relative mx-auto flex aspect-square w-full max-w-[360px] items-center justify-center overflow-hidden rounded-lg bg-zinc-100">
               <ProductDisplayImage
-                product={serializeProductImageFieldsForClient(product)}
+                product={serializeProductImageFieldsForClient(product as any)}
                 alt={displayName}
                 goodsNo={goodsNo}
               />

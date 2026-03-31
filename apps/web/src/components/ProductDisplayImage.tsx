@@ -45,6 +45,7 @@ function productImageStableKey(
   }
   return [
     goodsNo ?? "",
+    p.manualImageUrl ?? "",
     p.safeImageUrl ?? "",
     p.amazonImage ?? "",
     p.rakutenImage ?? "",

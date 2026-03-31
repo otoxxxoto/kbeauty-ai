@@ -30,6 +30,12 @@ export type ProductImageFields = ProductMarketplaceImages & {
   rakutenImageUrl?: string;
   qoo10ImageUrl?: string;
   imageUrls?: string[];
+  /** 管理画面から手動アップロードされた正本画像 URL */
+  manualImageUrl?: string;
+  /** 手動画像の由来（アップロード or 外部URL） */
+  manualImageSource?: "upload" | "external" | null;
+  manualImageUpdatedAt?: unknown;
+  manualImageNote?: string | null;
   /** Vision Job: 公式系など人物なしと判定した表示用URL */
   safeImageUrl?: string;
   hasSafeProductImage?: boolean;
@@ -45,6 +51,7 @@ export const OLIVEYOUNG_PRODUCT_IMAGE_FALLBACK_PATH =
   "/oliveyoung-product-placeholder.svg";
 
 export type ProductDisplayImageSource =
+  | "manual_image"
   | "safe_image"
   | "oy_official_safe"
   | "marketplace_strong"

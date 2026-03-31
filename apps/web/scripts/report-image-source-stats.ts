@@ -74,7 +74,7 @@ async function main() {
     const p = await getOliveYoungProductByGoodsNo(row.goodsNo);
     if (p) officialProducts.push(p);
   }
-  const officialCounts = tallyImageSourcesForProducts(officialProducts);
+  const officialCounts = tallyImageSourcesForProducts(officialProducts as any);
   printBlock(`ランキング公式1〜50位（${runDate}）`, officialCounts);
 
   // --- 注目・おすすめ枠向け「画像ブースト」順の先頭50件（公開一覧は公式 rank 順）---
@@ -96,7 +96,10 @@ async function main() {
   const top3 = await getRankingTopNWithProducts(runDate, 3);
   const entry = [...(rising?.items ?? []), ...(top3?.items ?? [])];
   if (entry.length > 0) {
-    printBlock("トップ（急上昇 + 今日の注目TOP3）", tallyImageSourcesForProducts(entry));
+    printBlock(
+      "トップ（急上昇 + 今日の注目TOP3）",
+      tallyImageSourcesForProducts(entry as any)
+    );
   }
 
   // --- 関連商品: 先頭の公式50件のうち最初の1商品を基準にサンプル ---

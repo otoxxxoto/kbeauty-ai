@@ -66,7 +66,7 @@ export async function GET(
     );
   }
 
-  const displayResolved = resolveProductDisplayImage(product);
+  const displayResolved = resolveProductDisplayImage(product as any);
 
   const body: OliveYoungProductApiResponse = {
     goodsNo: product.goodsNo,

@@ -207,7 +207,7 @@ async function main() {
     if (!detail) continue;
     loaded += 1;
 
-    const plain = serializeProductImageFieldsForClient(detail);
+    const plain = serializeProductImageFieldsForClient(detail as any);
     const pipe = resolveProductImageForDisplay(plain, { goodsNo: detail.goodsNo });
     if (pipe.imagePolicy !== "fallback_no_image") continue;
 

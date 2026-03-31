@@ -215,6 +215,11 @@ export type OliveYoungProductDetail = {
   lastSeenRunDate: string | null;
   /** 表示用（Firestore Timestamp は取得時に文字列化済み） */
   updatedAt: string | null;
+  /** 管理画面からの手動画像メタ（任意） */
+  manualImageUrl?: string | null;
+  manualImageSource?: "upload" | "external" | null;
+  manualImageUpdatedAt?: unknown;
+  manualImageNote?: string | null;
   /** 翻訳バッチ用メタ（任意） */
   needsNameJa?: boolean;
   translationPriority?: TranslationPriority;
@@ -509,6 +514,13 @@ export async function getOliveYoungProductByGoodsNo(
     marketplaceImageMatchLevels: mapMarketplaceImageMatchLevelsFromFirestore(
       data.marketplaceImageMatchLevels
     ),
+    manualImageUrl: optImageStr(data.manualImageUrl),
+    manualImageSource:
+      data.manualImageSource === "upload" || data.manualImageSource === "external"
+        ? data.manualImageSource
+        : null,
+    manualImageUpdatedAt: data.manualImageUpdatedAt ?? null,
+    manualImageNote: optPlainStr(data.manualImageNote),
     source: String(data.source ?? "").trim(),
     lastRank:
       data.lastRank != null && typeof data.lastRank === "number"
@@ -570,6 +582,8 @@ export type OliveYoungProductCard = {
   productUrl: string;
   lastRank: number | null;
   lastSeenRunDate: string | null;
+  manualImageUrl?: string | null;
+  manualImageSource?: "upload" | "external" | null;
 } & ProductMarketplaceFields;
 
 /**

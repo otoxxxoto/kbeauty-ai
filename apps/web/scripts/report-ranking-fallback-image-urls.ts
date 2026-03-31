@@ -148,7 +148,7 @@ async function main() {
     const p = await getOliveYoungProductByGoodsNo(row.goodsNo);
     if (!p) continue;
     loaded += 1;
-    const plain = serializeProductImageFieldsForClient(p);
+    const plain = serializeProductImageFieldsForClient(p as any);
     const pipe = resolveProductImageForDisplay(plain, { goodsNo: p.goodsNo });
     if (pipe.imagePolicy !== "fallback_no_image") continue;
 

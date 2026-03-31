@@ -140,9 +140,12 @@ async function main() {
 
   const rowsRanking = await collectSafeImageRows(
     "ランキング公式1〜100位",
-    official100
+    official100 as any
   );
-  const rowsEntry = await collectSafeImageRows("トップ急上昇+注目", entry);
+  const rowsEntry = await collectSafeImageRows(
+    "トップ急上昇+注目",
+    entry as any
+  );
 
   const all = [...rowsRanking, ...rowsEntry, ...relatedRows];
   const kindTotals = emptyKindCounts();

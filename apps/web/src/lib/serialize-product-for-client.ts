@@ -103,6 +103,9 @@ export function serializeProductImageFieldsForClient(
   }
 
   return {
+    ...(str(p.manualImageUrl) !== undefined && {
+      manualImageUrl: str(p.manualImageUrl),
+    }),
     ...(str(p.imageUrl) !== undefined && { imageUrl: str(p.imageUrl) }),
     ...(str(p.thumbnailUrl) !== undefined && {
       thumbnailUrl: str(p.thumbnailUrl),

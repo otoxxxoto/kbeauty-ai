@@ -122,7 +122,7 @@ async function main() {
       continue;
     }
 
-    const resolution = resolveProductDisplayImage(p);
+    const resolution = resolveProductDisplayImage(p as any);
     const isPlaceholder =
       resolution.url === OLIVEYOUNG_PRODUCT_IMAGE_FALLBACK_PATH ||
       resolution.source === "fallback_placeholder";

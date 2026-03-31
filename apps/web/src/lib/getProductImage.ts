@@ -200,6 +200,9 @@ export function computePublicImagePolicy(
   showOfficialImageBadge: boolean
 ): PublicImageDisplayPolicy {
   const t = (url ?? "").trim();
+  if (imageSource === "manual_image") {
+    return "safe_person_free";
+  }
   if (
     productDisplayImageIsPlaceholder(t) ||
     t === PRODUCT_NO_IMAGE_PATH ||
