@@ -36,6 +36,7 @@ function rankingItemToImageFields(
   item: RankingItemWithProduct
 ): ProductImageFields {
   return {
+    manualImageUrl: item.manualImageUrl ?? undefined,
     imageUrl: item.imageUrl,
     thumbnailUrl: item.thumbnailUrl,
     imageUrls: item.imageUrls,
@@ -97,6 +98,8 @@ export type RankingItemRow = {
 export type RankingItemWithProduct = RankingItemRow & {
   nameJa?: string;
   brandJa?: string;
+  /** oliveyoung_products_public.manualImageUrl（手動アップロード正本） */
+  manualImageUrl?: string | null;
   amazonImage?: string;
   rakutenImage?: string;
   qoo10Image?: string;
@@ -224,6 +227,7 @@ export async function getRankingWithProducts(
       imageUrl,
       thumbnailUrl,
       imageUrls: publicProduct?.imageUrls,
+      manualImageUrl: publicProduct?.manualImageUrl ?? null,
       safeImageUrl: publicProduct?.safeImageUrl,
       hasSafeProductImage: publicProduct?.hasSafeProductImage,
       imageAnalysis: publicProduct?.imageAnalysis,
@@ -313,6 +317,7 @@ export async function getRisingProductsWithProducts(
       imageUrl,
       thumbnailUrl,
       imageUrls: publicProduct?.imageUrls,
+      manualImageUrl: publicProduct?.manualImageUrl ?? null,
       safeImageUrl: publicProduct?.safeImageUrl,
       hasSafeProductImage: publicProduct?.hasSafeProductImage,
       imageAnalysis: publicProduct?.imageAnalysis,

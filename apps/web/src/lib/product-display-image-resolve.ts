@@ -30,8 +30,8 @@ export type ProductImageFields = ProductMarketplaceImages & {
   rakutenImageUrl?: string;
   qoo10ImageUrl?: string;
   imageUrls?: string[];
-  /** 管理画面から手動アップロードされた正本画像 URL */
-  manualImageUrl?: string;
+  /** 管理画面から手動アップロードされた正本画像 URL（Firestore では null もあり得る） */
+  manualImageUrl?: string | null;
   /** 手動画像の由来（アップロード or 外部URL） */
   manualImageSource?: "upload" | "external" | null;
   manualImageUpdatedAt?: unknown;

@@ -45,6 +45,7 @@ export function classifyImageSourceForStats(
   imageSource: string,
   finalUrl: string
 ): ImageSourceStatBucket {
+  if (imageSource === "manual_image") return "display:safe_image";
   if (imageSource === "fallback_no_image") return "fallback_no_image";
   if (imageSource === "amazon") return "amazon";
   if (imageSource === "rakuten") return "rakuten";

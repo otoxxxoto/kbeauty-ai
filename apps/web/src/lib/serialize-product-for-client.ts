@@ -59,7 +59,7 @@ export function logClientSerializeDebugForProduct(
 export function serializeProductImageFieldsForClient(
   p: ProductImageFields
 ): ProductImageFields {
-  const str = (x: string | undefined): string | undefined => {
+  const str = (x: string | null | undefined): string | undefined => {
     const t = x != null ? String(x).trim() : "";
     return t || undefined;
   };

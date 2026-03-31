@@ -256,7 +256,10 @@ export function resolveProductImageForDisplay(
   const placeholder = productDisplayImageIsPlaceholder(resolved.url);
 
   let url = resolved.url;
-  let imageSource = `display:${resolved.source}`;
+  let imageSource =
+    resolved.source === "manual_image"
+      ? "manual_image"
+      : `display:${resolved.source}`;
   let showOfficialImageBadge =
     resolved.showOfficialImageBadge && !placeholder;
 

@@ -636,6 +636,8 @@ export async function getOliveYoungProductsByGoodsNos(
       marketScore: p.marketScore,
       amazonMatchScore: p.amazonMatchScore,
       amazonMatchedAt: p.amazonMatchedAt,
+      manualImageUrl: p.manualImageUrl ?? null,
+      manualImageSource: p.manualImageSource ?? null,
     });
   }
   return result;

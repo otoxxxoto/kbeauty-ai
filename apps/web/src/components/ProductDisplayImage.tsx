@@ -239,11 +239,14 @@ export function ProductDisplayImage({
   const devOpenHref =
     isDev && /^https?:\/\//i.test(dataUrl) ? dataUrl : undefined;
 
+  const hasManualImage = Boolean((plain.manualImageUrl ?? "").trim());
+
   return (
     <div
       role="img"
       aria-label={alt}
       data-image-source={pipeline.imageSource}
+      data-manual-image={isDev ? (hasManualImage ? "yes" : "no") : undefined}
       data-image-policy={isDev ? pipeline.imagePolicy : undefined}
       data-image-pipeline-url={pipelineUrlNorm || undefined}
       data-image-display-url={dataUrl || undefined}
@@ -277,6 +280,7 @@ export function ProductDisplayImage({
           onLoad={handleLoad}
           onError={onError}
           data-image-source={pipeline.imageSource}
+          data-manual-image={isDev ? (hasManualImage ? "yes" : "no") : undefined}
           data-image-policy={isDev ? pipeline.imagePolicy : undefined}
           data-image-host={dataHost || undefined}
           data-image-url={dataUrl || undefined}
