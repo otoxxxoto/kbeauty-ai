@@ -1,0 +1,8 @@
+[firestore] init {
+  projectIdSet: false,
+  clientEmailSet: false,
+  privateKeySet: false,
+  authMode: 'application_default'
+}
+[fallback-image-urls] runDate=2026-03-31  rank_slots=98  loaded_products=98  fallback_no_image_goods=26  ndjson_rows=26
+[fallback-image-urls] url_rows_by_field oliveYoungImageUrl=0 imageUrl=26 thumbnailUrl=0

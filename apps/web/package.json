@@ -17,6 +17,7 @@
     "report-image-policy-stats": "tsx scripts/report-image-policy-stats.ts",
     "compare-image-policy-snapshots": "tsx scripts/compare-image-policy-snapshots.ts",
     "report-ranking-unanalyzed-image-urls": "tsx scripts/report-ranking-unanalyzed-image-urls.ts",
+    "report-ranking-fallback-image-urls": "tsx scripts/report-ranking-fallback-image-urls.ts",
     "backfill-amazon-ranking-images": "tsx scripts/backfill-amazon-ranking-images.ts",
     "diagnose-display-safe-image": "tsx scripts/diagnose-display-safe-image.ts"
   },
