@@ -2,15 +2,45 @@
  * Olive Young 公式サイトの商品・店舗導線 URL 判定（一覧カードの暫定フォールバック用）
  */
 
-function hostnameFromUrl(raw: string): string | null {
+function parseOliveYoungUrl(raw: string): URL | null {
   const s = raw.trim();
   if (!s) return null;
   try {
-    const href = /^https?:\/\//i.test(s) ? s : /^\/\//.test(s) ? `https:${s}` : `https://${s}`;
-    return new URL(href).hostname.toLowerCase();
+    const href = /^https?:\/\//i.test(s)
+      ? s
+      : /^\/\//.test(s)
+        ? `https:${s}`
+        : `https://${s}`;
+    return new URL(href);
   } catch {
     return null;
   }
+}
+
+function hostnameFromUrl(raw: string): string | null {
+  const u = parseOliveYoungUrl(raw);
+  return u ? u.hostname.toLowerCase() : null;
+}
+
+/** 明らかに API / JSON レスポンスと思われる OY URL かどうか（商品詳細・店舗導線には使わない） */
+export function isOliveYoungApiLikeUrl(raw: string): boolean {
+  const s = raw.trim();
+  if (!s) return false;
+  const lower = s.toLowerCase();
+
+  // 拡張子・クエリから JSON/API レスポンスっぽいものを除外
+  if (/\.(json|do)(\?|$)/.test(lower)) return true;
+  if (/[?&]callback=/.test(lower)) return true;
+
+  const u = parseOliveYoungUrl(lower);
+  const path = u?.pathname.toLowerCase() ?? lower;
+
+  if (path.startsWith("/api/") || path === "/api") return true;
+  if (path.includes("/api/")) return true;
+  if (path.includes("/goods/api") || path.includes("/goodsapi")) return true;
+  if (path.includes("/article/api") || path.includes("/articles/api")) return true;
+
+  return false;
 }
 
 /**
@@ -22,15 +52,21 @@ export function isOliveYoungOfficialProductUrl(raw: string): boolean {
   const s = raw.trim();
   if (!s) return false;
   const lower = s.toLowerCase();
+  if (isOliveYoungApiLikeUrl(lower)) return false;
   const host = hostnameFromUrl(s);
   if (host) {
-    if (host === "oliveyoung.co.kr" || host.endsWith(".oliveyoung.co.kr")) return true;
-    if (host === "oliveyoung.com" || host.endsWith(".oliveyoung.com")) return true;
-    if (host === "m.oliveyoung.com" || host.endsWith(".m.oliveyoung.com")) return true;
+    const isOyHost =
+      host === "oliveyoung.co.kr" ||
+      host.endsWith(".oliveyoung.co.kr") ||
+      host === "oliveyoung.com" ||
+      host.endsWith(".oliveyoung.com") ||
+      host === "m.oliveyoung.com" ||
+      host.endsWith(".m.oliveyoung.com");
+    if (isOyHost) return true;
   }
   // 解析不能時はドメイン文字列の含有のみ（レガシー・コピペURL）
-  if (lower.includes("oliveyoung.co.kr")) return true;
-  if (/\boliveyoung\.com\b/i.test(s)) return true;
+  if (lower.includes("oliveyoung.co.kr") && !isOliveYoungApiLikeUrl(lower)) return true;
+  if (/\boliveyoung\.com\b/i.test(s) && !isOliveYoungApiLikeUrl(lower)) return true;
   return false;
 }
 

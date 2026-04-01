@@ -30,17 +30,36 @@ export async function POST(request: Request) {
       );
     }
 
-    const destination = `product-images/manual/${goodsNo}.jpg`;
+    const extFromType = (() => {
+      const t = (file as Blob).type || "";
+      if (!t) return "jpg";
+      const [, subtype] = t.split("/");
+      if (!subtype) return "jpg";
+      if (subtype.includes("jpeg")) return "jpg";
+      if (subtype.includes("png")) return "png";
+      if (subtype.includes("webp")) return "webp";
+      return "jpg";
+    })();
+    const uniqueSuffix = Date.now();
+    const destination = `product-images/manual/${goodsNo}-${uniqueSuffix}.${extFromType}`;
     const projectId = process.env.GCP_PROJECT_ID ?? undefined;
     const storage = new Storage(projectId ? { projectId } : {});
     const bucket = storage.bucket(BUCKET);
     const gcsFile = bucket.file(destination);
 
-    const arrayBuffer = await file.arrayBuffer();
+    const arrayBuffer = await (file as Blob).arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
+    const docRef = db.collection("oliveyoung_products_public").doc(goodsNo);
+    const prevSnap = await docRef.get();
+    const prevData = prevSnap.exists ? prevSnap.data() ?? {} : {};
+    const oldManualImageUrl =
+      typeof prevData.manualImageUrl === "string"
+        ? (prevData.manualImageUrl as string)
+        : null;
+
     await gcsFile.save(buffer, {
-      contentType: file.type || "image/jpeg",
+      contentType: (file as Blob).type || "image/jpeg",
       resumable: false,
     });
 
@@ -48,17 +67,14 @@ export async function POST(request: Request) {
 
     const imageUrl = `https://storage.googleapis.com/${BUCKET}/${destination}`;
 
-    await db
-      .collection("oliveyoung_products_public")
-      .doc(goodsNo)
-      .set(
-        {
-          manualImageUrl: imageUrl,
-          manualImageSource: "upload",
-          manualImageUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        },
-        { merge: true }
-      );
+    await docRef.set(
+      {
+        manualImageUrl: imageUrl,
+        manualImageSource: "upload",
+        manualImageUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
 
     let runDate: string | null = null;
     try {
@@ -97,6 +113,8 @@ export async function POST(request: Request) {
       path: destination,
       goodsNo,
       runDate,
+      oldManualImageUrl,
+      newManualImageUrl: imageUrl,
     });
 
     return NextResponse.json({ ok: true, imageUrl });

@@ -19,6 +19,7 @@
     "report-ranking-unanalyzed-image-urls": "tsx scripts/report-ranking-unanalyzed-image-urls.ts",
     "report-ranking-fallback-image-urls": "tsx scripts/report-ranking-fallback-image-urls.ts",
     "report-ranking-fallback-reasons": "tsx scripts/report-ranking-fallback-reasons.ts",
+    "report-oliveyoung-name-url-issues": "tsx scripts/report-oliveyoung-name-url-issues.ts",
     "backfill-amazon-ranking-images": "tsx scripts/backfill-amazon-ranking-images.ts",
     "diagnose-display-safe-image": "tsx scripts/diagnose-display-safe-image.ts"
   },
