@@ -44,7 +44,20 @@ export function ProductCardOliveYoungLink({
   gaAffiliate?: ProductCardOliveYoungGaAffiliate;
 }) {
   const href = oliveYoungUrl?.trim();
-  if (!href || !isOliveYoungOfficialProductUrl(href)) return null;
+  const isDev = process.env.NODE_ENV === "development";
+  const isOfficial = href ? isOliveYoungOfficialProductUrl(href) : false;
+
+  if (isDev) {
+    // eslint-disable-next-line no-console -- dev debug
+    console.log("[OY_LINK_DEBUG]", {
+      goodsNo,
+      raw: oliveYoungUrl ?? null,
+      href: href || null,
+      isOfficial,
+    });
+  }
+
+  if (!href || !isOfficial) return null;
   const base = variant === "detail" ? detailClass : cardClass;
 
   const ga: ProductCardOliveYoungGaAffiliate =

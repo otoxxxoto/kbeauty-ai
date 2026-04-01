@@ -41,6 +41,7 @@ import {
   orderCompareCtaRows,
   shouldSuppressAffiliateCtasForProduct,
 } from "@/lib/getPrimaryShop";
+import { isOliveYoungOfficialProductUrl } from "@/lib/oliveyoung-official-url";
 import { notFound } from "next/navigation";
 import {
   PRODUCT_CARD_ROOT_CLASS,
@@ -403,13 +404,34 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const primaryCategoryLabel =
     CATEGORY_CONFIG[primaryCategorySlug as keyof typeof CATEGORY_CONFIG]?.label ?? "乾燥肌・保湿";
 
+  const oyDebug =
+    process.env.NODE_ENV === "development"
+      ? {
+          goodsNo,
+          oliveYoungUrl: product.oliveYoungUrl ?? null,
+          productUrl: product.productUrl ?? null,
+          pickedUrl: product.pickedUrl ?? null,
+          isOfficialOliveYoungUrl: product.oliveYoungUrl
+            ? isOliveYoungOfficialProductUrl(product.oliveYoungUrl)
+            : false,
+        }
+      : null;
+
   logClientSerializeDebugForProduct(
     "product-detail",
     product as unknown as Record<string, unknown>
   );
 
   return (
-    <div className="p-6 max-w-4xl mx-auto pb-28 sm:pb-32">
+    <div
+      className="p-6 max-w-4xl mx-auto pb-28 sm:pb-32"
+      data-oy-url={oyDebug ? oyDebug.oliveYoungUrl || undefined : undefined}
+      data-product-url={oyDebug ? oyDebug.productUrl || undefined : undefined}
+      data-picked-url={oyDebug ? oyDebug.pickedUrl || undefined : undefined}
+      data-oy-official={
+        oyDebug ? (oyDebug.isOfficialOliveYoungUrl ? "yes" : "no") : undefined
+      }
+    >
       {/* パンくず・戻る */}
       <nav className="flex flex-wrap gap-3 mb-6 text-sm text-zinc-600" aria-label="パンくず">
         <Link href="/oliveyoung" className="text-blue-600 hover:underline">

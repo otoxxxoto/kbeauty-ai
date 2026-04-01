@@ -62,11 +62,33 @@ export function isOliveYoungOfficialProductUrl(raw: string): boolean {
       host.endsWith(".oliveyoung.com") ||
       host === "m.oliveyoung.com" ||
       host.endsWith(".m.oliveyoung.com");
-    if (isOyHost) return true;
+    if (isOyHost) {
+      if (process.env.NODE_ENV === "development") {
+        // eslint-disable-next-line no-console -- dev debug
+        console.log("[OY_URL_DEBUG] official_host", { raw, host });
+      }
+      return true;
+    }
   }
   // 解析不能時はドメイン文字列の含有のみ（レガシー・コピペURL）
-  if (lower.includes("oliveyoung.co.kr") && !isOliveYoungApiLikeUrl(lower)) return true;
-  if (/\boliveyoung\.com\b/i.test(s) && !isOliveYoungApiLikeUrl(lower)) return true;
+  if (lower.includes("oliveyoung.co.kr") && !isOliveYoungApiLikeUrl(lower)) {
+    if (process.env.NODE_ENV === "development") {
+      // eslint-disable-next-line no-console -- dev debug
+      console.log("[OY_URL_DEBUG] fallback_contains_co_kr", { raw });
+    }
+    return true;
+  }
+  if (/\boliveyoung\.com\b/i.test(s) && !isOliveYoungApiLikeUrl(lower)) {
+    if (process.env.NODE_ENV === "development") {
+      // eslint-disable-next-line no-console -- dev debug
+      console.log("[OY_URL_DEBUG] fallback_contains_com", { raw });
+    }
+    return true;
+  }
+  if (process.env.NODE_ENV === "development") {
+    // eslint-disable-next-line no-console -- dev debug
+    console.log("[OY_URL_DEBUG] not_official", { raw });
+  }
   return false;
 }
 
