@@ -29,6 +29,7 @@ import {
 } from "@/lib/product-card-layout";
 import { serializeProductImageFieldsForClient } from "@/lib/serialize-product-for-client";
 import { ProductCardOliveYoungLink } from "@/components/ProductCardOliveYoungLink";
+import { resolveEffectiveOliveYoungUrl } from "@/lib/oliveyoung-official-url";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -96,7 +97,11 @@ function CategoryProductCard({
           商品詳細を見る
         </Link>
         <ProductCardOliveYoungLink
-          oliveYoungUrl={p.oliveYoungUrl}
+          oliveYoungUrl={resolveEffectiveOliveYoungUrl({
+            oliveYoungUrl: p.oliveYoungUrl,
+            productUrl: p.productUrl,
+            pickedUrl: undefined,
+          })}
           goodsNo={p.goodsNo}
           gaAffiliate={{
             position: "category_card",

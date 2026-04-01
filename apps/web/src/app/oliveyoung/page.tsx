@@ -15,6 +15,7 @@ import {
 import { ProductDisplayImage } from "@/components/ProductDisplayImage";
 import { ProductAffiliateCtas } from "@/components/ProductAffiliateCtas";
 import { ProductCardOliveYoungLink } from "@/components/ProductCardOliveYoungLink";
+import { resolveEffectiveOliveYoungUrl } from "@/lib/oliveyoung-official-url";
 import { getDisplayProductNameText } from "@/lib/oliveyoung-display";
 import { getBrandRankingByDate, getDisplayBrand } from "@/lib/brand-rankings";
 import { CATEGORY_CONFIG, CATEGORY_LINKS } from "@/lib/category-config";
@@ -300,7 +301,11 @@ export default async function OliveYoungEntryPage() {
                             商品詳細を見る
                           </Link>
                           <ProductCardOliveYoungLink
-                            oliveYoungUrl={item.oliveYoungUrl}
+                        oliveYoungUrl={resolveEffectiveOliveYoungUrl({
+                          oliveYoungUrl: item.oliveYoungUrl,
+                          productUrl: item.productUrl,
+                              pickedUrl: undefined,
+                        })}
                             goodsNo={item.goodsNo}
                             gaAffiliate={{
                               position: "rising_card",
@@ -393,7 +398,11 @@ export default async function OliveYoungEntryPage() {
                             商品詳細を見る
                           </Link>
                           <ProductCardOliveYoungLink
-                            oliveYoungUrl={item.oliveYoungUrl}
+                        oliveYoungUrl={resolveEffectiveOliveYoungUrl({
+                          oliveYoungUrl: item.oliveYoungUrl,
+                          productUrl: item.productUrl,
+                              pickedUrl: undefined,
+                        })}
                             goodsNo={item.goodsNo}
                             gaAffiliate={{
                               position: "featured_card",

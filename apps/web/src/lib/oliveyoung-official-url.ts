@@ -111,3 +111,53 @@ export function resolveNormalizedOliveYoungUrl(
   if (pk && isOliveYoungOfficialProductUrl(pk)) return pk;
   return undefined;
 }
+
+/**
+ * 表示用の最終的な Olive Young 導線 URL を復元する。
+ * 優先順:
+ * 1. oliveYoungUrl が official なら採用
+ * 2. productUrl が official なら採用
+ * 3. pickedUrl が official なら採用
+ * 4. それ以外は null
+ */
+export function resolveEffectiveOliveYoungUrl(args: {
+  oliveYoungUrl?: string | null;
+  productUrl?: string | null;
+  pickedUrl?: string | null;
+}): string | null {
+  const isDev = process.env.NODE_ENV === "development";
+
+  const trim = (v?: string | null) => (v ?? "").trim() || null;
+  const candOlive = trim(args.oliveYoungUrl);
+  const candProduct = trim(args.productUrl);
+  const candPicked = trim(args.pickedUrl);
+
+  let chosen: string | null = null;
+  let source: "oliveYoungUrl" | "productUrl" | "pickedUrl" | "none" = "none";
+
+  if (candOlive && isOliveYoungOfficialProductUrl(candOlive)) {
+    chosen = candOlive;
+    source = "oliveYoungUrl";
+  } else if (candProduct && isOliveYoungOfficialProductUrl(candProduct)) {
+    chosen = candProduct;
+    source = "productUrl";
+  } else if (candPicked && isOliveYoungOfficialProductUrl(candPicked)) {
+    chosen = candPicked;
+    source = "pickedUrl";
+  }
+
+  if (isDev) {
+    // eslint-disable-next-line no-console -- dev debug
+    console.log("[OY_EFFECTIVE_URL]", {
+      raw: {
+        oliveYoungUrl: args.oliveYoungUrl ?? null,
+        productUrl: args.productUrl ?? null,
+        pickedUrl: args.pickedUrl ?? null,
+      },
+      chosen,
+      source,
+    });
+  }
+
+  return chosen;
+}

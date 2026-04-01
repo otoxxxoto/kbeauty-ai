@@ -18,6 +18,7 @@ import {
 } from "@/lib/product-card-layout";
 import { serializeProductImageFieldsForClient } from "@/lib/serialize-product-for-client";
 import { ProductCardOliveYoungLink } from "@/components/ProductCardOliveYoungLink";
+import { resolveEffectiveOliveYoungUrl } from "@/lib/oliveyoung-official-url";
 import type { RankingItemWithProduct } from "@/lib/oliveyoung-rankings";
 import { notFound } from "next/navigation";
 import {
@@ -102,7 +103,11 @@ function ProductCard({
       <div className={`${PRODUCT_CARD_CTA_CLASS} flex flex-col gap-1.5`}>
         <ProductCardCta goodsNo={item.goodsNo} />
         <ProductCardOliveYoungLink
-          oliveYoungUrl={item.oliveYoungUrl}
+          oliveYoungUrl={resolveEffectiveOliveYoungUrl({
+            oliveYoungUrl: item.oliveYoungUrl,
+            productUrl: item.productUrl,
+            pickedUrl: undefined,
+          })}
           goodsNo={item.goodsNo}
           gaAffiliate={{
             position: "ranking_card",

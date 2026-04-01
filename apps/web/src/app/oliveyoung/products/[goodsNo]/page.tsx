@@ -41,7 +41,10 @@ import {
   orderCompareCtaRows,
   shouldSuppressAffiliateCtasForProduct,
 } from "@/lib/getPrimaryShop";
-import { isOliveYoungOfficialProductUrl } from "@/lib/oliveyoung-official-url";
+import {
+  isOliveYoungOfficialProductUrl,
+  resolveEffectiveOliveYoungUrl,
+} from "@/lib/oliveyoung-official-url";
 import { notFound } from "next/navigation";
 import {
   PRODUCT_CARD_ROOT_CLASS,
@@ -404,6 +407,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const primaryCategoryLabel =
     CATEGORY_CONFIG[primaryCategorySlug as keyof typeof CATEGORY_CONFIG]?.label ?? "乾燥肌・保湿";
 
+  const effectiveOliveYoungUrl = resolveEffectiveOliveYoungUrl({
+    oliveYoungUrl: product.oliveYoungUrl,
+    productUrl: product.productUrl,
+    pickedUrl: product.pickedUrl,
+  });
+
   const oyDebug =
     process.env.NODE_ENV === "development"
       ? {
@@ -411,8 +420,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
           oliveYoungUrl: product.oliveYoungUrl ?? null,
           productUrl: product.productUrl ?? null,
           pickedUrl: product.pickedUrl ?? null,
-          isOfficialOliveYoungUrl: product.oliveYoungUrl
-            ? isOliveYoungOfficialProductUrl(product.oliveYoungUrl)
+          isOfficialOliveYoungUrl: effectiveOliveYoungUrl
+            ? isOliveYoungOfficialProductUrl(effectiveOliveYoungUrl)
             : false,
         }
       : null;
@@ -498,7 +507,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 primaryShop={primaryShop}
                 suppressAffiliateCtas={suppressAffiliate}
                 productNameForGa={displayName}
-                oliveYoungUrl={product.oliveYoungUrl}
+                oliveYoungUrl={effectiveOliveYoungUrl}
               />
               {ctaDebugEnabled ? (
                 <details className="rounded-xl border border-dashed border-zinc-300 bg-zinc-50/60 px-4 py-3 text-xs text-zinc-600">
