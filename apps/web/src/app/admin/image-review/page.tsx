@@ -67,7 +67,7 @@ async function getReviewItems(limit: number, filter: FilterKind) {
 }
 
 type PageProps = {
-  searchParams?: { filter?: FilterKind };
+  searchParams: Promise<{ filter?: FilterKind }>;
 };
 
 type AdminItem = {
@@ -83,7 +83,8 @@ type AdminItem = {
 };
 
 export default async function AdminImageReviewPage({ searchParams }: PageProps) {
-  const filter: FilterKind = searchParams?.filter ?? "non_official_only";
+  const sp = await searchParams;
+  const filter: FilterKind = sp?.filter ?? "non_official_only";
   const { runDate, items } = await getReviewItems(100, filter);
 
   const FILTER_LABELS: { value: FilterKind; label: string }[] = [
