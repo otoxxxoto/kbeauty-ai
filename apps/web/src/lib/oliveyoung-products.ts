@@ -183,6 +183,8 @@ export type OliveYoungProductDetail = {
   goodsNo: string;
   name: string;
   nameJa?: string;
+  /** 管理画面からの手動日本語名（最優先で表示） */
+  manualNameJa?: string | null;
   summaryJa?: string;
   /** 口コミ要約（任意）。将来の補完Jobで投入されれば表示される */
   reviewSummaryJa?: string;
@@ -220,6 +222,8 @@ export type OliveYoungProductDetail = {
   manualImageSource?: "upload" | "external" | null;
   manualImageUpdatedAt?: unknown;
   manualImageNote?: string | null;
+  /** 手動日本語名の更新日時（任意） */
+  manualNameUpdatedAt?: unknown;
   /** 翻訳バッチ用メタ（任意） */
   needsNameJa?: boolean;
   translationPriority?: TranslationPriority;
@@ -489,6 +493,8 @@ export async function getOliveYoungProductByGoodsNo(
     goodsNo: trimmed,
     name: String(data.name ?? "").trim(),
     nameJa: data.nameJa != null ? String(data.nameJa).trim() : undefined,
+    manualNameJa:
+      data.manualNameJa != null ? String(data.manualNameJa).trim() : undefined,
     summaryJa: data.summaryJa != null ? String(data.summaryJa).trim() : undefined,
     reviewSummaryJa:
       data.reviewSummaryJa != null ? String(data.reviewSummaryJa).trim() : undefined,
@@ -521,6 +527,7 @@ export async function getOliveYoungProductByGoodsNo(
         : null,
     manualImageUpdatedAt: data.manualImageUpdatedAt ?? null,
     manualImageNote: optPlainStr(data.manualImageNote),
+    manualNameUpdatedAt: data.manualNameUpdatedAt ?? null,
     source: String(data.source ?? "").trim(),
     lastRank:
       data.lastRank != null && typeof data.lastRank === "number"
@@ -684,6 +691,7 @@ export type OliveYoungProductMinimal = {
   goodsNo: string;
   name: string;
   nameJa?: string;
+  manualNameJa?: string | null;
   summaryJa?: string;
   /** 口コミ要約（公開前レポート用・任意） */
   reviewSummaryJa?: string;
@@ -831,6 +839,8 @@ export async function getAllOliveYoungProductsMinimal(): Promise<
           : undefined,
       brand: String(data.brand ?? "").trim(),
       brandJa: data.brandJa != null ? String(data.brandJa).trim() : undefined,
+      manualNameJa:
+        data.manualNameJa != null ? String(data.manualNameJa).trim() : undefined,
       amazonImage: optImageStr(data.amazonImage),
       rakutenImage: optImageStr(data.rakutenImage),
       qoo10Image: optImageStr(data.qoo10Image),

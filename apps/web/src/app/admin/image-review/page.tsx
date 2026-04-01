@@ -5,6 +5,7 @@ import { serializeProductImageFieldsForClient } from "@/lib/serialize-product-fo
 import { resolveProductImageForDisplay } from "@/lib/getProductImage";
 import { getDisplayBrand, getDisplayName } from "@/lib/oliveyoung-products";
 import { UploadManualImageForm } from "./upload-form";
+import { ManualNameForm } from "./name-form";
 
 type ImageKind = "official" | "non_official" | "fallback";
 type FilterKind = "fallback_only" | "non_official_only" | "all";
@@ -60,6 +61,7 @@ async function getReviewItems(limit: number, filter: FilterKind) {
       imageKind: kind,
       displayImageUrl: pipe.url,
       manualImageUrl: detail.manualImageUrl ?? null,
+      manualNameJa: detail.manualNameJa ?? null,
     });
   }
 
@@ -80,6 +82,7 @@ type AdminItem = {
   imageKind: ImageKind;
   displayImageUrl: string;
   manualImageUrl: string | null;
+  manualNameJa?: string | null;
 };
 
 export default async function AdminImageReviewPage({ searchParams }: PageProps) {
@@ -136,6 +139,7 @@ export default async function AdminImageReviewPage({ searchParams }: PageProps) 
 
 function AdminImageCard({ item }: { item: AdminItem }) {
   const hasManual = Boolean((item.manualImageUrl ?? "").trim());
+  const hasManualName = Boolean((item.manualNameJa ?? "").trim());
   const kindLabel =
     item.imageKind === "official"
       ? "公式画像"
@@ -148,6 +152,7 @@ function AdminImageCard({ item }: { item: AdminItem }) {
       className="flex flex-col gap-2 rounded-lg border border-zinc-200 bg-white p-3 text-sm"
       data-image-source={item.imageSource}
       data-image-kind={item.imageKind}
+      data-manual-name={hasManualName ? "yes" : "no"}
     >
       <div className="flex items-center justify-between gap-2">
         <span className="inline-flex min-w-[2rem] items-center justify-center rounded bg-zinc-200 px-2 py-1 text-xs font-semibold text-zinc-700">
@@ -172,7 +177,10 @@ function AdminImageCard({ item }: { item: AdminItem }) {
       <div className="line-clamp-2 text-xs text-zinc-800">{item.name}</div>
       <div className="mt-1 flex items-center justify-between text-[11px] text-zinc-500">
         <span>{kindLabel}</span>
-        <span>{hasManual ? "manual画像あり" : "manual画像なし"}</span>
+        <span>
+          {hasManual ? "manual画像あり" : "manual画像なし"} /{" "}
+          {hasManualName ? "manual名あり" : "manual名なし"}
+        </span>
       </div>
       <div className="mt-2 h-32">
         <div className="flex h-full w-full items-center justify-center overflow-hidden rounded bg-zinc-100">
@@ -189,6 +197,10 @@ function AdminImageCard({ item }: { item: AdminItem }) {
         </div>
       </div>
       <UploadManualImageForm goodsNo={item.goodsNo} />
+      <ManualNameForm
+        goodsNo={item.goodsNo}
+        initialName={item.manualNameJa ?? item.name ?? ""}
+      />
     </div>
   );
 }

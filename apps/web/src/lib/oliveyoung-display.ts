@@ -24,6 +24,8 @@ const PRODUCT_PURPOSE_HINT =
 export const MIN_SAFE_NAMEJA_GRAPHEMES = 4;
 
 export type ProductNameDisplayInput = {
+  /** 管理画面からの手動日本語名（最優先） */
+  manualNameJa?: string | null;
   nameJa?: string | null;
   name?: string | null;
   brand?: string | null;
@@ -89,11 +91,14 @@ export function isUnsafeNameJa(
 
 /**
  * 一覧・カード・詳細の表示用商品名。
+ * - manualNameJa があれば最優先
  * - nameJa が安全 → nameJa
  * - nameJa が不安全で name が使える → name（韓国語オリジナル名のフォールバック）
  * - 両方ダメ → 商品名準備中
  */
 export function getDisplayProductNameText(product: ProductNameDisplayInput): string {
+  const manual = product.manualNameJa?.trim() ?? "";
+  if (manual) return manual;
   const ja = product.nameJa?.trim() ?? "";
   const raw = product.name?.trim() ?? "";
   if (ja && !isUnsafeNameJa(ja, product)) return ja;

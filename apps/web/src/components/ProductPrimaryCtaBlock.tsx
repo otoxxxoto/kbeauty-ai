@@ -51,10 +51,11 @@ export function ProductPrimaryCtaBlock({
     rakuten: (rakutenUrl ?? "").trim(),
     qoo10: (qoo10Url ?? "").trim(),
   };
-  if (suppressAffiliateCtas) return null;
-  if (!hasAnyUrl({ amazonUrl: urls.amazon, rakutenUrl: urls.rakuten, qoo10Url: urls.qoo10 })) {
-    return null;
-  }
+  const hasAffiliateUrls = hasAnyUrl({
+    amazonUrl: urls.amazon,
+    rakutenUrl: urls.rakuten,
+    qoo10Url: urls.qoo10,
+  });
 
   const oyTrim = oliveYoungUrl?.trim();
   const showOySupplement =
@@ -74,9 +75,10 @@ export function ProductPrimaryCtaBlock({
   };
 
   const nodes: ReactNode[] = [];
-  for (const shop of order) {
-    if (shop === "amazon" && urls.amazon) {
-      nodes.push(
+  if (!suppressAffiliateCtas && hasAffiliateUrls) {
+    for (const shop of order) {
+      if (shop === "amazon" && urls.amazon) {
+        nodes.push(
         <a
           key="amazon"
           href={urls.amazon}
@@ -95,9 +97,9 @@ export function ProductPrimaryCtaBlock({
         >
           {CTA_COPY.primary.amazon}
         </a>
-      );
-    } else if (shop === "rakuten" && urls.rakuten) {
-      nodes.push(
+        );
+      } else if (shop === "rakuten" && urls.rakuten) {
+        nodes.push(
         <a
           key="rakuten"
           href={urls.rakuten}
@@ -116,9 +118,9 @@ export function ProductPrimaryCtaBlock({
         >
           {CTA_COPY.primary.rakuten}
         </a>
-      );
-    } else if (shop === "qoo10" && urls.qoo10) {
-      nodes.push(
+        );
+      } else if (shop === "qoo10" && urls.qoo10) {
+        nodes.push(
         <a
           key="qoo10"
           href={urls.qoo10}
@@ -137,16 +139,19 @@ export function ProductPrimaryCtaBlock({
         >
           {CTA_COPY.primary.qoo10}
         </a>
-      );
+        );
+      }
     }
   }
 
-  if (nodes.length === 0) return null;
+  if (nodes.length === 0 && !showOySupplement) return null;
 
   return (
     <section
       className={`rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6 ${className}`.trim()}
       aria-label="購入先CTA（ファーストビュー）"
+      data-has-oy-link={process.env.NODE_ENV === "development" ? (showOySupplement ? "yes" : "no") : undefined}
+      data-oy-url={process.env.NODE_ENV === "development" ? oyTrim || undefined : undefined}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
