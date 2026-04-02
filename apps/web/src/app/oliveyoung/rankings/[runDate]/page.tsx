@@ -17,8 +17,10 @@ import {
   logCardLayoutDebug,
 } from "@/lib/product-card-layout";
 import { serializeProductImageFieldsForClient } from "@/lib/serialize-product-for-client";
-import { ProductCardOliveYoungLink } from "@/components/ProductCardOliveYoungLink";
-import { resolveEffectiveOliveYoungUrl } from "@/lib/oliveyoung-official-url";
+import {
+  RelatedStyleOliveYoungLink,
+  getRelatedStyleOyHref,
+} from "@/components/RelatedStyleOliveYoungLink";
 import type { RankingItemWithProduct } from "@/lib/oliveyoung-rankings";
 import { notFound } from "next/navigation";
 import {
@@ -70,38 +72,16 @@ function ProductCard({
     brandJa: item.brandJa,
   });
   const displayBrand = getDisplayBrand(item);
-  const effectiveOliveYoungUrl = resolveEffectiveOliveYoungUrl({
-    oliveYoungUrl: item.oliveYoungUrl,
-    productUrl: item.productUrl,
-    pickedUrl: item.pickedUrl ?? null,
-    goodsNo: item.goodsNo,
-  });
-
-  if (process.env.NODE_ENV === "development") {
-    // eslint-disable-next-line no-console -- dev OY URL trace
-    console.log("[OY_CARD_INPUT_DEBUG]", {
-      context: "ranking",
-      goodsNo: item.goodsNo,
-      itemOliveYoungUrl: item.oliveYoungUrl ?? null,
-      itemProductUrl: item.productUrl ?? null,
-      itemPickedUrl: item.pickedUrl ?? null,
-      effectiveOliveYoungUrl,
-    });
-  }
+  const oyHref = getRelatedStyleOyHref(item.productUrl);
+  const isDev = process.env.NODE_ENV === "development";
 
   return (
     <div
       className={`${PRODUCT_CARD_ROOT_CLASS} hover:border-zinc-300 transition-colors`}
-      data-debug-ranking-card={
-        process.env.NODE_ENV === "development" ? "1" : undefined
-      }
-      data-has-oy-link={
-        process.env.NODE_ENV === "development"
-          ? effectiveOliveYoungUrl
-            ? "yes"
-            : "no"
-          : undefined
-      }
+      data-debug-ranking-card={isDev ? "1" : undefined}
+      data-debug-oy={isDev && oyHref ? "yes" : undefined}
+      data-oy-href={isDev && oyHref ? oyHref : undefined}
+      data-has-oy-link={isDev ? (oyHref ? "yes" : "no") : undefined}
     >
       {showRankBadge ? (
         <div className="mb-2 flex shrink-0 items-start justify-between gap-2">
@@ -130,13 +110,10 @@ function ProductCard({
       </div>
       <div className={`${PRODUCT_CARD_CTA_CLASS} flex flex-col gap-1.5`}>
         <ProductCardCta goodsNo={item.goodsNo} />
-        <ProductCardOliveYoungLink
-          oliveYoungUrl={effectiveOliveYoungUrl}
-          goodsNo={item.goodsNo}
-          gaAffiliate={{
-            position: "ranking_card",
-            pageType: "ranking",
-          }}
+        <RelatedStyleOliveYoungLink
+          productUrl={item.productUrl}
+          fullWidth
+          label="Olive Youngで見る"
         />
       </div>
     </div>

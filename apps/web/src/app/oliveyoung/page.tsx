@@ -14,8 +14,10 @@ import {
 } from "@/lib/getPrimaryShop";
 import { ProductDisplayImage } from "@/components/ProductDisplayImage";
 import { ProductAffiliateCtas } from "@/components/ProductAffiliateCtas";
-import { ProductCardOliveYoungLink } from "@/components/ProductCardOliveYoungLink";
-import { resolveEffectiveOliveYoungUrl } from "@/lib/oliveyoung-official-url";
+import {
+  RelatedStyleOliveYoungLink,
+  getRelatedStyleOyHref,
+} from "@/components/RelatedStyleOliveYoungLink";
 import { getDisplayProductNameText } from "@/lib/oliveyoung-display";
 import { getBrandRankingByDate, getDisplayBrand } from "@/lib/brand-rankings";
 import { CATEGORY_CONFIG, CATEGORY_LINKS } from "@/lib/category-config";
@@ -245,37 +247,16 @@ export default async function OliveYoungEntryPage() {
                     });
                     const primaryShop = getPrimaryShopFromProduct(item);
                     const suppressAffiliate = shouldSuppressAffiliateCtasForProduct(item);
-                    const effectiveOliveYoungUrl = resolveEffectiveOliveYoungUrl({
-                      oliveYoungUrl: item.oliveYoungUrl,
-                      productUrl: item.productUrl,
-                      pickedUrl: item.pickedUrl ?? null,
-                      goodsNo: item.goodsNo,
-                    });
-                    if (process.env.NODE_ENV === "development") {
-                      // eslint-disable-next-line no-console -- dev OY URL trace
-                      console.log("[OY_CARD_INPUT_DEBUG]", {
-                        context: "top_rising",
-                        goodsNo: item.goodsNo,
-                        itemOliveYoungUrl: item.oliveYoungUrl ?? null,
-                        itemProductUrl: item.productUrl ?? null,
-                        itemPickedUrl: item.pickedUrl ?? null,
-                        effectiveOliveYoungUrl,
-                      });
-                    }
+                    const oyHref = getRelatedStyleOyHref(item.productUrl);
+                    const isDev = process.env.NODE_ENV === "development";
                     return (
                       <div
                         key={item.goodsNo}
                         className={`${PRODUCT_CARD_ROOT_CLASS} hover:border-emerald-300 hover:shadow-sm`}
-                        data-debug-ranking-card={
-                          process.env.NODE_ENV === "development" ? "1" : undefined
-                        }
-                        data-has-oy-link={
-                          process.env.NODE_ENV === "development"
-                            ? effectiveOliveYoungUrl
-                              ? "yes"
-                              : "no"
-                            : undefined
-                        }
+                        data-debug-ranking-card={isDev ? "1" : undefined}
+                        data-debug-oy={isDev && oyHref ? "yes" : undefined}
+                        data-oy-href={isDev && oyHref ? oyHref : undefined}
+                        data-has-oy-link={isDev ? (oyHref ? "yes" : "no") : undefined}
                       >
                         <Link
                           href={`/oliveyoung/products/${item.goodsNo}`}
@@ -327,14 +308,10 @@ export default async function OliveYoungEntryPage() {
                           >
                             商品詳細を見る
                           </Link>
-                          <ProductCardOliveYoungLink
-                            oliveYoungUrl={effectiveOliveYoungUrl}
-                            goodsNo={item.goodsNo}
-                            gaAffiliate={{
-                              position: "rising_card",
-                              productName: displayName,
-                              pageType: "ranking",
-                            }}
+                          <RelatedStyleOliveYoungLink
+                            productUrl={item.productUrl}
+                            fullWidth
+                            label="Olive Youngで見る"
                           />
                           <ProductAffiliateCtas
                             goodsNo={item.goodsNo}
@@ -368,37 +345,16 @@ export default async function OliveYoungEntryPage() {
                     });
                     const primaryShop = getPrimaryShopFromProduct(item);
                     const suppressAffiliate = shouldSuppressAffiliateCtasForProduct(item);
-                    const effectiveOliveYoungUrl = resolveEffectiveOliveYoungUrl({
-                      oliveYoungUrl: item.oliveYoungUrl,
-                      productUrl: item.productUrl,
-                      pickedUrl: item.pickedUrl ?? null,
-                      goodsNo: item.goodsNo,
-                    });
-                    if (process.env.NODE_ENV === "development") {
-                      // eslint-disable-next-line no-console -- dev OY URL trace
-                      console.log("[OY_CARD_INPUT_DEBUG]", {
-                        context: "top_featured",
-                        goodsNo: item.goodsNo,
-                        itemOliveYoungUrl: item.oliveYoungUrl ?? null,
-                        itemProductUrl: item.productUrl ?? null,
-                        itemPickedUrl: item.pickedUrl ?? null,
-                        effectiveOliveYoungUrl,
-                      });
-                    }
+                    const oyHref = getRelatedStyleOyHref(item.productUrl);
+                    const isDev = process.env.NODE_ENV === "development";
                     return (
                       <div
                         key={item.goodsNo}
                         className={PRODUCT_CARD_ROOT_CLASS}
-                        data-debug-ranking-card={
-                          process.env.NODE_ENV === "development" ? "1" : undefined
-                        }
-                        data-has-oy-link={
-                          process.env.NODE_ENV === "development"
-                            ? effectiveOliveYoungUrl
-                              ? "yes"
-                              : "no"
-                            : undefined
-                        }
+                        data-debug-ranking-card={isDev ? "1" : undefined}
+                        data-debug-oy={isDev && oyHref ? "yes" : undefined}
+                        data-oy-href={isDev && oyHref ? oyHref : undefined}
+                        data-has-oy-link={isDev ? (oyHref ? "yes" : "no") : undefined}
                       >
                         <div className="flex min-h-0 flex-1 flex-col">
                           <div className="mb-2 flex shrink-0 items-center gap-2">
@@ -447,14 +403,10 @@ export default async function OliveYoungEntryPage() {
                           >
                             商品詳細を見る
                           </Link>
-                          <ProductCardOliveYoungLink
-                            oliveYoungUrl={effectiveOliveYoungUrl}
-                            goodsNo={item.goodsNo}
-                            gaAffiliate={{
-                              position: "featured_card",
-                              productName: displayName,
-                              pageType: "ranking",
-                            }}
+                          <RelatedStyleOliveYoungLink
+                            productUrl={item.productUrl}
+                            fullWidth
+                            label="Olive Youngで見る"
                           />
                           <ProductAffiliateCtas
                             goodsNo={item.goodsNo}

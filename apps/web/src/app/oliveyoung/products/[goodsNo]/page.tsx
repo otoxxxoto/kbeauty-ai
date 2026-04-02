@@ -25,6 +25,7 @@ import {
 } from "@/lib/image-source-stats";
 import { LoggedShopLink } from "@/components/LoggedShopLink";
 import { ProductAffiliateCtas } from "@/components/ProductAffiliateCtas";
+import { RelatedStyleOliveYoungLink } from "@/components/RelatedStyleOliveYoungLink";
 import { BottomStickyCta } from "@/components/BottomStickyCta";
 import { CollapsibleText } from "@/components/CollapsibleText";
 import { ProductPrimaryCtaBlock } from "@/components/ProductPrimaryCtaBlock";
@@ -165,16 +166,7 @@ function RelatedProductCard({ p }: { p: OliveYoungProductMinimal }) {
           >
             商品詳細
           </Link>
-          {p.productUrl ? (
-            <a
-              href={p.productUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex rounded-lg border border-zinc-300 px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
-            >
-              Olive Young で見る
-            </a>
-          ) : null}
+          <RelatedStyleOliveYoungLink productUrl={p.productUrl} />
         </div>
         <ProductAffiliateCtas
           goodsNo={p.goodsNo}
