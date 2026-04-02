@@ -251,18 +251,30 @@ export default async function OliveYoungEntryPage() {
                       pickedUrl: item.pickedUrl ?? null,
                       goodsNo: item.goodsNo,
                     });
-                    // eslint-disable-next-line no-console -- temporary OY button debug
-                    console.log("[OY_TOP_RISING_CARD_SERVER]", {
-                      goodsNo: item.goodsNo,
-                      effectiveOliveYoungUrl,
-                    });
+                    if (process.env.NODE_ENV === "development") {
+                      // eslint-disable-next-line no-console -- dev OY URL trace
+                      console.log("[OY_CARD_INPUT_DEBUG]", {
+                        context: "top_rising",
+                        goodsNo: item.goodsNo,
+                        itemOliveYoungUrl: item.oliveYoungUrl ?? null,
+                        itemProductUrl: item.productUrl ?? null,
+                        itemPickedUrl: item.pickedUrl ?? null,
+                        effectiveOliveYoungUrl,
+                      });
+                    }
                     return (
                       <div
                         key={item.goodsNo}
                         className={`${PRODUCT_CARD_ROOT_CLASS} hover:border-emerald-300 hover:shadow-sm`}
-                        data-debug-ranking-card="1"
+                        data-debug-ranking-card={
+                          process.env.NODE_ENV === "development" ? "1" : undefined
+                        }
                         data-has-oy-link={
-                          effectiveOliveYoungUrl ? "yes" : "no"
+                          process.env.NODE_ENV === "development"
+                            ? effectiveOliveYoungUrl
+                              ? "yes"
+                              : "no"
+                            : undefined
                         }
                       >
                         <Link
@@ -362,18 +374,30 @@ export default async function OliveYoungEntryPage() {
                       pickedUrl: item.pickedUrl ?? null,
                       goodsNo: item.goodsNo,
                     });
-                    // eslint-disable-next-line no-console -- temporary OY button debug
-                    console.log("[OY_TOP_FEATURED_CARD_SERVER]", {
-                      goodsNo: item.goodsNo,
-                      effectiveOliveYoungUrl,
-                    });
+                    if (process.env.NODE_ENV === "development") {
+                      // eslint-disable-next-line no-console -- dev OY URL trace
+                      console.log("[OY_CARD_INPUT_DEBUG]", {
+                        context: "top_featured",
+                        goodsNo: item.goodsNo,
+                        itemOliveYoungUrl: item.oliveYoungUrl ?? null,
+                        itemProductUrl: item.productUrl ?? null,
+                        itemPickedUrl: item.pickedUrl ?? null,
+                        effectiveOliveYoungUrl,
+                      });
+                    }
                     return (
                       <div
                         key={item.goodsNo}
                         className={PRODUCT_CARD_ROOT_CLASS}
-                        data-debug-ranking-card="1"
+                        data-debug-ranking-card={
+                          process.env.NODE_ENV === "development" ? "1" : undefined
+                        }
                         data-has-oy-link={
-                          effectiveOliveYoungUrl ? "yes" : "no"
+                          process.env.NODE_ENV === "development"
+                            ? effectiveOliveYoungUrl
+                              ? "yes"
+                              : "no"
+                            : undefined
                         }
                       >
                         <div className="flex min-h-0 flex-1 flex-col">

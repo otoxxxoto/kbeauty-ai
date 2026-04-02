@@ -46,10 +46,6 @@ export function ProductCardOliveYoungLink({
   /** 未指定時は `category_card`（一覧カード向け） */
   gaAffiliate?: ProductCardOliveYoungGaAffiliate;
 }) {
-  // 一時デバッグ: ブラウザコンソールで必ず確認（Client Component）
-  // eslint-disable-next-line no-console -- temporary OY button debug
-  console.log("[OY_LINK_DEBUG_BROWSER]", { goodsNo, oliveYoungUrl });
-
   const href = oliveYoungUrl?.trim();
   const isDev = process.env.NODE_ENV === "development";
   const isOfficial = href ? isOliveYoungOfficialProductUrl(href) : false;
@@ -64,14 +60,14 @@ export function ProductCardOliveYoungLink({
 
   if (isDev) {
     // eslint-disable-next-line no-console -- dev debug
-    console.log("[OY_LINK_DEBUG]", {
+    console.log("[OY_LINK_DEBUG_BROWSER]", {
       goodsNo,
-      raw: oliveYoungUrl ?? null,
+      oliveYoungUrl: oliveYoungUrl ?? null,
       href: href || null,
       isOfficial,
       isApiLike,
-      rendered: !!href && !isApiLike,
       skipReason,
+      rendered: !!href && !isApiLike,
     });
   }
 

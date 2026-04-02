@@ -100,7 +100,8 @@ function CategoryProductCard({
           oliveYoungUrl={resolveEffectiveOliveYoungUrl({
             oliveYoungUrl: p.oliveYoungUrl,
             productUrl: p.productUrl,
-            pickedUrl: undefined,
+            pickedUrl: p.pickedUrl ?? null,
+            goodsNo: p.goodsNo,
           })}
           goodsNo={p.goodsNo}
           gaAffiliate={{

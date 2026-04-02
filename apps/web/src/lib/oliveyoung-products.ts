@@ -587,6 +587,7 @@ export type OliveYoungProductCard = {
   imageAnalysis?: ProductImageAnalysisEntry[];
   marketplaceImageMatchLevels?: ProductImageFields["marketplaceImageMatchLevels"];
   productUrl: string;
+  pickedUrl?: string | null;
   lastRank: number | null;
   lastSeenRunDate: string | null;
   manualImageUrl?: string | null;
@@ -626,6 +627,7 @@ export async function getOliveYoungProductsByGoodsNos(
       imageAnalysis: p.imageAnalysis,
       marketplaceImageMatchLevels: p.marketplaceImageMatchLevels,
       productUrl: p.productUrl,
+      pickedUrl: p.pickedUrl ?? null,
       lastRank: p.lastRank ?? p.lastSeenRank,
       lastSeenRunDate: p.lastSeenRunDate,
       asin: p.asin,
@@ -713,6 +715,8 @@ export type OliveYoungProductMinimal = {
   imageAnalysis?: ProductImageAnalysisEntry[];
   marketplaceImageMatchLevels?: ProductImageFields["marketplaceImageMatchLevels"];
   productUrl: string;
+  /** Firestore `pickedUrl`（公式ページ候補・effective URL と揃える） */
+  pickedUrl?: string | null;
   lastRank: number | null;
   lastSeenRunDate: string | null;
   /** 表示用（Firestore Timestamp は取得時に文字列化済み） */
@@ -857,6 +861,7 @@ export async function getAllOliveYoungProductsMinimal(): Promise<
         data.marketplaceImageMatchLevels
       ),
       productUrl,
+      pickedUrl: pickedUrlRaw || undefined,
       lastRank:
         data.lastRank != null && typeof data.lastRank === "number"
           ? data.lastRank

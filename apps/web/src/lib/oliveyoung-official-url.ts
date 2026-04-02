@@ -114,11 +114,8 @@ export function resolveNormalizedOliveYoungUrl(
 
 /**
  * 表示用の最終的な Olive Young 導線 URL を復元する。
- * 優先順:
- * 1. oliveYoungUrl が official なら採用
- * 2. productUrl が official なら採用
- * 3. pickedUrl が official なら採用
- * 4. それ以外は null
+ * `ProductCardOliveYoungLink` と同じ基準: 空・API ライクのみ除外（厳密な公式ドメイン判定はしない）。
+ * 優先順: oliveYoungUrl → productUrl → pickedUrl（関連商品カードの `productUrl` 直リンクと揃える）
  */
 export function resolveEffectiveOliveYoungUrl(args: {
   oliveYoungUrl?: string | null;
@@ -129,22 +126,30 @@ export function resolveEffectiveOliveYoungUrl(args: {
   const isDev = process.env.NODE_ENV === "development";
 
   const trim = (v?: string | null) => (v ?? "").trim() || null;
-  const candOlive = trim(args.oliveYoungUrl);
-  const candProduct = trim(args.productUrl);
-  const candPicked = trim(args.pickedUrl);
 
+  type Field = "oliveYoungUrl" | "productUrl" | "pickedUrl";
+  const candidates: { field: Field; url: string | null }[] = [
+    { field: "oliveYoungUrl", url: trim(args.oliveYoungUrl) },
+    { field: "productUrl", url: trim(args.productUrl) },
+    { field: "pickedUrl", url: trim(args.pickedUrl) },
+  ];
+
+  const rejections: { field: Field; reason: string }[] = [];
   let chosen: string | null = null;
-  let source: "oliveYoungUrl" | "productUrl" | "pickedUrl" | "none" = "none";
+  let source: Field | "none" = "none";
 
-  if (candOlive && isOliveYoungOfficialProductUrl(candOlive)) {
-    chosen = candOlive;
-    source = "oliveYoungUrl";
-  } else if (candProduct && isOliveYoungOfficialProductUrl(candProduct)) {
-    chosen = candProduct;
-    source = "productUrl";
-  } else if (candPicked && isOliveYoungOfficialProductUrl(candPicked)) {
-    chosen = candPicked;
-    source = "pickedUrl";
+  for (const { field, url } of candidates) {
+    if (!url) {
+      rejections.push({ field, reason: "empty" });
+      continue;
+    }
+    if (isOliveYoungApiLikeUrl(url)) {
+      rejections.push({ field, reason: "api_like" });
+      continue;
+    }
+    chosen = url;
+    source = field;
+    break;
   }
 
   if (isDev) {
@@ -158,6 +163,13 @@ export function resolveEffectiveOliveYoungUrl(args: {
       },
       chosen,
       source,
+      rejections,
+      allRejectedReason:
+        chosen == null
+          ? rejections.length
+            ? rejections.map((r) => `${r.field}:${r.reason}`).join(", ")
+            : "no_candidates"
+          : undefined,
     });
   }
 

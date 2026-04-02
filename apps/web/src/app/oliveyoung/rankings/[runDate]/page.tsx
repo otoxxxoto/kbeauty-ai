@@ -77,18 +77,31 @@ function ProductCard({
     goodsNo: item.goodsNo,
   });
 
-  // 一時デバッグ: ターミナルで必ず確認できるようにする（本番ビルドでも出力）
-  // eslint-disable-next-line no-console -- temporary OY button debug
-  console.log("[OY_RANKING_CARD_SERVER]", {
-    goodsNo: item.goodsNo,
-    effectiveOliveYoungUrl,
-  });
+  if (process.env.NODE_ENV === "development") {
+    // eslint-disable-next-line no-console -- dev OY URL trace
+    console.log("[OY_CARD_INPUT_DEBUG]", {
+      context: "ranking",
+      goodsNo: item.goodsNo,
+      itemOliveYoungUrl: item.oliveYoungUrl ?? null,
+      itemProductUrl: item.productUrl ?? null,
+      itemPickedUrl: item.pickedUrl ?? null,
+      effectiveOliveYoungUrl,
+    });
+  }
 
   return (
     <div
       className={`${PRODUCT_CARD_ROOT_CLASS} hover:border-zinc-300 transition-colors`}
-      data-debug-ranking-card="1"
-      data-has-oy-link={effectiveOliveYoungUrl ? "yes" : "no"}
+      data-debug-ranking-card={
+        process.env.NODE_ENV === "development" ? "1" : undefined
+      }
+      data-has-oy-link={
+        process.env.NODE_ENV === "development"
+          ? effectiveOliveYoungUrl
+            ? "yes"
+            : "no"
+          : undefined
+      }
     >
       {showRankBadge ? (
         <div className="mb-2 flex shrink-0 items-start justify-between gap-2">
