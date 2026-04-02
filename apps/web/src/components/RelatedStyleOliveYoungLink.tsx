@@ -1,22 +1,13 @@
-import { isOliveYoungApiLikeUrl } from "@/lib/oliveyoung-official-url";
+import { getRelatedStyleOyHref } from "@/lib/oliveyoung-official-url";
+
+export { getRelatedStyleOyHref } from "@/lib/oliveyoung-official-url";
 
 const BTN_CLASS =
   "inline-flex rounded-lg border border-zinc-300 px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50";
 
 /**
- * 商品詳細「関連商品」カードと同じ OY 導線:
- * - href は Firestore の `productUrl` のみ（trim）
- * - API ライク URL のみ除外
- * - ProductCardOliveYoungLink / resolveEffectiveOliveYoungUrl は使わない
+ * 商品詳細「関連商品」カードと同じ OY 導線（href 決定は getRelatedStyleOyHref）
  */
-export function getRelatedStyleOyHref(
-  productUrl: string | null | undefined
-): string | null {
-  const u = (productUrl ?? "").trim();
-  if (!u) return null;
-  if (isOliveYoungApiLikeUrl(u)) return null;
-  return u;
-}
 
 export function RelatedStyleOliveYoungLink({
   productUrl,

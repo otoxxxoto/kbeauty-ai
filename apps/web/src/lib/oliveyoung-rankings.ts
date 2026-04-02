@@ -17,6 +17,10 @@ import {
   classifyImageSourceForStats,
   rankingVisualBoostForDisplayedBucket,
 } from "@/lib/image-source-stats";
+import {
+  getRelatedStyleOyHref,
+  mergeOliveYoungListingProductUrl,
+} from "@/lib/oliveyoung-official-url";
 
 /** ランキング行の name と public.name をマージ（行が goodsNo のときは public の実名を優先） */
 function resolveRankingItemName(
@@ -94,6 +98,18 @@ export type RankingItemRow = {
   isNew: boolean;
 };
 
+/** development のみ付与: 画面上 OY URL デバッグ */
+export type OyListingCardDebug = {
+  goodsNo: string;
+  /** Firestore `productUrl` 素値が非空か */
+  dbProductUrl: boolean;
+  dbPickedUrl: boolean;
+  dbOliveYoungUrl: boolean;
+  /** merge 後の item.productUrl（カードに載せた値）が非空か */
+  mergedProductUrl: boolean;
+  oyHref: boolean;
+};
+
 /** 商品公開データで補完したランキング1件（一覧・カード用） */
 export type RankingItemWithProduct = RankingItemRow & {
   nameJa?: string;
@@ -119,6 +135,7 @@ export type RankingItemWithProduct = RankingItemRow & {
   pickedUrl?: string | null;
   lastRank: number | null;
   lastSeenRunDate: string | null;
+  oyListingDebug?: OyListingCardDebug;
 } & ProductMarketplaceFields;
 
 export type RankingMeta = {
@@ -204,8 +221,15 @@ export async function getRankingWithProducts(
     const publicProduct = await getOliveYoungProductByGoodsNo(row.goodsNo);
     const imageUrl = publicProduct?.imageUrl ?? "";
     const thumbnailUrl = publicProduct?.thumbnailUrl ?? "";
-    const productUrl = publicProduct?.productUrl ?? "";
-     const pickedUrl = publicProduct?.pickedUrl ?? null;
+    const dbProductUrl = !!(publicProduct?.productUrl ?? "").trim();
+    const dbPickedUrl = !!(publicProduct?.pickedUrl ?? "").trim();
+    const dbOliveYoungUrl = !!(publicProduct?.oliveYoungUrl ?? "").trim();
+    const productUrl = mergeOliveYoungListingProductUrl({
+      productUrl: publicProduct?.productUrl,
+      pickedUrl: publicProduct?.pickedUrl,
+      oliveYoungUrl: publicProduct?.oliveYoungUrl,
+    });
+    const pickedUrl = publicProduct?.pickedUrl ?? null;
     const lastRank = publicProduct?.lastRank ?? publicProduct?.lastSeenRank ?? null;
     const lastSeenRunDate = publicProduct?.lastSeenRunDate ?? null;
     const name = resolveRankingItemName(row.name, publicProduct?.name);
@@ -214,6 +238,18 @@ export async function getRankingWithProducts(
     const brandJaRaw = publicProduct?.brandJa?.trim();
     const brandJa =
       brandJaRaw && !isUnsafeBrandJa(brandJaRaw) ? brandJaRaw : undefined;
+
+    const isDev = process.env.NODE_ENV === "development";
+    const oyListingDebug: OyListingCardDebug | undefined = isDev
+      ? {
+          goodsNo: row.goodsNo,
+          dbProductUrl,
+          dbPickedUrl,
+          dbOliveYoungUrl,
+          mergedProductUrl: !!productUrl.trim(),
+          oyHref: !!getRelatedStyleOyHref(productUrl),
+        }
+      : undefined;
 
     enriched.push({
       ...row,
@@ -240,6 +276,7 @@ export async function getRankingWithProducts(
       lastRank,
       lastSeenRunDate,
       ...marketplaceExtensionForListItem(publicProduct ?? null),
+      ...(oyListingDebug ? { oyListingDebug } : {}),
     });
   }
 
@@ -298,7 +335,14 @@ export async function getRisingProductsWithProducts(
     const publicProduct = await getOliveYoungProductByGoodsNo(row.goodsNo);
     const imageUrl = publicProduct?.imageUrl ?? "";
     const thumbnailUrl = publicProduct?.thumbnailUrl ?? "";
-    const productUrl = publicProduct?.productUrl ?? "";
+    const dbProductUrl = !!(publicProduct?.productUrl ?? "").trim();
+    const dbPickedUrl = !!(publicProduct?.pickedUrl ?? "").trim();
+    const dbOliveYoungUrl = !!(publicProduct?.oliveYoungUrl ?? "").trim();
+    const productUrl = mergeOliveYoungListingProductUrl({
+      productUrl: publicProduct?.productUrl,
+      pickedUrl: publicProduct?.pickedUrl,
+      oliveYoungUrl: publicProduct?.oliveYoungUrl,
+    });
     const pickedUrl = publicProduct?.pickedUrl ?? null;
     const name = resolveRankingItemName(row.name, publicProduct?.name);
     const brand = (row.brand || publicProduct?.brand || "").trim();
@@ -306,6 +350,18 @@ export async function getRisingProductsWithProducts(
     const brandJaRaw = publicProduct?.brandJa?.trim();
     const brandJa =
       brandJaRaw && !isUnsafeBrandJa(brandJaRaw) ? brandJaRaw : undefined;
+
+    const isDev = process.env.NODE_ENV === "development";
+    const oyListingDebug: OyListingCardDebug | undefined = isDev
+      ? {
+          goodsNo: row.goodsNo,
+          dbProductUrl,
+          dbPickedUrl,
+          dbOliveYoungUrl,
+          mergedProductUrl: !!productUrl.trim(),
+          oyHref: !!getRelatedStyleOyHref(productUrl),
+        }
+      : undefined;
 
     enriched.push({
       ...row,
@@ -334,6 +390,7 @@ export async function getRisingProductsWithProducts(
       rankDiff: typeof rankDiff === "number" ? rankDiff : row.rankDiff,
       isNew,
       ...marketplaceExtensionForListItem(publicProduct ?? null),
+      ...(oyListingDebug ? { oyListingDebug } : {}),
     });
   }
 

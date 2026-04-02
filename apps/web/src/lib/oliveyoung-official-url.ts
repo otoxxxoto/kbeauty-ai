@@ -44,6 +44,38 @@ export function isOliveYoungApiLikeUrl(raw: string): boolean {
 }
 
 /**
+ * 関連商品カード・ランキング OY ボタン共通: Firestore の表示用 URL（trim）があれば採用し、API ライクのみ除外。
+ */
+export function getRelatedStyleOyHref(
+  productUrl: string | null | undefined
+): string | null {
+  const u = (productUrl ?? "").trim();
+  if (!u) return null;
+  if (isOliveYoungApiLikeUrl(u)) return null;
+  return u;
+}
+
+/**
+ * 一覧用: productUrl → pickedUrl → oliveYoungUrl の順で、最初の「非空かつ API ライクでない」URL を item.productUrl に載せる
+ */
+export function mergeOliveYoungListingProductUrl(p: {
+  productUrl?: string | null;
+  pickedUrl?: string | null;
+  oliveYoungUrl?: string | null;
+}): string {
+  for (const candidate of [
+    (p.productUrl ?? "").trim(),
+    (p.pickedUrl ?? "").trim(),
+    (p.oliveYoungUrl ?? "").trim(),
+  ]) {
+    if (!candidate) continue;
+    const href = getRelatedStyleOyHref(candidate);
+    if (href) return href;
+  }
+  return "";
+}
+
+/**
  * 公式 Olive Young の商品ページ・店舗導線として扱う URL か。
  * - ホスト: oliveyoung.co.kr / *.oliveyoung.co.kr、oliveyoung.com / www 等
  * - プロトコル省略や // 始まりも許容

@@ -18,6 +18,7 @@ import {
   RelatedStyleOliveYoungLink,
   getRelatedStyleOyHref,
 } from "@/components/RelatedStyleOliveYoungLink";
+import { OyListingCardDevDebug } from "@/components/OyListingCardDevDebug";
 import { getDisplayProductNameText } from "@/lib/oliveyoung-display";
 import { getBrandRankingByDate, getDisplayBrand } from "@/lib/brand-rankings";
 import { CATEGORY_CONFIG, CATEGORY_LINKS } from "@/lib/category-config";
@@ -313,6 +314,9 @@ export default async function OliveYoungEntryPage() {
                             fullWidth
                             label="Olive Youngで見る"
                           />
+                          {isDev && item.oyListingDebug ? (
+                            <OyListingCardDevDebug d={item.oyListingDebug} />
+                          ) : null}
                           <ProductAffiliateCtas
                             goodsNo={item.goodsNo}
                             urls={getEffectiveAffiliateUrls(item)}
@@ -408,6 +412,9 @@ export default async function OliveYoungEntryPage() {
                             fullWidth
                             label="Olive Youngで見る"
                           />
+                          {isDev && item.oyListingDebug ? (
+                            <OyListingCardDevDebug d={item.oyListingDebug} />
+                          ) : null}
                           <ProductAffiliateCtas
                             goodsNo={item.goodsNo}
                             urls={getEffectiveAffiliateUrls(item)}

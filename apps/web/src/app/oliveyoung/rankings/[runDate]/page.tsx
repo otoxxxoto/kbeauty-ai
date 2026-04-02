@@ -21,6 +21,7 @@ import {
   RelatedStyleOliveYoungLink,
   getRelatedStyleOyHref,
 } from "@/components/RelatedStyleOliveYoungLink";
+import { OyListingCardDevDebug } from "@/components/OyListingCardDevDebug";
 import type { RankingItemWithProduct } from "@/lib/oliveyoung-rankings";
 import { notFound } from "next/navigation";
 import {
@@ -115,6 +116,9 @@ function ProductCard({
           fullWidth
           label="Olive Youngで見る"
         />
+        {isDev && item.oyListingDebug ? (
+          <OyListingCardDevDebug d={item.oyListingDebug} />
+        ) : null}
       </div>
     </div>
   );

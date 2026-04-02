@@ -19,7 +19,10 @@ import type {
   ProductMarketplaceFields,
   ProductRevenueImageSource,
 } from "@/lib/product-marketplace-types";
-import { resolveNormalizedOliveYoungUrl } from "@/lib/oliveyoung-official-url";
+import {
+  mergeOliveYoungListingProductUrl,
+  resolveNormalizedOliveYoungUrl,
+} from "@/lib/oliveyoung-official-url";
 
 export type {
   ProductImageAnalysisEntry,
@@ -469,20 +472,25 @@ export async function getOliveYoungProductByGoodsNo(
   if (!snap.exists) return null;
 
   const data = snap.data() ?? {};
-  const productUrl = String(data.productUrl ?? "").trim();
+  const productUrlRaw = String(data.productUrl ?? "").trim();
   const pickedUrlRaw = String(data.pickedUrl ?? "").trim();
   const oliveYoungUrlExplicit = optHrefStr(data.oliveYoungUrl);
   const oliveYoungUrlResolved = resolveNormalizedOliveYoungUrl(
     oliveYoungUrlExplicit,
-    productUrl,
+    productUrlRaw,
     pickedUrlRaw
   );
+  const productUrl = mergeOliveYoungListingProductUrl({
+    productUrl: productUrlRaw,
+    pickedUrl: pickedUrlRaw,
+    oliveYoungUrl: oliveYoungUrlResolved,
+  });
 
   if (process.env.DEBUG_OY_URL_RESOLVE === "1") {
     // eslint-disable-next-line no-console -- 明示的デバッグ用（URLは出さない）
     console.log("[oy-url-resolve]", {
       goodsNo: trimmed,
-      hasProductUrl: !!productUrl,
+      hasProductUrl: !!productUrlRaw,
       hasPickedUrl: !!pickedUrlRaw,
       hasExplicitOliveYoungUrl: !!oliveYoungUrlExplicit,
       hasResolvedOliveYoungUrl: !!oliveYoungUrlResolved,
@@ -827,6 +835,11 @@ export async function getAllOliveYoungProductsMinimal(): Promise<
       productUrl,
       pickedUrlRaw
     );
+    const listingProductUrl = mergeOliveYoungListingProductUrl({
+      productUrl,
+      pickedUrl: pickedUrlRaw,
+      oliveYoungUrl: oliveYoungUrlResolved,
+    });
     return {
       goodsNo: doc.id,
       name: String(data.name ?? "").trim(),
@@ -860,7 +873,7 @@ export async function getAllOliveYoungProductsMinimal(): Promise<
       marketplaceImageMatchLevels: mapMarketplaceImageMatchLevelsFromFirestore(
         data.marketplaceImageMatchLevels
       ),
-      productUrl,
+      productUrl: listingProductUrl,
       pickedUrl: pickedUrlRaw || undefined,
       lastRank:
         data.lastRank != null && typeof data.lastRank === "number"
