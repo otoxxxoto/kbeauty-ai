@@ -77,6 +77,14 @@ function ProductCard({
     goodsNo: item.goodsNo,
   });
 
+  if (process.env.NODE_ENV === "development") {
+    // eslint-disable-next-line no-console -- dev debug
+    console.log("[OY_RANKING_CARD]", {
+      goodsNo: item.goodsNo,
+      effectiveOliveYoungUrl,
+    });
+  }
+
   return (
     <div
       className={`${PRODUCT_CARD_ROOT_CLASS} hover:border-zinc-300 transition-colors`}

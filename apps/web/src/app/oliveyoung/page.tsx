@@ -251,6 +251,13 @@ export default async function OliveYoungEntryPage() {
                       pickedUrl: item.pickedUrl ?? null,
                       goodsNo: item.goodsNo,
                     });
+                    if (process.env.NODE_ENV === "development") {
+                      // eslint-disable-next-line no-console -- dev debug
+                      console.log("[OY_TOP_RISING_CARD]", {
+                        goodsNo: item.goodsNo,
+                        effectiveOliveYoungUrl,
+                      });
+                    }
                     return (
                       <div
                         key={item.goodsNo}
@@ -360,6 +367,13 @@ export default async function OliveYoungEntryPage() {
                       pickedUrl: item.pickedUrl ?? null,
                       goodsNo: item.goodsNo,
                     });
+                    if (process.env.NODE_ENV === "development") {
+                      // eslint-disable-next-line no-console -- dev debug
+                      console.log("[OY_TOP_FEATURED_CARD]", {
+                        goodsNo: item.goodsNo,
+                        effectiveOliveYoungUrl,
+                      });
+                    }
                     return (
                       <div
                         key={item.goodsNo}

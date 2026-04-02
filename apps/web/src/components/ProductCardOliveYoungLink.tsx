@@ -1,7 +1,10 @@
 "use client";
 
 import { LoggedShopLink } from "@/components/LoggedShopLink";
-import { isOliveYoungOfficialProductUrl } from "@/lib/oliveyoung-official-url";
+import {
+  isOliveYoungApiLikeUrl,
+  isOliveYoungOfficialProductUrl,
+} from "@/lib/oliveyoung-official-url";
 import type {
   AffiliateClickPosition,
   AffiliateCtaPlacement,
@@ -46,6 +49,14 @@ export function ProductCardOliveYoungLink({
   const href = oliveYoungUrl?.trim();
   const isDev = process.env.NODE_ENV === "development";
   const isOfficial = href ? isOliveYoungOfficialProductUrl(href) : false;
+  const isApiLike = href ? isOliveYoungApiLikeUrl(href) : false;
+
+  let skipReason: string | null = null;
+  if (!href) {
+    skipReason = "empty_href";
+  } else if (isApiLike) {
+    skipReason = "api_like_url";
+  }
 
   if (isDev) {
     // eslint-disable-next-line no-console -- dev debug
@@ -54,10 +65,15 @@ export function ProductCardOliveYoungLink({
       raw: oliveYoungUrl ?? null,
       href: href || null,
       isOfficial,
+      isApiLike,
+      rendered: !!href && !isApiLike,
+      skipReason,
     });
   }
 
-  if (!href || !isOfficial) return null;
+  // 関連商品カードと同様に「公式判定」は緩め、
+  // API ライクな URL だけを除外する。
+  if (!href || isApiLike) return null;
   const base = variant === "detail" ? detailClass : cardClass;
 
   const ga: ProductCardOliveYoungGaAffiliate =
