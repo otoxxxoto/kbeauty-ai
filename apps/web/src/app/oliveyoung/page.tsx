@@ -245,10 +245,23 @@ export default async function OliveYoungEntryPage() {
                     });
                     const primaryShop = getPrimaryShopFromProduct(item);
                     const suppressAffiliate = shouldSuppressAffiliateCtasForProduct(item);
+                    const effectiveOliveYoungUrl = resolveEffectiveOliveYoungUrl({
+                      oliveYoungUrl: item.oliveYoungUrl,
+                      productUrl: item.productUrl,
+                      pickedUrl: item.pickedUrl ?? null,
+                      goodsNo: item.goodsNo,
+                    });
                     return (
                       <div
                         key={item.goodsNo}
                         className={`${PRODUCT_CARD_ROOT_CLASS} hover:border-emerald-300 hover:shadow-sm`}
+                        data-has-oy-link={
+                          process.env.NODE_ENV === "development"
+                            ? effectiveOliveYoungUrl
+                              ? "yes"
+                              : "no"
+                            : undefined
+                        }
                       >
                         <Link
                           href={`/oliveyoung/products/${item.goodsNo}`}
@@ -301,11 +314,7 @@ export default async function OliveYoungEntryPage() {
                             商品詳細を見る
                           </Link>
                           <ProductCardOliveYoungLink
-                        oliveYoungUrl={resolveEffectiveOliveYoungUrl({
-                          oliveYoungUrl: item.oliveYoungUrl,
-                          productUrl: item.productUrl,
-                              pickedUrl: undefined,
-                        })}
+                            oliveYoungUrl={effectiveOliveYoungUrl}
                             goodsNo={item.goodsNo}
                             gaAffiliate={{
                               position: "rising_card",
@@ -345,10 +354,23 @@ export default async function OliveYoungEntryPage() {
                     });
                     const primaryShop = getPrimaryShopFromProduct(item);
                     const suppressAffiliate = shouldSuppressAffiliateCtasForProduct(item);
+                    const effectiveOliveYoungUrl = resolveEffectiveOliveYoungUrl({
+                      oliveYoungUrl: item.oliveYoungUrl,
+                      productUrl: item.productUrl,
+                      pickedUrl: item.pickedUrl ?? null,
+                      goodsNo: item.goodsNo,
+                    });
                     return (
                       <div
                         key={item.goodsNo}
                         className={PRODUCT_CARD_ROOT_CLASS}
+                        data-has-oy-link={
+                          process.env.NODE_ENV === "development"
+                            ? effectiveOliveYoungUrl
+                              ? "yes"
+                              : "no"
+                            : undefined
+                        }
                       >
                         <div className="flex min-h-0 flex-1 flex-col">
                           <div className="mb-2 flex shrink-0 items-center gap-2">
@@ -398,11 +420,7 @@ export default async function OliveYoungEntryPage() {
                             商品詳細を見る
                           </Link>
                           <ProductCardOliveYoungLink
-                        oliveYoungUrl={resolveEffectiveOliveYoungUrl({
-                          oliveYoungUrl: item.oliveYoungUrl,
-                          productUrl: item.productUrl,
-                              pickedUrl: undefined,
-                        })}
+                            oliveYoungUrl={effectiveOliveYoungUrl}
                             goodsNo={item.goodsNo}
                             gaAffiliate={{
                               position: "featured_card",

@@ -124,6 +124,7 @@ export function resolveEffectiveOliveYoungUrl(args: {
   oliveYoungUrl?: string | null;
   productUrl?: string | null;
   pickedUrl?: string | null;
+  goodsNo?: string;
 }): string | null {
   const isDev = process.env.NODE_ENV === "development";
 
@@ -149,6 +150,7 @@ export function resolveEffectiveOliveYoungUrl(args: {
   if (isDev) {
     // eslint-disable-next-line no-console -- dev debug
     console.log("[OY_EFFECTIVE_URL]", {
+      goodsNo: args.goodsNo ?? null,
       raw: {
         oliveYoungUrl: args.oliveYoungUrl ?? null,
         productUrl: args.productUrl ?? null,

@@ -70,10 +70,23 @@ function ProductCard({
     brandJa: item.brandJa,
   });
   const displayBrand = getDisplayBrand(item);
+  const effectiveOliveYoungUrl = resolveEffectiveOliveYoungUrl({
+    oliveYoungUrl: item.oliveYoungUrl,
+    productUrl: item.productUrl,
+    pickedUrl: item.pickedUrl ?? null,
+    goodsNo: item.goodsNo,
+  });
 
   return (
     <div
       className={`${PRODUCT_CARD_ROOT_CLASS} hover:border-zinc-300 transition-colors`}
+      data-has-oy-link={
+        process.env.NODE_ENV === "development"
+          ? effectiveOliveYoungUrl
+            ? "yes"
+            : "no"
+          : undefined
+      }
     >
       {showRankBadge ? (
         <div className="mb-2 flex shrink-0 items-start justify-between gap-2">
@@ -103,11 +116,7 @@ function ProductCard({
       <div className={`${PRODUCT_CARD_CTA_CLASS} flex flex-col gap-1.5`}>
         <ProductCardCta goodsNo={item.goodsNo} />
         <ProductCardOliveYoungLink
-          oliveYoungUrl={resolveEffectiveOliveYoungUrl({
-            oliveYoungUrl: item.oliveYoungUrl,
-            productUrl: item.productUrl,
-            pickedUrl: undefined,
-          })}
+          oliveYoungUrl={effectiveOliveYoungUrl}
           goodsNo={item.goodsNo}
           gaAffiliate={{
             position: "ranking_card",

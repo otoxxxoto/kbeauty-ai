@@ -115,6 +115,8 @@ export type RankingItemWithProduct = RankingItemRow & {
   imageAnalysis?: ProductImageAnalysisEntry[];
   marketplaceImageMatchLevels?: ProductImageFields["marketplaceImageMatchLevels"];
   productUrl: string;
+  /** 推奨リンク（productUrl が非公式のときに公式ページが入ることがある） */
+  pickedUrl?: string | null;
   lastRank: number | null;
   lastSeenRunDate: string | null;
 } & ProductMarketplaceFields;
@@ -203,6 +205,7 @@ export async function getRankingWithProducts(
     const imageUrl = publicProduct?.imageUrl ?? "";
     const thumbnailUrl = publicProduct?.thumbnailUrl ?? "";
     const productUrl = publicProduct?.productUrl ?? "";
+     const pickedUrl = publicProduct?.pickedUrl ?? null;
     const lastRank = publicProduct?.lastRank ?? publicProduct?.lastSeenRank ?? null;
     const lastSeenRunDate = publicProduct?.lastSeenRunDate ?? null;
     const name = resolveRankingItemName(row.name, publicProduct?.name);
@@ -233,6 +236,7 @@ export async function getRankingWithProducts(
       imageAnalysis: publicProduct?.imageAnalysis,
       marketplaceImageMatchLevels: publicProduct?.marketplaceImageMatchLevels,
       productUrl,
+      pickedUrl,
       lastRank,
       lastSeenRunDate,
       ...marketplaceExtensionForListItem(publicProduct ?? null),
@@ -295,6 +299,7 @@ export async function getRisingProductsWithProducts(
     const imageUrl = publicProduct?.imageUrl ?? "";
     const thumbnailUrl = publicProduct?.thumbnailUrl ?? "";
     const productUrl = publicProduct?.productUrl ?? "";
+    const pickedUrl = publicProduct?.pickedUrl ?? null;
     const name = resolveRankingItemName(row.name, publicProduct?.name);
     const brand = (row.brand || publicProduct?.brand || "").trim();
     const nameJa = publicProduct?.nameJa?.trim();
@@ -323,6 +328,7 @@ export async function getRisingProductsWithProducts(
       imageAnalysis: publicProduct?.imageAnalysis,
       marketplaceImageMatchLevels: publicProduct?.marketplaceImageMatchLevels,
       productUrl,
+      pickedUrl,
       lastRank: publicProduct?.lastRank ?? publicProduct?.lastSeenRank ?? null,
       lastSeenRunDate: publicProduct?.lastSeenRunDate ?? null,
       rankDiff: typeof rankDiff === "number" ? rankDiff : row.rankDiff,
