@@ -14,7 +14,6 @@ import {
   type AffiliateClickPosition,
 } from "@/components/ProductAffiliateCtas";
 import { ProductCardOliveYoungLink } from "@/components/ProductCardOliveYoungLink";
-import { isOliveYoungOfficialProductUrl } from "@/lib/oliveyoung-official-url";
 
 export type ProductPrimaryCtaBlockProps = {
   goodsNo: string;
@@ -26,7 +25,7 @@ export type ProductPrimaryCtaBlockProps = {
   primaryShop?: PrimaryShop | null;
   suppressAffiliateCtas?: boolean;
   productNameForGa?: string;
-  /** 正規化済み `oliveYoungUrl`（`getOliveYoungProductByGoodsNo` 由来） */
+  /** 表示用 OY 遷移先（例: `resolveEffectiveOliveYoungUrl` 結果）。trim 後に空でなければ補助リンクを出す */
   oliveYoungUrl?: string | null;
 };
 
@@ -57,9 +56,8 @@ export function ProductPrimaryCtaBlock({
     qoo10Url: urls.qoo10,
   });
 
-  const oyTrim = oliveYoungUrl?.trim();
-  const showOySupplement =
-    !!oyTrim && isOliveYoungOfficialProductUrl(oyTrim);
+  const oyTrim = oliveYoungUrl?.trim() ?? "";
+  const showOySupplement = oyTrim.length > 0;
 
   const ctaBase =
     "inline-flex w-full min-h-[50px] items-center justify-center rounded-xl px-4 py-3 text-sm sm:text-base font-bold text-white shadow-sm transition-colors";
@@ -152,6 +150,13 @@ export function ProductPrimaryCtaBlock({
       aria-label="購入先CTA（ファーストビュー）"
       data-has-oy-link={process.env.NODE_ENV === "development" ? (showOySupplement ? "yes" : "no") : undefined}
       data-oy-url={process.env.NODE_ENV === "development" ? oyTrim || undefined : undefined}
+      data-oy-supplement-hidden-reason={
+        process.env.NODE_ENV === "development"
+          ? showOySupplement
+            ? undefined
+            : "empty_olive_young_url"
+          : undefined
+      }
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">

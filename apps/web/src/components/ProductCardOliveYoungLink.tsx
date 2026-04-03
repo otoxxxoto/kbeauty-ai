@@ -1,10 +1,7 @@
 "use client";
 
 import { LoggedShopLink } from "@/components/LoggedShopLink";
-import {
-  isOliveYoungApiLikeUrl,
-  isOliveYoungOfficialProductUrl,
-} from "@/lib/oliveyoung-official-url";
+import { isOliveYoungApiLikeUrl } from "@/lib/oliveyoung-official-url";
 import type {
   AffiliateClickPosition,
   AffiliateCtaPlacement,
@@ -26,8 +23,7 @@ export type ProductCardOliveYoungGaAffiliate = {
 };
 
 /**
- * 出典・公式確認の補助導線。
- * 渡す `oliveYoungUrl` はサーバー側で正規化済み（DB値 ?? 公式 domain の productUrl）。
+ * OY 外部導線。表示は trim 後の非空 + API ライク除外のみ（公式ドメイン判定はしない）。
  * クリックは `LoggedShopLink`（product_click_logs）＋ GA `affiliate_click`（shop: oliveyoung）。
  */
 export function ProductCardOliveYoungLink({
@@ -48,7 +44,6 @@ export function ProductCardOliveYoungLink({
 }) {
   const href = oliveYoungUrl?.trim();
   const isDev = process.env.NODE_ENV === "development";
-  const isOfficial = href ? isOliveYoungOfficialProductUrl(href) : false;
   const isApiLike = href ? isOliveYoungApiLikeUrl(href) : false;
 
   let skipReason: string | null = null;
@@ -64,15 +59,12 @@ export function ProductCardOliveYoungLink({
       goodsNo,
       oliveYoungUrl: oliveYoungUrl ?? null,
       href: href || null,
-      isOfficial,
       isApiLike,
       skipReason,
       rendered: !!href && !isApiLike,
     });
   }
 
-  // 関連商品カードと同様に「公式判定」は緩め、
-  // API ライクな URL だけを除外する。
   if (!href || isApiLike) return null;
   const base = variant === "detail" ? detailClass : cardClass;
 

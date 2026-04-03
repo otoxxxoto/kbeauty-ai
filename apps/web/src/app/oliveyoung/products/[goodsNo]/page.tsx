@@ -42,10 +42,7 @@ import {
   orderCompareCtaRows,
   shouldSuppressAffiliateCtasForProduct,
 } from "@/lib/getPrimaryShop";
-import {
-  isOliveYoungOfficialProductUrl,
-  resolveEffectiveOliveYoungUrl,
-} from "@/lib/oliveyoung-official-url";
+import { resolveEffectiveOliveYoungUrl } from "@/lib/oliveyoung-official-url";
 import { notFound } from "next/navigation";
 import {
   PRODUCT_CARD_ROOT_CLASS,
@@ -416,9 +413,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
           oliveYoungUrl: product.oliveYoungUrl ?? null,
           productUrl: product.productUrl ?? null,
           pickedUrl: product.pickedUrl ?? null,
-          isOfficialOliveYoungUrl: effectiveOliveYoungUrl
-            ? isOliveYoungOfficialProductUrl(effectiveOliveYoungUrl)
-            : false,
+          effectiveOliveYoungUrl: effectiveOliveYoungUrl ?? null,
         }
       : null;
 
@@ -433,8 +428,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
       data-oy-url={oyDebug ? oyDebug.oliveYoungUrl || undefined : undefined}
       data-product-url={oyDebug ? oyDebug.productUrl || undefined : undefined}
       data-picked-url={oyDebug ? oyDebug.pickedUrl || undefined : undefined}
-      data-oy-official={
-        oyDebug ? (oyDebug.isOfficialOliveYoungUrl ? "yes" : "no") : undefined
+      data-oy-effective={
+        oyDebug
+          ? oyDebug.effectiveOliveYoungUrl
+            ? "yes"
+            : "no"
+          : undefined
       }
     >
       {/* パンくず・戻る */}
