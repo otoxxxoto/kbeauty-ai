@@ -55,24 +55,6 @@ export function getRelatedStyleOyHref(
   return u;
 }
 
-export function buildOliveYoungProductUrl(goodsNo: string) {
-  if (!goodsNo) return null;
-  return `https://www.oliveyoung.co.kr/store/goods/getGoodsDetail.do?goodsNo=${goodsNo}`;
-}
-
-/** ランキング・トップ・関連カードの OY ボタン href（productUrl → pickedUrl → goodsNo 固定 URL） */
-export function resolveOyHrefForListingItem(item: {
-  goodsNo: string;
-  productUrl?: string | null;
-  pickedUrl?: string | null;
-}): string | null {
-  const oyHref =
-    getRelatedStyleOyHref(item.productUrl) ||
-    getRelatedStyleOyHref(item.pickedUrl) ||
-    buildOliveYoungProductUrl(item.goodsNo);
-  return oyHref;
-}
-
 /**
  * 一覧用: productUrl → pickedUrl → oliveYoungUrl の順で、最初の「非空かつ API ライクでない」URL を item.productUrl に載せる
  */

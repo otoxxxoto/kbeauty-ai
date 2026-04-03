@@ -18,7 +18,7 @@ import {
 } from "@/lib/product-card-layout";
 import { serializeProductImageFieldsForClient } from "@/lib/serialize-product-for-client";
 import { RelatedStyleOliveYoungLink } from "@/components/RelatedStyleOliveYoungLink";
-import { resolveOyHrefForListingItem } from "@/lib/oliveyoung-official-url";
+import { resolveOyNavigableUrl } from "@/lib/product-shop-cta-links";
 import { OyListingCardDevDebug } from "@/components/OyListingCardDevDebug";
 import type { RankingItemWithProduct } from "@/lib/oliveyoung-rankings";
 import { notFound } from "next/navigation";
@@ -71,10 +71,10 @@ function ProductCard({
     brandJa: item.brandJa,
   });
   const displayBrand = getDisplayBrand(item);
-  const oyHref = resolveOyHrefForListingItem({
-    goodsNo: item.goodsNo,
+  const oyHref = resolveOyNavigableUrl({
     productUrl: item.productUrl,
     pickedUrl: item.pickedUrl,
+    oliveYoungUrl: item.oliveYoungUrl,
   });
   const isDev = process.env.NODE_ENV === "development";
 
@@ -114,9 +114,9 @@ function ProductCard({
       <div className={`${PRODUCT_CARD_CTA_CLASS} flex flex-col gap-1.5`}>
         <ProductCardCta goodsNo={item.goodsNo} />
         <RelatedStyleOliveYoungLink
-          goodsNo={item.goodsNo}
           productUrl={item.productUrl}
           pickedUrl={item.pickedUrl}
+          oliveYoungUrl={item.oliveYoungUrl}
           fullWidth
           label="Olive Youngで見る"
         />

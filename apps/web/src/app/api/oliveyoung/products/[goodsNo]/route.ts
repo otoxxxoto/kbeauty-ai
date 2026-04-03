@@ -9,6 +9,10 @@ import {
   getEffectiveAffiliateUrls,
   type ProductDisplayImageSource,
 } from "@/lib/oliveyoung-products";
+import {
+  resolveProductShopCtaLinks,
+  type ProductShopCtaLinks,
+} from "@/lib/product-shop-cta-links";
 
 export type OliveYoungProductApiResponse = {
   goodsNo: string;
@@ -40,6 +44,8 @@ export type OliveYoungProductApiResponse = {
     rakuten: string;
     qoo10: string;
   };
+  /** OY 含む4チャネル（url + isAvailable）。後方互換のため effectiveAffiliateUrls も維持 */
+  shopCtaLinks: ProductShopCtaLinks;
   lastRank: number | null;
   lastSeenRank: number | null;
   lastSeenRunDate: string | null;
@@ -67,6 +73,18 @@ export async function GET(
   }
 
   const displayResolved = resolveProductDisplayImage(product as any);
+  const effectiveAffiliateUrls = getEffectiveAffiliateUrls(product);
+  const shopCtaLinks = resolveProductShopCtaLinks({
+    goodsNo: product.goodsNo,
+    productUrl: product.productUrl,
+    pickedUrl: product.pickedUrl,
+    oliveYoungUrl: product.oliveYoungUrl,
+    amazonUrl: product.amazonUrl,
+    rakutenUrl: product.rakutenUrl,
+    qoo10Url: product.qoo10Url,
+    name: product.name,
+    nameJa: product.nameJa,
+  });
 
   const body: OliveYoungProductApiResponse = {
     goodsNo: product.goodsNo,
@@ -89,7 +107,8 @@ export async function GET(
     displayImageUrl: displayResolved.url,
     displayImageSource: displayResolved.source,
     displayImageShowOfficialBadge: displayResolved.showOfficialImageBadge,
-    effectiveAffiliateUrls: getEffectiveAffiliateUrls(product),
+    effectiveAffiliateUrls,
+    shopCtaLinks,
     lastRank: product.lastRank,
     lastSeenRank: product.lastSeenRank,
     lastSeenRunDate: product.lastSeenRunDate,

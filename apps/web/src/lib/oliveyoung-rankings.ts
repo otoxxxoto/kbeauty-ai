@@ -17,10 +17,8 @@ import {
   classifyImageSourceForStats,
   rankingVisualBoostForDisplayedBucket,
 } from "@/lib/image-source-stats";
-import {
-  mergeOliveYoungListingProductUrl,
-  resolveOyHrefForListingItem,
-} from "@/lib/oliveyoung-official-url";
+import { mergeOliveYoungListingProductUrl } from "@/lib/oliveyoung-official-url";
+import { resolveOyNavigableUrl } from "@/lib/product-shop-cta-links";
 
 /** ランキング行の name と public.name をマージ（行が goodsNo のときは public の実名を優先） */
 function resolveRankingItemName(
@@ -247,10 +245,10 @@ export async function getRankingWithProducts(
           dbPickedUrl,
           dbOliveYoungUrl,
           mergedProductUrl: !!productUrl.trim(),
-          oyHref: !!resolveOyHrefForListingItem({
-            goodsNo: row.goodsNo,
+          oyHref: !!resolveOyNavigableUrl({
             productUrl,
             pickedUrl,
+            oliveYoungUrl: publicProduct?.oliveYoungUrl,
           }),
         }
       : undefined;
@@ -363,10 +361,10 @@ export async function getRisingProductsWithProducts(
           dbPickedUrl,
           dbOliveYoungUrl,
           mergedProductUrl: !!productUrl.trim(),
-          oyHref: !!resolveOyHrefForListingItem({
-            goodsNo: row.goodsNo,
+          oyHref: !!resolveOyNavigableUrl({
             productUrl,
             pickedUrl,
+            oliveYoungUrl: publicProduct?.oliveYoungUrl,
           }),
         }
       : undefined;
