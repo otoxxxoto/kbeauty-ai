@@ -14,10 +14,8 @@ import {
 } from "@/lib/getPrimaryShop";
 import { ProductDisplayImage } from "@/components/ProductDisplayImage";
 import { ProductAffiliateCtas } from "@/components/ProductAffiliateCtas";
-import {
-  RelatedStyleOliveYoungLink,
-  getRelatedStyleOyHref,
-} from "@/components/RelatedStyleOliveYoungLink";
+import { RelatedStyleOliveYoungLink } from "@/components/RelatedStyleOliveYoungLink";
+import { resolveOyHrefForListingItem } from "@/lib/oliveyoung-official-url";
 import { OyListingCardDevDebug } from "@/components/OyListingCardDevDebug";
 import { getDisplayProductNameText } from "@/lib/oliveyoung-display";
 import { getBrandRankingByDate, getDisplayBrand } from "@/lib/brand-rankings";
@@ -248,7 +246,11 @@ export default async function OliveYoungEntryPage() {
                     });
                     const primaryShop = getPrimaryShopFromProduct(item);
                     const suppressAffiliate = shouldSuppressAffiliateCtasForProduct(item);
-                    const oyHref = getRelatedStyleOyHref(item.productUrl);
+                    const oyHref = resolveOyHrefForListingItem({
+                      goodsNo: item.goodsNo,
+                      productUrl: item.productUrl,
+                      pickedUrl: item.pickedUrl,
+                    });
                     const isDev = process.env.NODE_ENV === "development";
                     return (
                       <div
@@ -310,7 +312,9 @@ export default async function OliveYoungEntryPage() {
                             商品詳細を見る
                           </Link>
                           <RelatedStyleOliveYoungLink
+                            goodsNo={item.goodsNo}
                             productUrl={item.productUrl}
+                            pickedUrl={item.pickedUrl}
                             fullWidth
                             label="Olive Youngで見る"
                           />
@@ -349,7 +353,11 @@ export default async function OliveYoungEntryPage() {
                     });
                     const primaryShop = getPrimaryShopFromProduct(item);
                     const suppressAffiliate = shouldSuppressAffiliateCtasForProduct(item);
-                    const oyHref = getRelatedStyleOyHref(item.productUrl);
+                    const oyHref = resolveOyHrefForListingItem({
+                      goodsNo: item.goodsNo,
+                      productUrl: item.productUrl,
+                      pickedUrl: item.pickedUrl,
+                    });
                     const isDev = process.env.NODE_ENV === "development";
                     return (
                       <div
@@ -408,7 +416,9 @@ export default async function OliveYoungEntryPage() {
                             商品詳細を見る
                           </Link>
                           <RelatedStyleOliveYoungLink
+                            goodsNo={item.goodsNo}
                             productUrl={item.productUrl}
+                            pickedUrl={item.pickedUrl}
                             fullWidth
                             label="Olive Youngで見る"
                           />

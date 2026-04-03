@@ -1,27 +1,38 @@
-import { getRelatedStyleOyHref } from "@/lib/oliveyoung-official-url";
+import { resolveOyHrefForListingItem } from "@/lib/oliveyoung-official-url";
 
-export { getRelatedStyleOyHref } from "@/lib/oliveyoung-official-url";
+export {
+  getRelatedStyleOyHref,
+  resolveOyHrefForListingItem,
+} from "@/lib/oliveyoung-official-url";
 
 const BTN_CLASS =
   "inline-flex rounded-lg border border-zinc-300 px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50";
 
 /**
- * 商品詳細「関連商品」カードと同じ OY 導線（href 決定は getRelatedStyleOyHref）
+ * OY 導線: productUrl → pickedUrl → buildOliveYoungProductUrl(goodsNo)
  */
 
 export function RelatedStyleOliveYoungLink({
+  goodsNo,
   productUrl,
+  pickedUrl,
   className = "",
   fullWidth = false,
   label = "Olive Young で見る",
 }: {
-  productUrl: string | null | undefined;
+  goodsNo: string;
+  productUrl?: string | null;
+  pickedUrl?: string | null;
   className?: string;
   /** ランキング・トップの縦並び CTA 用 */
   fullWidth?: boolean;
   label?: string;
 }) {
-  const href = getRelatedStyleOyHref(productUrl);
+  const href = resolveOyHrefForListingItem({
+    goodsNo,
+    productUrl,
+    pickedUrl,
+  });
   if (!href) return null;
 
   const base = fullWidth

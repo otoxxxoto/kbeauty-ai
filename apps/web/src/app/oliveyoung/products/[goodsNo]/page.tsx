@@ -166,7 +166,11 @@ function RelatedProductCard({ p }: { p: OliveYoungProductMinimal }) {
           >
             商品詳細
           </Link>
-          <RelatedStyleOliveYoungLink productUrl={p.productUrl} />
+          <RelatedStyleOliveYoungLink
+            goodsNo={p.goodsNo}
+            productUrl={p.productUrl}
+            pickedUrl={p.pickedUrl}
+          />
         </div>
         <ProductAffiliateCtas
           goodsNo={p.goodsNo}
