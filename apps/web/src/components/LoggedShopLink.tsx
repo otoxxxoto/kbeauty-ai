@@ -13,7 +13,7 @@ import {
 /**
  * 外部ショップリンク。クリック時に product_click_logs へ送信してから遷移。
  * ログ失敗しても遷移は行う（購入導線優先）。
- * `gaAffiliateClick` 指定時は `shop` props をそのまま GA `affiliate_click` に送る。
+ * `gaAffiliateClick` 指定時は `logAffiliateClick` → `emitCtaClick` で GA `affiliate_click`（page_type 等）を送る。
  */
 export function LoggedShopLink({
   href,

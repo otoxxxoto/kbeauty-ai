@@ -7,6 +7,7 @@ import {
 } from "@/lib/oliveyoung-products";
 import { ProductDisplayImage } from "@/components/ProductDisplayImage";
 import { ProductAffiliateCtas } from "@/components/ProductAffiliateCtas";
+import { RelatedStyleOliveYoungLink } from "@/components/RelatedStyleOliveYoungLink";
 import { getDisplayProductNameText, getDisplayBrandText } from "@/lib/oliveyoung-display";
 import { CATEGORY_LINKS } from "@/lib/category-config";
 import type { OliveYoungProductCard } from "@/lib/oliveyoung-products";
@@ -101,15 +102,19 @@ function BrandProductCard({ p }: { p: OliveYoungProductCard }) {
           >
             商品詳細を見る
           </Link>
-          {p.productUrl ? (
-            <a
-              href={p.productUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex rounded-lg border border-zinc-300 px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
-            >
-              Olive Young で見る
-            </a>
+          {p.productUrl?.trim() ? (
+            <RelatedStyleOliveYoungLink
+              productUrl={p.productUrl}
+              pickedUrl={p.pickedUrl ?? null}
+              oliveYoungUrl={p.oliveYoungUrl ?? null}
+              label="Olive Young で見る"
+              track={{
+                goodsNo: p.goodsNo,
+                pageType: "brand",
+                ctaPlacement: "brand_card",
+                productName: displayName,
+              }}
+            />
           ) : null}
         </div>
         <ProductAffiliateCtas

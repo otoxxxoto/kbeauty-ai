@@ -119,6 +119,12 @@ function ProductCard({
           oliveYoungUrl={item.oliveYoungUrl}
           fullWidth
           label="Olive Youngで見る"
+          track={{
+            goodsNo: item.goodsNo,
+            pageType: "ranking",
+            ctaPlacement: "ranking_card",
+            productName: displayName,
+          }}
         />
         {isDev && item.oyListingDebug ? (
           <OyListingCardDevDebug d={item.oyListingDebug} />

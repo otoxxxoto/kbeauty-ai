@@ -107,6 +107,8 @@ function CategoryProductCard({
           gaAffiliate={{
             position: "category_card",
             pageType: "category",
+            ctaPlacement: "category_card",
+            productName: displayName,
           }}
         />
       </div>

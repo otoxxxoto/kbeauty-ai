@@ -28,6 +28,8 @@ export type ProductCompareCtaBlockProps = {
   rows: ProductCompareCtaRow[];
   position?: AffiliateClickPosition;
   className?: string;
+  /** GA `affiliate_click` の product_name / product 用 */
+  productNameForGa?: string;
 };
 
 function relForShop(shop: CompareShopKey): string {
@@ -43,6 +45,7 @@ export function ProductCompareCtaBlock({
   rows,
   position = "product_detail_middle",
   className = "",
+  productNameForGa,
 }: ProductCompareCtaBlockProps) {
   const visible = rows.filter((r) => r.href.trim());
   if (visible.length === 0) return null;
@@ -80,6 +83,7 @@ export function ProductCompareCtaBlock({
                   ctx: {
                     ctaPlacement: "compare",
                     pageType: "product_detail",
+                    productName: productNameForGa,
                   },
                 })
               }

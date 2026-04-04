@@ -1,18 +1,11 @@
 import { resolveOyNavigableUrl } from "@/lib/product-shop-cta-links";
-
-export { getRelatedStyleOyHref } from "@/lib/oliveyoung-official-url";
-export {
-  resolveOyNavigableUrl,
-  resolveProductShopCtaLinks,
-} from "@/lib/product-shop-cta-links";
-
-const BTN_CLASS =
-  "inline-flex rounded-lg border border-zinc-300 px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50";
+import { RelatedStyleOliveYoungLinkClient } from "@/components/RelatedStyleOliveYoungLinkClient";
+import type { RelatedStyleOliveYoungTrack } from "@/lib/cta-click-analytics";
 
 /**
  * OY 導線: productUrl → pickedUrl → oliveYoungUrl（いずれも getRelatedStyleOyHref 通過）
+ * href は Server で解決し、計測は Client 子に委譲（Firestore 依存をクライアントに持ち込まない）
  */
-
 export function RelatedStyleOliveYoungLink({
   productUrl,
   pickedUrl,
@@ -20,14 +13,15 @@ export function RelatedStyleOliveYoungLink({
   className = "",
   fullWidth = false,
   label = "Olive Young で見る",
+  track,
 }: {
   productUrl?: string | null;
   pickedUrl?: string | null;
   oliveYoungUrl?: string | null;
   className?: string;
-  /** ランキング・トップの縦並び CTA 用 */
   fullWidth?: boolean;
   label?: string;
+  track?: RelatedStyleOliveYoungTrack;
 }) {
   const href = resolveOyNavigableUrl({
     productUrl,
@@ -36,18 +30,13 @@ export function RelatedStyleOliveYoungLink({
   });
   if (!href) return null;
 
-  const base = fullWidth
-    ? `${BTN_CLASS} w-full items-center justify-center`
-    : BTN_CLASS;
-
   return (
-    <a
+    <RelatedStyleOliveYoungLinkClient
       href={href}
-      target="_blank"
-      rel="noreferrer"
-      className={`${base} ${className}`.trim()}
-    >
-      {label}
-    </a>
+      className={className}
+      fullWidth={fullWidth}
+      label={label}
+      track={track}
+    />
   );
 }

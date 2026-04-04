@@ -167,6 +167,12 @@ function RelatedProductCard({ p }: { p: OliveYoungProductMinimal }) {
             productUrl={p.productUrl}
             pickedUrl={p.pickedUrl}
             oliveYoungUrl={p.oliveYoungUrl}
+            track={{
+              goodsNo: p.goodsNo,
+              pageType: "related",
+              ctaPlacement: "related_card",
+              productName: displayName,
+            }}
           />
         </div>
         <ProductAffiliateCtas
@@ -324,6 +330,7 @@ function ShopCtaBlock({
                     position: "product_detail_bottom",
                     productName: productNameForGa,
                     pageType: "product_detail",
+                    ctaPlacement: "bottom",
                   }}
                 >
                   {isCheapest ? "最安価格で見る" : "このショップで見る"}
@@ -610,6 +617,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
       <ProductCompareCtaBlock
         goodsNo={goodsNo}
+        productNameForGa={displayName}
         rows={
           suppressAffiliate
             ? []

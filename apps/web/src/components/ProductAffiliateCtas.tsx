@@ -12,6 +12,10 @@ import {
 } from "@/lib/ctaCopy";
 import { getAffiliateCtaOrder } from "@/lib/getPrimaryShop";
 import type { PrimaryShop } from "@/lib/product-marketplace-types";
+import {
+  emitCtaClick,
+  resolveCtaEmitParamsFromLegacy,
+} from "@/lib/cta-click-analytics";
 
 /** oliveyoung-products の getEffectiveAffiliateUrls と同形 */
 export type AffiliateUrlsInput = {
@@ -22,7 +26,6 @@ export type AffiliateUrlsInput = {
 
 /** GA `affiliate_click` の shop と API ログ用のショップ識別子 */
 export type AffiliateGaShop = "amazon" | "rakuten" | "qoo10" | "oliveyoung";
-type GaClickLocation = "top" | "detail" | "card";
 
 /** affiliate_click の position（計測用） */
 export type AffiliateClickPosition =
@@ -41,9 +44,20 @@ export type AffiliateCtaPlacement =
   | "compare"
   | "bottom"
   | "ranking_card"
-  | "category_card";
+  | "category_card"
+  | "related_card"
+  | "featured_card"
+  | "rising_card"
+  | "brand_card";
 
-export type AffiliatePageType = "product_detail" | "ranking" | "category";
+export type AffiliatePageType =
+  | "product_detail"
+  | "ranking"
+  | "category"
+  | "top"
+  | "related"
+  | "brand"
+  | "detail";
 
 export type LogAffiliateClickArgs = {
   goodsNo: string;
@@ -59,32 +73,33 @@ export type LogAffiliateClickArgs = {
   };
 };
 
-function toGaLocation(p: AffiliateClickPosition): GaClickLocation {
-  if (p === "product_detail_first") return "top";
-  if (p === "product_detail_middle" || p === "product_detail_bottom") return "detail";
-  return "card";
-}
-
-/** GA4 `affiliate_click` とコンソールログ（将来DB保存用） */
+/** GA4 `affiliate_click` とコンソールログ（将来DB保存用）。GA 送信は `emitCtaClick` に集約 */
 export function logAffiliateClick(args: LogAffiliateClickArgs): void {
   const { goodsNo, shop, position, href, ctx } = args;
+  const emitParams = resolveCtaEmitParamsFromLegacy({
+    position,
+    ctx: {
+      pageType: ctx?.pageType,
+      ctaPlacement: ctx?.ctaPlacement,
+      productName: ctx?.productName,
+    },
+    goodsNo,
+    shop,
+    productName: ctx?.productName,
+  });
   const payload: Record<string, unknown> = {
     goodsNo,
     shop,
     position,
+    pageType: emitParams.pageType,
+    ctaPlacement: emitParams.ctaPlacement,
   };
   if (href != null && href !== "") payload.href = href;
-  if (ctx?.ctaPlacement) payload.ctaPlacement = ctx.ctaPlacement;
-  if (ctx?.pageType) payload.pageType = ctx.pageType;
+  if (ctx?.ctaPlacement) payload.ctxCtaPlacement = ctx.ctaPlacement;
+  if (ctx?.pageType) payload.ctxPageType = ctx.pageType;
   console.log("affiliate_click", payload);
 
-  if (typeof window !== "undefined" && typeof window.gtag === "function") {
-    window.gtag("event", "affiliate_click", {
-      shop,
-      product: (ctx?.productName ?? goodsNo).trim() || goodsNo,
-      location: toGaLocation(position),
-    });
-  }
+  emitCtaClick(emitParams);
 }
 
 export function isAffiliateGaShop(value: string): value is AffiliateGaShop {
