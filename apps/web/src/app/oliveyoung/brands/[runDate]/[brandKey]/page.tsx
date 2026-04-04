@@ -21,13 +21,13 @@ import {
 } from "@/lib/product-card-layout";
 import { serializeProductImageFieldsForClient } from "@/lib/serialize-product-for-client";
 import { notFound } from "next/navigation";
+import { getPublicSiteBaseUrl } from "@/lib/public-site-base-url";
 
 type PageProps = {
   params: Promise<{ runDate: string; brandKey: string }>;
 };
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://yourdomain.com";
+const BASE_URL = getPublicSiteBaseUrl();
 
 /** brandSummaryJa が無い場合の固定文。補完Jobで Firestore に brandSummaryJa が入れば自動で表示される */
 const FALLBACK_BRAND_SUMMARY =

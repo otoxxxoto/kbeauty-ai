@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
 import { getRankingRunDates } from "@/lib/oliveyoung-rankings";
 import { getAllCategorySlugs } from "@/lib/category-config";
+import { getPublicSiteBaseUrl } from "@/lib/public-site-base-url";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://kbeauty-lab.com";
+const BASE_URL = getPublicSiteBaseUrl();
 const SITEMAP_RANKING_DATE_LIMIT = 5;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

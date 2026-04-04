@@ -55,13 +55,14 @@ import {
   serializeProductImageFieldsForClient,
   logClientSerializeDebugForProduct,
 } from "@/lib/serialize-product-for-client";
+import { getPublicSiteBaseUrl } from "@/lib/public-site-base-url";
+import { shouldNoindexOliveYoungProductDetail } from "@/lib/oliveyoung-product-detail-seo-robots";
 
 type PageProps = {
   params: Promise<{ goodsNo: string }>;
 };
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "https://yourdomain.com";
+const BASE_URL = getPublicSiteBaseUrl();
 
 export async function generateMetadata({ params }: PageProps) {
   const { goodsNo } = await params;
@@ -70,6 +71,7 @@ export async function generateMetadata({ params }: PageProps) {
 
   const { description, selectedPattern } = buildProductPageSeoMeta(product);
   const displayName = getDisplayProductNameText({
+    manualNameJa: product.manualNameJa,
     nameJa: product.nameJa,
     name: product.name,
     brand: product.brand,
@@ -78,15 +80,17 @@ export async function generateMetadata({ params }: PageProps) {
   const title = buildProductTitle(displayName);
 
   const canonical = `${BASE_URL}/oliveyoung/products/${goodsNo}`;
-  if (goodsNo === "A000000141338") {
-    // eslint-disable-next-line no-console -- SEO経路の一時デバッグ
-    console.log("[SEO METADATA RETURN]", title);
-  }
+  const noindex = shouldNoindexOliveYoungProductDetail(product, goodsNo);
 
   return {
     title,
     description,
     alternates: { canonical },
+    ...(noindex
+      ? {
+          robots: { index: false, follow: true },
+        }
+      : {}),
     openGraph: {
       title,
       description,
@@ -364,6 +368,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const latestRunDate = rankingRunDates[0] ?? null;
 
   const displayName = getDisplayProductNameText({
+    manualNameJa: product.manualNameJa,
     nameJa: product.nameJa,
     name: product.name,
     brand: product.brand,
