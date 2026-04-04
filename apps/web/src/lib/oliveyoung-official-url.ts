@@ -28,8 +28,8 @@ export function isOliveYoungApiLikeUrl(raw: string): boolean {
   if (!s) return false;
   const lower = s.toLowerCase();
 
-  // 拡張子・クエリから JSON/API レスポンスっぽいものを除外
-  if (/\.(json|do)(\?|$)/.test(lower)) return true;
+  // .json のみ拡張子で除外（.do は Struts 等の商品ページ URL があり一律 API 扱いしない）
+  if (/\.json(\?|$)/.test(lower)) return true;
   if (/[?&]callback=/.test(lower)) return true;
 
   const u = parseOliveYoungUrl(lower);
