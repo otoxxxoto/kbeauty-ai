@@ -30,6 +30,7 @@ import {
 import { serializeProductImageFieldsForClient } from "@/lib/serialize-product-for-client";
 import { ProductCardOliveYoungLink } from "@/components/ProductCardOliveYoungLink";
 import { resolveEffectiveOliveYoungUrl } from "@/lib/oliveyoung-official-url";
+import { CTA_COPY } from "@/lib/ctaCopy";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -58,7 +59,11 @@ function CategoryProductCard({
     <div
       className={`${PRODUCT_CARD_ROOT_CLASS} hover:border-zinc-300 transition-colors`}
     >
-      <Link href={detailHref} className="group flex min-h-0 flex-1 flex-col text-left outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded-lg">
+      <Link
+        href={detailHref}
+        className="group flex min-h-0 flex-1 flex-col text-left outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded-lg"
+        aria-label={`${displayName} — ${CTA_COPY.card.detail}`}
+      >
         <div className={PRODUCT_CARD_IMAGE_FRAME_CLASS}>
           <ProductDisplayImage
             product={serializeProductImageFieldsForClient(p)}
@@ -85,17 +90,11 @@ function CategoryProductCard({
             <div className="shrink-0 text-xs text-zinc-400">順位 #{p.lastRank}</div>
           )}
           <span className="mt-2 text-xs font-medium text-blue-600 group-hover:underline">
-            商品ページを開く →
+            {CTA_COPY.card.detail}
           </span>
         </div>
       </Link>
       <div className={`${PRODUCT_CARD_CTA_CLASS} flex flex-col gap-1.5`}>
-        <Link
-          href={detailHref}
-          className="inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700"
-        >
-          商品詳細を見る
-        </Link>
         <ProductCardOliveYoungLink
           oliveYoungUrl={resolveEffectiveOliveYoungUrl({
             oliveYoungUrl: p.oliveYoungUrl,

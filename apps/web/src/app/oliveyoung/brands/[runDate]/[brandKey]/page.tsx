@@ -123,6 +123,7 @@ function BrandProductCard({ p }: { p: OliveYoungProductCard }) {
           variant="card"
           className=""
           position="brand_card"
+          amazonOnly
         />
       </div>
     </div>

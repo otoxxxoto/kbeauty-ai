@@ -336,6 +336,7 @@ export default async function OliveYoungEntryPage() {
                             primaryShop={primaryShop}
                             suppressAffiliateCtas={suppressAffiliate}
                             productNameForGa={displayName}
+                            amazonOnly
                           />
                         </div>
                       </div>
@@ -446,6 +447,7 @@ export default async function OliveYoungEntryPage() {
                             primaryShop={primaryShop}
                             suppressAffiliateCtas={suppressAffiliate}
                             productNameForGa={displayName}
+                            amazonOnly
                           />
                         </div>
                       </div>
