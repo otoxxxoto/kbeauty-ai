@@ -59,11 +59,18 @@ export function ProductPrimaryCtaBlock({
   const oyTrim = oliveYoungUrl?.trim() ?? "";
   const showOySupplement = oyTrim.length > 0;
 
-  const ctaBase =
-    "inline-flex w-full min-h-[50px] items-center justify-center rounded-xl px-4 py-3 text-sm sm:text-base font-bold text-white shadow-sm transition-colors";
-  const amazonBtn = `${ctaBase} bg-[#ff9900] hover:bg-[#e68a00]`;
-  const rakutenBtn = `${ctaBase} bg-[#bf0000] hover:bg-[#a30000]`;
-  const qoo10Btn = `${ctaBase} bg-[#ff3366] hover:bg-[#e62e5c]`;
+  /** 先頭1本だけ：従来どおりのソリッド主CTA */
+  const ctaPrimaryBase =
+    "inline-flex w-full min-h-[52px] items-center justify-center rounded-xl px-4 py-3 text-sm sm:text-base font-bold text-white shadow-md ring-2 ring-black/5 ring-offset-2 ring-offset-white transition-colors";
+  /** 2本目以降：同じショップ色味でアウトライン（主と並べても主が一目で分かる） */
+  const ctaSecondaryBase =
+    "inline-flex w-full min-h-[44px] items-center justify-center rounded-xl border-2 px-4 py-2.5 text-sm font-semibold shadow-none transition-colors";
+  const amazonPrimary = `${ctaPrimaryBase} bg-[#ff9900] hover:bg-[#e68a00]`;
+  const amazonSecondary = `${ctaSecondaryBase} border-orange-300 bg-orange-50/90 text-orange-900 hover:bg-orange-100`;
+  const rakutenPrimary = `${ctaPrimaryBase} bg-[#bf0000] hover:bg-[#a30000]`;
+  const rakutenSecondary = `${ctaSecondaryBase} border-red-300 bg-red-50/90 text-red-900 hover:bg-red-100`;
+  const qoo10Primary = `${ctaPrimaryBase} bg-[#ff3366] hover:bg-[#e62e5c]`;
+  const qoo10Secondary = `${ctaSecondaryBase} border-pink-300 bg-pink-50/90 text-pink-900 hover:bg-pink-100`;
 
   const order = getAffiliateCtaOrder(primaryShop ?? null);
   const gaCtx = {
@@ -74,15 +81,18 @@ export function ProductPrimaryCtaBlock({
 
   const nodes: ReactNode[] = [];
   if (!suppressAffiliateCtas && hasAffiliateUrls) {
+    let isFirstAffiliate = true;
     for (const shop of order) {
       if (shop === "amazon" && urls.amazon) {
+        const btnClass = isFirstAffiliate ? amazonPrimary : amazonSecondary;
+        isFirstAffiliate = false;
         nodes.push(
         <a
           key="amazon"
           href={urls.amazon}
           target="_blank"
           rel={AMAZON_AFFILIATE_REL}
-          className={amazonBtn}
+          className={btnClass}
           onClick={() =>
             logAffiliateClick({
               goodsNo,
@@ -97,13 +107,15 @@ export function ProductPrimaryCtaBlock({
         </a>
         );
       } else if (shop === "rakuten" && urls.rakuten) {
+        const btnClass = isFirstAffiliate ? rakutenPrimary : rakutenSecondary;
+        isFirstAffiliate = false;
         nodes.push(
         <a
           key="rakuten"
           href={urls.rakuten}
           target="_blank"
           rel={RAKUTEN_AFFILIATE_REL}
-          className={rakutenBtn}
+          className={btnClass}
           onClick={() =>
             logAffiliateClick({
               goodsNo,
@@ -118,13 +130,15 @@ export function ProductPrimaryCtaBlock({
         </a>
         );
       } else if (shop === "qoo10" && urls.qoo10) {
+        const btnClass = isFirstAffiliate ? qoo10Primary : qoo10Secondary;
+        isFirstAffiliate = false;
         nodes.push(
         <a
           key="qoo10"
           href={urls.qoo10}
           target="_blank"
           rel={QOO10_AFFILIATE_REL}
-          className={qoo10Btn}
+          className={btnClass}
           onClick={() =>
             logAffiliateClick({
               goodsNo,
@@ -168,7 +182,10 @@ export function ProductPrimaryCtaBlock({
       <div className="mt-4 flex flex-col gap-3">{nodes}</div>
 
       {showOySupplement ? (
-        <div className="mt-3 border-t border-zinc-100 pt-3">
+        <div className="mt-4 border-t border-zinc-200 pt-3">
+          <p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+            公式ストア
+          </p>
           <ProductCardOliveYoungLink
             variant="detail"
             oliveYoungUrl={oliveYoungUrl}
