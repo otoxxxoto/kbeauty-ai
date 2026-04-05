@@ -188,6 +188,14 @@ export type OliveYoungProductDetail = {
   nameJa?: string;
   /** 管理画面からの手動日本語名（最優先で表示） */
   manualNameJa?: string | null;
+  /**
+   * 管理画面からの手動ブランド名（最優先で表示・同一ブランド商品へ一括反映可）。
+   * isBrandManuallyEdited === true のとき、将来のクローラー更新で brandJa を上書きしてはならない（表示は manualBrandJa 優先のまま）。
+   */
+  manualBrandJa?: string | null;
+  /** 手動ブランド修正が入っているか（クローラーが brandJa を触る前に必ず参照） */
+  isBrandManuallyEdited?: boolean | null;
+  manualBrandUpdatedAt?: unknown;
   summaryJa?: string;
   /** 口コミ要約（任意）。将来の補完Jobで投入されれば表示される */
   reviewSummaryJa?: string;
@@ -302,11 +310,12 @@ export function getDisplayName(product: {
 }
 
 /**
- * 表示用ブランド名（brandJa 優先、無ければ brand）
+ * 表示用ブランド名（manualBrandJa → brandJa → brand）
  */
 export function getDisplayBrand(product: {
   brand?: string;
   brandJa?: string;
+  manualBrandJa?: string | null;
 }): string {
   return getDisplayBrandText(product);
 }
@@ -503,6 +512,15 @@ export async function getOliveYoungProductByGoodsNo(
     nameJa: data.nameJa != null ? String(data.nameJa).trim() : undefined,
     manualNameJa:
       data.manualNameJa != null ? String(data.manualNameJa).trim() : undefined,
+    manualBrandJa:
+      data.manualBrandJa != null ? String(data.manualBrandJa).trim() : undefined,
+    isBrandManuallyEdited:
+      data.isBrandManuallyEdited === true
+        ? true
+        : data.isBrandManuallyEdited === false
+          ? false
+          : undefined,
+    manualBrandUpdatedAt: data.manualBrandUpdatedAt ?? null,
     summaryJa: data.summaryJa != null ? String(data.summaryJa).trim() : undefined,
     reviewSummaryJa:
       data.reviewSummaryJa != null ? String(data.reviewSummaryJa).trim() : undefined,
@@ -581,6 +599,8 @@ export type OliveYoungProductCard = {
   nameJa?: string;
   brand: string;
   brandJa?: string;
+  manualBrandJa?: string | null;
+  isBrandManuallyEdited?: boolean | null;
   amazonImage?: string;
   rakutenImage?: string;
   qoo10Image?: string;
@@ -655,6 +675,8 @@ export async function getOliveYoungProductsByGoodsNos(
       amazonMatchedAt: p.amazonMatchedAt,
       manualImageUrl: p.manualImageUrl ?? null,
       manualImageSource: p.manualImageSource ?? null,
+      manualBrandJa: p.manualBrandJa,
+      isBrandManuallyEdited: p.isBrandManuallyEdited,
     });
   }
   return result;
@@ -702,6 +724,8 @@ export type OliveYoungProductMinimal = {
   name: string;
   nameJa?: string;
   manualNameJa?: string | null;
+  manualBrandJa?: string | null;
+  isBrandManuallyEdited?: boolean | null;
   summaryJa?: string;
   /** 口コミ要約（公開前レポート用・任意） */
   reviewSummaryJa?: string;
@@ -858,6 +882,14 @@ export async function getAllOliveYoungProductsMinimal(): Promise<
       brandJa: data.brandJa != null ? String(data.brandJa).trim() : undefined,
       manualNameJa:
         data.manualNameJa != null ? String(data.manualNameJa).trim() : undefined,
+      manualBrandJa:
+        data.manualBrandJa != null ? String(data.manualBrandJa).trim() : undefined,
+      isBrandManuallyEdited:
+        data.isBrandManuallyEdited === true
+          ? true
+          : data.isBrandManuallyEdited === false
+            ? false
+            : undefined,
       amazonImage: optImageStr(data.amazonImage),
       rakutenImage: optImageStr(data.rakutenImage),
       qoo10Image: optImageStr(data.qoo10Image),

@@ -133,12 +133,17 @@ export function isUnsafeBrandJa(value: string | null | undefined): boolean {
 }
 
 /**
- * ブランド表示の統一入口。安全な brandJa のみ採用し、それ以外は brand。
+ * ブランド表示の統一入口。
+ * - manualBrandJa（管理画面の手動修正）が最優先。自動クローラーは isBrandManuallyEdited 参照で brandJa を上書きしないこと。
+ * - 次に安全な brandJa、最後に brand。
  */
 export function getDisplayBrandText(input: {
+  manualBrandJa?: string | null;
   brand?: string | null;
   brandJa?: string | null;
 }): string {
+  const manual = input.manualBrandJa?.trim() ?? "";
+  if (manual) return manual;
   const raw = input.brand?.trim() || "";
   const ja = input.brandJa?.trim() || "";
   if (ja && !isUnsafeBrandJa(ja)) return ja;

@@ -1,6 +1,8 @@
 /**
  * Client Component に渡す前に商品の「画像解決用フィールド」だけをプレーンオブジェクト化する。
  * Firestore Timestamp や余計なキーを境界を越えさせない。
+ *
+ * ブランド表示はここでは扱わない（サーバー側で getDisplayBrand 等に manualBrandJa を渡す）。
  */
 import type {
   ProductImageAnalysisEntry,

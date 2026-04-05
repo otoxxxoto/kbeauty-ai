@@ -1,5 +1,8 @@
 /**
  * oliveyoung_products_public の Amazon / 楽天 / Qoo10 画像フィールド更新
+ *
+ * 注意: Firestore に isBrandManuallyEdited === true がある商品では、別経路のジョブが brandJa を上書きしないこと
+ * （Web 管理画面の手動ブランドと整合させるため）。
  */
 import { FieldValue, Firestore } from "@google-cloud/firestore";
 import {

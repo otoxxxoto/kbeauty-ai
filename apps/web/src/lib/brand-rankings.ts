@@ -25,11 +25,12 @@ export type BrandRankingItem = {
 };
 
 /**
- * 表示用ブランド名（brandJa 優先、無ければ brand）
+ * 表示用ブランド名（manualBrandJa → brandJa → brand）
  */
 export function getDisplayBrand(item: {
   brand?: string;
   brandJa?: string;
+  manualBrandJa?: string | null;
 }): string {
   return getDisplayBrandText(item);
 }
