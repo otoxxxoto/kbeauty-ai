@@ -35,18 +35,30 @@ import { getPublicSiteBaseUrl } from "@/lib/public-site-base-url";
 
 const BASE_URL = getPublicSiteBaseUrl();
 
-/** 記事 slug 別の固定SEO補強文（データスキーマは変えずページ内のみ） */
-const ARTICLE_SEO_BLOCKS: Record<
-  string,
-  {
-    forWhomTitle: string;
-    forWhomItems: string[];
-    howToChooseTitle: string;
-    howToChooseParagraphs: string[];
-    howToChooseBullets?: string[];
-  }
-> = {
-  "korean-toner-ranking-compare": {
+type ArticleSeoCategory = "toner" | "serum" | "cream" | "pack" | "cleansing";
+
+type ArticleSeoBlock = {
+  forWhomTitle: string;
+  forWhomItems: string[];
+  howToChooseTitle: string;
+  howToChooseParagraphs: string[];
+  howToChooseBullets?: string[];
+};
+
+/** slug からカテゴリ判定（量産記事は slug にカテゴリ語を含める） */
+function slugToArticleCategory(slug: string): ArticleSeoCategory {
+  const s = slug.toLowerCase();
+  if (s.includes("cleansing")) return "cleansing";
+  if (s.includes("serum")) return "serum";
+  if (s.includes("toner")) return "toner";
+  if (s.includes("cream")) return "cream";
+  if (s.includes("pack")) return "pack";
+  return "toner";
+}
+
+/** カテゴリ別の固定SEO補強文（UI・スキーマは据え置き） */
+const ARTICLE_SEO_BY_CATEGORY: Record<ArticleSeoCategory, ArticleSeoBlock> = {
+  toner: {
     forWhomTitle: "こんな人におすすめ",
     forWhomItems: [
       "韓国コスメの化粧水（トナー）で、売れ筋や定番を短時間で把握したい方",
@@ -64,21 +76,130 @@ const ARTICLE_SEO_BLOCKS: Record<
       "初めてのブランドは、まず小容量やセット品の有無もチェックする",
     ],
   },
+  serum: {
+    forWhomTitle: "こんな人におすすめ",
+    forWhomItems: [
+      "美容液（セラム）で、悩みに合わせた集中ケアをしたい方",
+      "韓国オリーブヤングの売れ筋から、候補を素早く洗い出したい方",
+      "化粧水のあとのステップを一本足したい方",
+    ],
+    howToChooseTitle: "選び方のヒント",
+    howToChooseParagraphs: [
+      "美容液は保湿・透明感・ハリなど、訴求が商品ごとに異なります。ランキング上位から気になるものを選び、詳細ページで成分や使い方の目安を確認すると失敗が減ります。",
+      "価格・在庫は店舗や時期で変わるため、各リンク先の最新情報をご確認ください。",
+    ],
+    howToChooseBullets: [
+      "重ねづけする場合は、さっぱり系としっとり系のバランスを意識する",
+      "初回は少量パックやミニサイズがあるかも確認する",
+      "敏感肌はパッチテストや刺激の少なめ処方を優先する",
+    ],
+  },
+  cream: {
+    forWhomTitle: "こんな人におすすめ",
+    forWhomItems: [
+      "クリームで保湿やバリアサポートを仕上げたい方",
+      "韓国コスメの人気ランキングから、定番・話題品を比較したい方",
+      "夜用にしっとりめの1本を探している方",
+    ],
+    howToChooseTitle: "選び方のヒント",
+    howToChooseParagraphs: [
+      "クリームは油分・保湿剤のバランスで「軽い／重い」が分かれます。肌質と季節に合わせ、詳細ページのテクスチャ説明も参考にしてください。",
+      "価格やセット品はショップにより異なることがあります。",
+    ],
+    howToChooseBullets: [
+      "朝は軽め、夜はしっとりめ、と使い分けると選びやすい",
+      "ニキビ肌はオイル過多になりにくい処方も候補に",
+      "香りが苦手な場合は無香料寄りを探す",
+    ],
+  },
+  pack: {
+    forWhomTitle: "こんな人におすすめ",
+    forWhomItems: [
+      "シートパックや洗い流しパックで、短時間ケアをしたい方",
+      "オリーブヤングのランキングで人気のパック系を比較したい方",
+      "イベント前や乾燥が気になる日の集中ケアを探している方",
+    ],
+    howToChooseTitle: "選び方のヒント",
+    howToChooseParagraphs: [
+      "パックはシート型・クリーム型など形状と、保湿・ハリなどの訴求が様々です。ランキング上位から用途に近いものを選び、詳細で使用方法を確認してください。",
+      "在庫・価格は変動しやすいため、購入前に各ショップでご確認ください。",
+    ],
+    howToChooseBullets: [
+      "毎日使うなら刺激が控えめなものを",
+      "シートはフィット感・液量のレビューも参考に",
+      "洗い流しタイプは放置時間を守る",
+    ],
+  },
+  cleansing: {
+    forWhomTitle: "こんな人におすすめ",
+    forWhomItems: [
+      "韓国のクレンジングで、メイク落としの候補を探している方",
+      "オリーブヤング人気ランキングを根拠に比較したい方",
+      "オイル・バーム・ジェルなどタイプ別に検討したい方",
+    ],
+    howToChooseTitle: "選び方のヒント",
+    howToChooseParagraphs: [
+      "クレンジングはメイクの濃さ・肌の敏感さで最適タイプが変わります。ランキング上位から候補を絞り、詳細ページで洗い流し方やW洗顔の必要性を確認してください。",
+      "価格・容量はショップごとに異なることがあります。",
+    ],
+    howToChooseBullets: [
+      "濃いメイクならオイル・バーム系を候補に",
+      "摩擦を減らすため、なじませ時間を守る",
+      "肌が揺らぎやすいときは低刺激処方を優先する",
+    ],
+  },
 };
 
-const DEFAULT_ARTICLE_SEO = ARTICLE_SEO_BLOCKS["korean-toner-ranking-compare"];
+/** カード内「特徴」1行（カテゴリ別の仮フレーズをローテーション） */
+const CARD_FEATURE_LINES_BY_CATEGORY: Record<
+  ArticleSeoCategory,
+  readonly string[]
+> = {
+  toner: [
+    "毛穴ケアに強い",
+    "保湿重視",
+    "韓国で人気",
+    "さっぱり使いやすい",
+    "定番の韓国スキンケア",
+  ],
+  serum: [
+    "集中ケア向き",
+    "浸透感を意識したい方に",
+    "韓国で定番の美容液",
+    "化粧水の次のステップに",
+    "売れ筋セラムの一角",
+  ],
+  cream: [
+    "保湿・密封感を補いやすい",
+    "仕上げのクリームとして",
+    "韓国ランキングで人気",
+    "バリアサポート意識",
+    "しっとりタイプの候補",
+  ],
+  pack: [
+    "集中保湿しやすい",
+    "シート・パック系の人気枠",
+    "韓国でよく見る定番アイテム",
+    "短時間ケア向き",
+    "ランキング上位の一角",
+  ],
+  cleansing: [
+    "メイク落としの定番枠",
+    "なじませやすさを意識",
+    "韓国で人気のクレンジング",
+    "W洗顔との相性は詳細で確認",
+    "売れ筋クレンジング候補",
+  ],
+};
 
-/** カード内「特徴」1行（仮・固定フレーズを順番でローテーション） */
-const CARD_FEATURE_COMMENT_LINES = [
-  "毛穴ケアに強い",
-  "保湿重視",
-  "韓国で人気",
-  "さっぱり使いやすい",
-  "定番の韓国スキンケア",
-] as const;
+function getArticleSeoBlocks(slug: string): ArticleSeoBlock {
+  const cat = slugToArticleCategory(slug);
+  return ARTICLE_SEO_BY_CATEGORY[cat];
+}
 
-function getArticleSeoBlocks(slug: string) {
-  return ARTICLE_SEO_BLOCKS[slug] ?? DEFAULT_ARTICLE_SEO;
+function getCardFeatureLine(slug: string, index: number): string {
+  const lines = CARD_FEATURE_LINES_BY_CATEGORY[slugToArticleCategory(slug)];
+  return lines[index % lines.length] ?? "";
 }
 
 type PageProps = {
@@ -292,11 +413,7 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
                 <ArticleProductCard
                   key={item.goodsNo}
                   item={item}
-                  featureLine={
-                    CARD_FEATURE_COMMENT_LINES[
-                      index % CARD_FEATURE_COMMENT_LINES.length
-                    ] ?? ""
-                  }
+                  featureLine={getCardFeatureLine(slug, index)}
                 />
               ))}
             </div>
