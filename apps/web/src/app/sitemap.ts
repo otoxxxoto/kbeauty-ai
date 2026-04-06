@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getRankingRunDates } from "@/lib/oliveyoung-rankings";
+import { getAllArticleSlugs } from "@/lib/oliveyoung-articles";
 import { getAllCategorySlugs } from "@/lib/category-config";
 import { getPublicSiteBaseUrl } from "@/lib/public-site-base-url";
 
@@ -20,6 +21,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/oliveyoung/tags", changeFrequency: "weekly" as const, priority: 0.6 },
     { path: "/oliveyoung/ingredients", changeFrequency: "weekly" as const, priority: 0.6 },
   ];
+
+  const articleSlugs = getAllArticleSlugs();
+  for (const slug of articleSlugs) {
+    if (!slug?.trim()) continue;
+    entries.push({
+      url: `${BASE_URL}/oliveyoung/articles/${slug}`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.78,
+    });
+  }
 
   for (const page of fixedPages) {
     entries.push({

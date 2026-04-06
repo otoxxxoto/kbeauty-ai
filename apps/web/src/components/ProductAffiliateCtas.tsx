@@ -36,6 +36,7 @@ export type AffiliateClickPosition =
   | "featured_card"
   | "rising_card"
   | "ranking_card"
+  | "article_card"
   | "brand_card"
   | "related_card";
 
@@ -48,6 +49,7 @@ export type AffiliateCtaPlacement =
   | "related_card"
   | "featured_card"
   | "rising_card"
+  | "article_card"
   | "brand_card";
 
 export type AffiliatePageType =
@@ -57,7 +59,8 @@ export type AffiliatePageType =
   | "top"
   | "related"
   | "brand"
-  | "detail";
+  | "detail"
+  | "article";
 
 export type LogAffiliateClickArgs = {
   goodsNo: string;
@@ -181,17 +184,21 @@ export function ProductAffiliateCtas({
     ctaPlacement ??
     (position === "ranking_card"
       ? "ranking_card"
-      : position === "category_card"
-        ? "category_card"
-        : undefined);
+      : position === "article_card"
+        ? "article_card"
+        : position === "category_card"
+          ? "category_card"
+          : undefined);
 
   const inferredPageType: AffiliatePageType | undefined =
     pageType ??
     (inferredPlacement === "ranking_card"
       ? "ranking"
-      : inferredPlacement === "category_card"
-        ? "category"
-        : undefined);
+      : inferredPlacement === "article_card"
+        ? "article"
+        : inferredPlacement === "category_card"
+          ? "category"
+          : undefined);
 
   const gaCtx = {
     ctaPlacement: inferredPlacement,

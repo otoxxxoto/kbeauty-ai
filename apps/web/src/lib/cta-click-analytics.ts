@@ -7,7 +7,14 @@
 export type CtaClickShop = "amazon" | "rakuten" | "qoo10" | "oliveyoung";
 
 /** GA・分析用の画面種別（一覧系と詳細を横断比較） */
-export type CtaPageType = "top" | "ranking" | "detail" | "related" | "brand" | "category";
+export type CtaPageType =
+  | "top"
+  | "ranking"
+  | "detail"
+  | "related"
+  | "brand"
+  | "category"
+  | "article";
 
 export type EmitCtaClickArgs = {
   shop: CtaClickShop;
@@ -62,6 +69,7 @@ function inferPageType(position: string, ctxPageType?: string): CtaPageType {
   if (c === "brand") return "brand";
   if (c === "ranking") return "ranking";
   if (c === "category") return "category";
+  if (c === "article") return "article";
   if (c === "detail") return "detail";
 
   switch (position) {
@@ -73,6 +81,8 @@ function inferPageType(position: string, ctxPageType?: string): CtaPageType {
       return "category";
     case "ranking_card":
       return "ranking";
+    case "article_card":
+      return "article";
     case "featured_card":
     case "rising_card":
       return "top";

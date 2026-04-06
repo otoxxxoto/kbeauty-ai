@@ -12,11 +12,11 @@ export const CTA_COPY_VARIANTS = {
   primary: {
     /** パターンA（現行ベース） */
     A: {
-      title: "今すぐショップをチェック",
-      subtitle: "主要ECで価格や在庫を確認できます",
-      amazon: "Amazonで最安をチェック",
-      rakuten: "楽天で価格を見る",
-      qoo10: "Qoo10で在庫を確認",
+      title: "今すぐ最安・在庫を確認する",
+      subtitle: "Amazon・楽天・Qoo10で、いま価格と在庫をチェックできます",
+      amazon: "Amazonで今すぐ最安を確認",
+      rakuten: "楽天で今すぐ最安を確認",
+      qoo10: "Qoo10で今すぐ最安を確認",
       /** ファーストビュー主CTA直下の OY 補助導線（一覧カードの「Olive Youngで見る」と役割分担） */
       oliveYoungSupplement: "公式ページ（Olive Young）で確認",
     },
