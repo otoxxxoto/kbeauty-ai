@@ -395,7 +395,9 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
       ) >= CATEGORY_SCORE_THRESHOLD
   );
   filtered.sort((a, b) => a.rank - b.rank);
-  const items = filtered.slice(0, Math.max(1, spec.limit));
+  const offset = spec.offset ?? 0;
+  const limitN = Math.max(1, spec.limit);
+  const items = filtered.slice(offset, offset + limitN);
 
   const seo = getArticleSeoBlocks(slug);
 
@@ -419,8 +421,15 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
         </h1>
         <p className="mt-2 text-sm text-zinc-500">
           ランキングデータ日: {data.meta.runDate}／カテゴリ「
-          {categoryConfig.label}」に該当する商品を、公式順位の若い順に最大{" "}
-          {spec.limit} 件まで掲載します。
+          {categoryConfig.label}」に該当する商品を、公式順位の若い順に
+          {offset > 0 ? (
+            <>
+              並べ、先頭 {offset} 件を除いたうち最大 {spec.limit}{" "}
+              件まで掲載します。
+            </>
+          ) : (
+            <>最大 {spec.limit} 件まで掲載します。</>
+          )}
           {items.length > 0 ? (
             <span>（このページでは {items.length} 件）</span>
           ) : null}

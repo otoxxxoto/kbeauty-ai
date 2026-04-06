@@ -21,6 +21,8 @@ export type OliveYoungArticleSpec = {
   /** 本文冒頭（HTML なし・プレーンテキスト） */
   intro: string;
   limit: number;
+  /** カテゴリ該当商品を rank 順に並べたあと、先頭から何件スキップするか（同カテゴリ記事の差分用） */
+  offset?: number;
   runDate: OliveYoungArticleRunDate;
   categoryConfigSlug: OliveYoungArticleCategoryConfigSlug;
 };
@@ -43,8 +45,9 @@ const ARTICLES: Record<string, OliveYoungArticleSpec> = {
     description:
       "保湿・うるおい重視の韓国化粧水を、オリーブヤングの人気ランキングから比較。売れ筋上位のトナー候補を一覧でチェックし、詳細・価格確認へ進めます。",
     intro:
-      "乾燥やもちもち肌を目指す方向けに、韓国オリーブヤングのランキングに載る化粧水（トナー）の人気商品をまとめました。ランキングは取得日時点の順位です。肌質に合うかは商品ページの成分・説明もあわせてご確認ください。",
+      "乾燥やもちもち肌を目指す方向けに、韓国オリーブヤングのランキングに載る化粧水（トナー）の人気商品をまとめました。ランキングは取得日時点の順位です。肌質に合うかは商品ページの成分・説明もあわせてご確認ください。本記事では同カテゴリ内の別候補も比較対象として掲載しています。",
     limit: 10,
+    offset: 5,
     runDate: "latest",
     categoryConfigSlug: "toner",
   },
@@ -65,8 +68,9 @@ const ARTICLES: Record<string, OliveYoungArticleSpec> = {
     description:
       "透明感やくすみが気になる方向けに、韓国オリーブヤングの人気ランキングから美容液・セラムを比較。ランキング上位品の詳細・購入導線をまとめました。",
     intro:
-      "くすみや明るさが気になる肌へ、韓国で人気の美容液（セラム）をランキング観点から一覧します。オリーブヤングの公式ランキングを根拠にした比較記事で、順位は取得時点のものです。効果感には個人差があります。",
+      "くすみや明るさが気になる肌へ、韓国で人気の美容液（セラム）をランキング観点から一覧します。オリーブヤングの公式ランキングを根拠にした比較記事で、順位は取得時点のものです。効果感には個人差があります。本記事では同カテゴリ内の別候補も比較対象として掲載しています。",
     limit: 10,
+    offset: 5,
     runDate: "latest",
     categoryConfigSlug: "serum",
   },
