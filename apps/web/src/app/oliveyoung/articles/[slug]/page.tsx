@@ -68,11 +68,13 @@ const ARTICLE_SEO_BLOCKS: Record<
 
 const DEFAULT_ARTICLE_SEO = ARTICLE_SEO_BLOCKS["korean-toner-ranking-compare"];
 
-/** カード下「特徴」1行（仮・ランキング順でローテーション） */
-const CARD_FEATURE_LINES = [
-  "韓国オリーブヤングで人気の化粧水カテゴリの売れ筋です。",
-  "洗顔後のうるおい補給・肌を整えるステップ向けの定番寄りアイテムです。",
-  "ランキング上位に位置する、注目度の高いトナー系商品です。",
+/** カード内「特徴」1行（仮・固定フレーズを順番でローテーション） */
+const CARD_FEATURE_COMMENT_LINES = [
+  "毛穴ケアに強い",
+  "保湿重視",
+  "韓国で人気",
+  "さっぱり使いやすい",
+  "定番の韓国スキンケア",
 ] as const;
 
 function getArticleSeoBlocks(slug: string) {
@@ -177,6 +179,7 @@ function ArticleProductCard({
               順位 #{item.lastRank}
             </div>
           )}
+          <p className="mt-2 text-sm leading-snug text-gray-600">特徴：{featureLine}</p>
         </div>
       </div>
       <div className={`${PRODUCT_CARD_CTA_CLASS} flex flex-col gap-1.5`}>
@@ -210,9 +213,6 @@ function ArticleProductCard({
           productNameForGa={displayName}
           amazonOnly
         />
-        <div className="mt-2 border-t border-zinc-100 pt-2">
-          <p className="text-xs leading-snug text-zinc-600">{featureLine}</p>
-        </div>
       </div>
     </div>
   );
@@ -293,7 +293,9 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
                   key={item.goodsNo}
                   item={item}
                   featureLine={
-                    CARD_FEATURE_LINES[index % CARD_FEATURE_LINES.length] ?? ""
+                    CARD_FEATURE_COMMENT_LINES[
+                      index % CARD_FEATURE_COMMENT_LINES.length
+                    ] ?? ""
                   }
                 />
               ))}
