@@ -24,7 +24,6 @@ import {
 } from "@/lib/product-card-layout";
 import { serializeProductImageFieldsForClient } from "@/lib/serialize-product-for-client";
 import { RelatedStyleOliveYoungLink } from "@/components/RelatedStyleOliveYoungLink";
-import { resolveOyNavigableUrl } from "@/lib/product-shop-cta-links";
 import { OyListingCardDevDebug } from "@/components/OyListingCardDevDebug";
 import type { RankingItemWithProduct } from "@/lib/oliveyoung-rankings";
 import { notFound } from "next/navigation";
@@ -35,6 +34,50 @@ import {
 import { getPublicSiteBaseUrl } from "@/lib/public-site-base-url";
 
 const BASE_URL = getPublicSiteBaseUrl();
+
+/** 記事 slug 別の固定SEO補強文（データスキーマは変えずページ内のみ） */
+const ARTICLE_SEO_BLOCKS: Record<
+  string,
+  {
+    forWhomTitle: string;
+    forWhomItems: string[];
+    howToChooseTitle: string;
+    howToChooseParagraphs: string[];
+    howToChooseBullets?: string[];
+  }
+> = {
+  "korean-toner-ranking-compare": {
+    forWhomTitle: "こんな人におすすめ",
+    forWhomItems: [
+      "韓国コスメの化粧水（トナー）で、売れ筋や定番を短時間で把握したい方",
+      "オリーブヤングの人気ランキングを参考に、購入候補を絞り込みたい方",
+      "洗顔後の保湿・整肌用の1本を探している方",
+    ],
+    howToChooseTitle: "選び方のヒント",
+    howToChooseParagraphs: [
+      "化粧水は、肌状態・季節・好みのテクスチャ（さっぱり／しっとり）で最適が変わります。まずはランキング上位の中から、自分の悩みに近い商品の詳細ページで成分や口コミ要約を確認すると選びやすくなります。",
+      "価格や在庫はショップで異なることがあるため、気になった商品は各ECのリンクから最新情報をご確認ください。",
+    ],
+    howToChooseBullets: [
+      "乾燥が気になるときは、保湿寄りの処方を意識する",
+      "さっぱり使いたいときは、軽めのトナー・化粧水を候補にする",
+      "初めてのブランドは、まず小容量やセット品の有無もチェックする",
+    ],
+  },
+};
+
+const DEFAULT_ARTICLE_SEO = ARTICLE_SEO_BLOCKS["korean-toner-ranking-compare"];
+
+/** カード下「特徴」1行（仮・ランキング順でローテーション） */
+const CARD_FEATURE_LINES = [
+  "韓国オリーブヤングで人気の化粧水カテゴリの売れ筋です。",
+  "洗顔後のうるおい補給・肌を整えるステップ向けの定番寄りアイテムです。",
+  "ランキング上位に位置する、注目度の高いトナー系商品です。",
+] as const;
+
+function getArticleSeoBlocks(slug: string) {
+  return ARTICLE_SEO_BLOCKS[slug] ?? DEFAULT_ARTICLE_SEO;
+}
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -90,7 +133,13 @@ function RankBadge({ rank }: { rank: number }) {
   );
 }
 
-function ArticleProductCard({ item }: { item: RankingItemWithProduct }) {
+function ArticleProductCard({
+  item,
+  featureLine,
+}: {
+  item: RankingItemWithProduct;
+  featureLine: string;
+}) {
   const displayName = getDisplayProductNameText({
     nameJa: item.nameJa,
     name: item.name,
@@ -100,11 +149,6 @@ function ArticleProductCard({ item }: { item: RankingItemWithProduct }) {
   const displayBrand = getDisplayBrand(item);
   const primaryShop = getPrimaryShopFromProduct(item);
   const suppressAffiliate = shouldSuppressAffiliateCtasForProduct(item);
-  const oyHref = resolveOyNavigableUrl({
-    productUrl: item.productUrl,
-    pickedUrl: item.pickedUrl,
-    oliveYoungUrl: item.oliveYoungUrl,
-  });
   const isDev = process.env.NODE_ENV === "development";
 
   return (
@@ -166,6 +210,9 @@ function ArticleProductCard({ item }: { item: RankingItemWithProduct }) {
           productNameForGa={displayName}
           amazonOnly
         />
+        <div className="mt-2 border-t border-zinc-100 pt-2">
+          <p className="text-xs leading-snug text-zinc-600">{featureLine}</p>
+        </div>
       </div>
     </div>
   );
@@ -187,6 +234,7 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
   if (!data) notFound();
 
   const items = data.items.slice(0, Math.max(1, spec.limit));
+  const seo = getArticleSeoBlocks(slug);
 
   return (
     <div className="mx-auto max-w-5xl p-6">
@@ -214,6 +262,22 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
         </p>
 
         <section className="mt-10" aria-labelledby="article-ranking-heading">
+          <div className="mb-6" aria-labelledby="article-for-whom-heading">
+            <h2
+              id="article-for-whom-heading"
+              className="mb-2 text-base font-bold text-zinc-900"
+            >
+              {seo.forWhomTitle}
+            </h2>
+            <ul className="list-disc space-y-1 pl-5 text-sm text-zinc-700">
+              {seo.forWhomItems.map((t) => (
+                <li key={t}>
+                  <p className="inline">{t}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           <h2
             id="article-ranking-heading"
             className="mb-4 text-lg font-bold text-zinc-900"
@@ -224,11 +288,40 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
             <p className="text-sm text-zinc-500">表示できる商品がありません。</p>
           ) : (
             <div className="grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {items.map((item) => (
-                <ArticleProductCard key={item.goodsNo} item={item} />
+              {items.map((item, index) => (
+                <ArticleProductCard
+                  key={item.goodsNo}
+                  item={item}
+                  featureLine={
+                    CARD_FEATURE_LINES[index % CARD_FEATURE_LINES.length] ?? ""
+                  }
+                />
               ))}
             </div>
           )}
+
+          <div className="mt-8" aria-labelledby="article-how-to-heading">
+            <h2
+              id="article-how-to-heading"
+              className="mb-2 text-base font-bold text-zinc-900"
+            >
+              {seo.howToChooseTitle}
+            </h2>
+            {seo.howToChooseParagraphs.map((p, i) => (
+              <p key={`how-p-${i}`} className="mb-3 text-sm text-zinc-700">
+                {p}
+              </p>
+            ))}
+            {seo.howToChooseBullets && seo.howToChooseBullets.length > 0 ? (
+              <ul className="list-disc space-y-1 pl-5 text-sm text-zinc-700">
+                {seo.howToChooseBullets.map((t) => (
+                  <li key={t}>
+                    <p className="inline">{t}</p>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
         </section>
       </article>
 
