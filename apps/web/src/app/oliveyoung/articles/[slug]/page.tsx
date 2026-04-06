@@ -6,7 +6,10 @@ import {
 import {
   getDisplayBrand,
   getEffectiveAffiliateUrls,
+  type OliveYoungProductMinimal,
 } from "@/lib/oliveyoung-products";
+import { CATEGORY_CONFIG } from "@/lib/category-config";
+import { scoreProductForCategory } from "@/lib/filter-products-by-category";
 import { ProductDisplayImage } from "@/components/ProductDisplayImage";
 import { ProductCardCta } from "@/components/ProductCardCta";
 import { ProductAffiliateCtas } from "@/components/ProductAffiliateCtas";
@@ -202,6 +205,33 @@ function getCardFeatureLine(slug: string, index: number): string {
   return lines[index % lines.length] ?? "";
 }
 
+/** filter-products-by-category と同じ閾値（score >= 2 で掲載候補） */
+const CATEGORY_SCORE_THRESHOLD = 2;
+
+/**
+ * ランキング行 → カテゴリスコア計算用の最小形。
+ * summaryJa はマージされていないため未設定（name / nameJa / brand での一致のみ）。
+ */
+function rankingItemToMinimalForCategoryScore(
+  item: RankingItemWithProduct
+): OliveYoungProductMinimal {
+  return {
+    goodsNo: item.goodsNo,
+    name: item.name,
+    nameJa: item.nameJa,
+    brand: item.brand,
+    brandJa: item.brandJa,
+    summaryJa: undefined,
+    imageUrl: item.imageUrl,
+    thumbnailUrl: item.thumbnailUrl,
+    productUrl: item.productUrl,
+    pickedUrl: item.pickedUrl ?? null,
+    lastRank: item.lastRank,
+    lastSeenRunDate: item.lastSeenRunDate,
+    updatedAt: null,
+  } as OliveYoungProductMinimal;
+}
+
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
@@ -354,7 +384,19 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
   const data = await getRankingWithProducts(runDate);
   if (!data) notFound();
 
-  const items = data.items.slice(0, Math.max(1, spec.limit));
+  const categoryConfig = CATEGORY_CONFIG[spec.categoryConfigSlug];
+  if (!categoryConfig) notFound();
+
+  const filtered = data.items.filter(
+    (item) =>
+      scoreProductForCategory(
+        rankingItemToMinimalForCategoryScore(item),
+        categoryConfig
+      ) >= CATEGORY_SCORE_THRESHOLD
+  );
+  filtered.sort((a, b) => a.rank - b.rank);
+  const items = filtered.slice(0, Math.max(1, spec.limit));
+
   const seo = getArticleSeoBlocks(slug);
 
   return (
@@ -376,7 +418,12 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
           {spec.title}
         </h1>
         <p className="mt-2 text-sm text-zinc-500">
-          ランキングデータ日: {data.meta.runDate}（上位 {spec.limit} 件を掲載）
+          ランキングデータ日: {data.meta.runDate}／カテゴリ「
+          {categoryConfig.label}」に該当する商品を、公式順位の若い順に最大{" "}
+          {spec.limit} 件まで掲載します。
+          {items.length > 0 ? (
+            <span>（このページでは {items.length} 件）</span>
+          ) : null}
         </p>
         <p className="mt-6 whitespace-pre-wrap text-sm leading-relaxed text-zinc-700">
           {spec.intro}
@@ -406,7 +453,24 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
             人気商品ランキング（比較）
           </h2>
           {items.length === 0 ? (
-            <p className="text-sm text-zinc-500">表示できる商品がありません。</p>
+            <div
+              className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950"
+              role="status"
+            >
+              <p className="font-semibold">このランキングでは該当商品がありません</p>
+              <p className="mt-2 leading-relaxed text-amber-900">
+                掲載日 {data.meta.runDate} のランキング全体のうち、「
+                {categoryConfig.label}」のキーワード基準（スコア
+                {CATEGORY_SCORE_THRESHOLD} 以上）に合致する商品が見つかりませんでした。カテゴリや商品名の表記により、別日のランキングでは表示される場合があります。全商品は
+                <Link
+                  href={`/oliveyoung/rankings/${runDate}`}
+                  className="mx-1 font-medium text-amber-800 underline hover:text-amber-950"
+                >
+                  日別ランキング一覧
+                </Link>
+                からご確認ください。
+              </p>
+            </div>
           ) : (
             <div className="grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {items.map((item, index) => (
