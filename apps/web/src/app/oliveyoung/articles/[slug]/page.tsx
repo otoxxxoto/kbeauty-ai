@@ -209,8 +209,7 @@ function getCardFeatureLine(slug: string, index: number): string {
 const CATEGORY_SCORE_THRESHOLD = 2;
 
 /**
- * ランキング行 → カテゴリスコア計算用の最小形。
- * summaryJa はマージされていないため未設定（name / nameJa / brand での一致のみ）。
+ * ランキング行 → カテゴリスコア計算用の最小形（公開商品の summaryJa を含む）。
  */
 function rankingItemToMinimalForCategoryScore(
   item: RankingItemWithProduct
@@ -221,7 +220,7 @@ function rankingItemToMinimalForCategoryScore(
     nameJa: item.nameJa,
     brand: item.brand,
     brandJa: item.brandJa,
-    summaryJa: undefined,
+    summaryJa: item.summaryJa,
     imageUrl: item.imageUrl,
     thumbnailUrl: item.thumbnailUrl,
     productUrl: item.productUrl,

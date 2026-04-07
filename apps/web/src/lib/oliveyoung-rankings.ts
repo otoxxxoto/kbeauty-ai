@@ -112,6 +112,8 @@ export type OyListingCardDebug = {
 export type RankingItemWithProduct = RankingItemRow & {
   nameJa?: string;
   brandJa?: string;
+  /** oliveyoung_products_public.summaryJa（カテゴリ判定の検索テキスト用） */
+  summaryJa?: string;
   /** oliveyoung_products_public.manualImageUrl（手動アップロード正本） */
   manualImageUrl?: string | null;
   amazonImage?: string;
@@ -253,12 +255,16 @@ export async function getRankingWithProducts(
         }
       : undefined;
 
+    const summaryJaRaw = publicProduct?.summaryJa?.trim();
+    const summaryJa = summaryJaRaw || undefined;
+
     enriched.push({
       ...row,
       name,
       nameJa: nameJa || undefined,
       brand: brand || "",
       brandJa,
+      summaryJa,
       amazonImage: publicProduct?.amazonImage,
       rakutenImage: publicProduct?.rakutenImage,
       qoo10Image: publicProduct?.qoo10Image,
@@ -369,12 +375,16 @@ export async function getRisingProductsWithProducts(
         }
       : undefined;
 
+    const summaryJaRaw = publicProduct?.summaryJa?.trim();
+    const summaryJa = summaryJaRaw || undefined;
+
     enriched.push({
       ...row,
       name,
       nameJa: nameJa || undefined,
       brand: brand || "",
       brandJa,
+      summaryJa,
       amazonImage: publicProduct?.amazonImage,
       rakutenImage: publicProduct?.rakutenImage,
       qoo10Image: publicProduct?.qoo10Image,
