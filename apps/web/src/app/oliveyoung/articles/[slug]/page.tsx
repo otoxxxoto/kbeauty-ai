@@ -386,18 +386,38 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
   const categoryConfig = CATEGORY_CONFIG[spec.categoryConfigSlug];
   if (!categoryConfig) notFound();
 
-  const filtered = data.items.filter(
-    (item) =>
-      scoreProductForCategory(
-        rankingItemToMinimalForCategoryScore(item),
-        categoryConfig
-      ) >= CATEGORY_SCORE_THRESHOLD
-  );
-  filtered.sort((a, b) => a.rank - b.rank);
-  const offset = spec.offset ?? 0;
   const limitN = Math.max(1, spec.limit);
-  const safeOffset = filtered.length <= offset ? 0 : offset;
-  const items = filtered.slice(safeOffset, safeOffset + limitN);
+  const curatedGoodsNos = (spec.goodsNos ?? [])
+    .map((g) => g.trim())
+    .filter(Boolean);
+  const useCuratedGoods = curatedGoodsNos.length > 0;
+
+  let items: RankingItemWithProduct[];
+  let safeOffset = 0;
+
+  if (useCuratedGoods) {
+    const byGoodsNo = new Map(
+      data.items.map((item) => [item.goodsNo, item] as const)
+    );
+    const ordered: RankingItemWithProduct[] = [];
+    for (const g of curatedGoodsNos) {
+      const row = byGoodsNo.get(g);
+      if (row) ordered.push(row);
+    }
+    items = ordered.slice(0, limitN);
+  } else {
+    const filtered = data.items.filter(
+      (item) =>
+        scoreProductForCategory(
+          rankingItemToMinimalForCategoryScore(item),
+          categoryConfig
+        ) >= CATEGORY_SCORE_THRESHOLD
+    );
+    filtered.sort((a, b) => a.rank - b.rank);
+    const offset = spec.offset ?? 0;
+    safeOffset = filtered.length <= offset ? 0 : offset;
+    items = filtered.slice(safeOffset, safeOffset + limitN);
+  }
 
   const seo = getArticleSeoBlocks(slug);
 
@@ -420,19 +440,31 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
           {spec.title}
         </h1>
         <p className="mt-2 text-sm text-zinc-500">
-          ランキングデータ日: {data.meta.runDate}／カテゴリ「
-          {categoryConfig.label}」に該当する商品を、公式順位の若い順に
-          {safeOffset > 0 ? (
+          ランキングデータ日: {data.meta.runDate}／
+          {useCuratedGoods ? (
             <>
-              並べ、先頭 {safeOffset} 件を除いたうち最大 {spec.limit}{" "}
-              件まで掲載します。
+              カテゴリ「{categoryConfig.label}」について、本記事では同カテゴリ内の注目商品を比較用に掲載しています。最大{" "}
+              {spec.limit} 件まで掲載します。
+              {items.length > 0 ? (
+                <span>（このページでは {items.length} 件）</span>
+              ) : null}
             </>
           ) : (
-            <>最大 {spec.limit} 件まで掲載します。</>
+            <>
+              カテゴリ「{categoryConfig.label}」に該当する商品を、公式順位の若い順に
+              {safeOffset > 0 ? (
+                <>
+                  並べ、先頭 {safeOffset} 件を除いたうち最大 {spec.limit}{" "}
+                  件まで掲載します。
+                </>
+              ) : (
+                <>最大 {spec.limit} 件まで掲載します。</>
+              )}
+              {items.length > 0 ? (
+                <span>（このページでは {items.length} 件）</span>
+              ) : null}
+            </>
           )}
-          {items.length > 0 ? (
-            <span>（このページでは {items.length} 件）</span>
-          ) : null}
         </p>
         <p className="mt-6 whitespace-pre-wrap text-sm leading-relaxed text-zinc-700">
           {spec.intro}

@@ -23,6 +23,11 @@ export type OliveYoungArticleSpec = {
   limit: number;
   /** カテゴリ該当商品を rank 順に並べたあと、先頭から何件スキップするか（同カテゴリ記事の差分用） */
   offset?: number;
+  /**
+   * 指定時は自動カテゴリ判定より優先。`runDate` のランキング行から goodsNo で引き、配列順で表示（存在しない ID はスキップ）。
+   * 少件数カテゴリの記事差分用。
+   */
+  goodsNos?: string[];
   runDate: OliveYoungArticleRunDate;
   categoryConfigSlug: OliveYoungArticleCategoryConfigSlug;
 };
@@ -36,6 +41,19 @@ const ARTICLES: Record<string, OliveYoungArticleSpec> = {
     intro:
       "本記事では、韓国オリーブヤングの公式ランキングデータに基づき、人気の化粧水（トナー）カテゴリに位置づけられる売れ筋商品をピックアップして比較します。表示順位・商品情報はランキング取得日時点のものです。気になる商品は詳細ページや各ショップで価格・在庫をご確認ください。",
     limit: 10,
+    /** 2026-04-07 ランキング rank 1〜10（runDate 更新時は要メンテ） */
+    goodsNos: [
+      "A000000250474",
+      "A000000250472",
+      "A000000223414",
+      "A000000224658",
+      "A000000202414",
+      "A000000238634",
+      "A000000249797",
+      "A000000189261",
+      "A000000171427",
+      "A000000238406",
+    ],
     runDate: "latest",
     categoryConfigSlug: "toner",
   },
@@ -47,7 +65,19 @@ const ARTICLES: Record<string, OliveYoungArticleSpec> = {
     intro:
       "乾燥やもちもち肌を目指す方向けに、韓国オリーブヤングのランキングに載る化粧水（トナー）の人気商品をまとめました。ランキングは取得日時点の順位です。肌質に合うかは商品ページの成分・説明もあわせてご確認ください。本記事では同カテゴリ内の別候補も比較対象として掲載しています。",
     limit: 10,
-    offset: 5,
+    /** 2026-04-07 ランキング rank 11〜20（本記事は総合記事と別セット） */
+    goodsNos: [
+      "A000000250255",
+      "A000000149501",
+      "A000000217765",
+      "A000000249969",
+      "A000000250098",
+      "A000000240905",
+      "A000000252115",
+      "A000000232394",
+      "A000000222215",
+      "A000000226081",
+    ],
     runDate: "latest",
     categoryConfigSlug: "toner",
   },
