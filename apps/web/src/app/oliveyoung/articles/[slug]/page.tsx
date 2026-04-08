@@ -404,6 +404,7 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
       const row = byGoodsNo.get(g);
       if (row) ordered.push(row);
     }
+    ordered.sort((a, b) => a.rank - b.rank);
     items = ordered.slice(0, limitN);
   } else {
     const filtered = data.items.filter(
@@ -443,11 +444,22 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
           ランキングデータ日: {data.meta.runDate}／
           {useCuratedGoods ? (
             <>
-              カテゴリ「{categoryConfig.label}」について、本記事では同カテゴリ内の注目商品を比較用に掲載しています。最大{" "}
-              {spec.limit} 件まで掲載します。
               {items.length > 0 ? (
-                <span>（このページでは {items.length} 件）</span>
-              ) : null}
+                <>
+                  カテゴリ「{categoryConfig.label}」の該当商品を、公式ランキングの順位が若い順に掲載しています。
+                  <span>
+                    （このページでは {items.length} 件
+                    {items.length < spec.limit
+                      ? "。該当候補はデータ取得時点の自動判定に依存します"
+                      : ""}
+                    ）
+                  </span>
+                </>
+              ) : (
+                <>
+                  カテゴリ「{categoryConfig.label}」の該当について、本ランキングデータでは掲載できる商品が見つかりませんでした。
+                </>
+              )}
             </>
           ) : (
             <>
