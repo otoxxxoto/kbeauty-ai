@@ -22,6 +22,19 @@ function buildSearchText(product: OliveYoungProductMinimal): string {
   );
 }
 
+/** カテゴリ判定用と同じ正規化テキストに、いずれかのテーマ語が含まれるか（OR） */
+export function productMatchesAnyThemeKeyword(
+  product: OliveYoungProductMinimal,
+  themeKeywords: string[]
+): boolean {
+  if (themeKeywords.length === 0) return true;
+  const haystack = buildSearchText(product);
+  return themeKeywords.some((kw) => {
+    const n = normalizeForCategoryMatch(kw);
+    return n.length > 0 && haystack.includes(n);
+  });
+}
+
 export function scoreProductForCategory(
   product: OliveYoungProductMinimal,
   category: CategoryConfigItem

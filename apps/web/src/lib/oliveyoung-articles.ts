@@ -21,13 +21,21 @@ export type OliveYoungArticleSpec = {
   /** 本文冒頭（HTML なし・プレーンテキスト） */
   intro: string;
   limit: number;
-  /** カテゴリ該当商品を rank 順に並べたあと、先頭から何件スキップするか（同カテゴリ記事の差分用） */
+  /**
+   * カテゴリ該当商品を rank 順に並べたあと、先頭から何件スキップするか（同カテゴリ記事の差分用）。
+   * `themeMatchKeywords` がある記事では無視される。
+   */
   offset?: number;
   /**
    * 指定時は自動カテゴリ判定より優先。`runDate` のランキング行から goodsNo で引き、存在しない ID はスキップ。
    * 表示順は記事ページ側で公式 rank 昇順に整列する（spec の配列順は候補集合の定義用）。
    */
   goodsNos?: string[];
+  /**
+   * `goodsNos` 未指定時のみ有効。カテゴリスコア通過後、name/nameJa/summaryJa/brand 合成テキストに
+   * いずれかが含まれる行だけ残す（OR）。並びは rank 昇順、`limit` のみ（offset なし）。
+   */
+  themeMatchKeywords?: string[];
   runDate: OliveYoungArticleRunDate;
   categoryConfigSlug: OliveYoungArticleCategoryConfigSlug;
 };
@@ -78,7 +86,19 @@ const ARTICLES: Record<string, OliveYoungArticleSpec> = {
     intro:
       "くすみや明るさが気になる肌へ、韓国で人気の美容液（セラム）をランキング観点から一覧します。オリーブヤングの公式ランキングを根拠にした比較記事で、順位は取得時点のものです。効果感には個人差があります。本記事では同カテゴリ内の別候補も比較対象として掲載しています。",
     limit: 10,
-    offset: 5,
+    themeMatchKeywords: [
+      "透明",
+      "トーン",
+      "美白",
+      "ナイアシン",
+      "ビタミン",
+      "VC",
+      "くすみ",
+      "ナイアシンアミド",
+      "비타민",
+      "나이아신",
+      "비타민c",
+    ],
     runDate: "latest",
     categoryConfigSlug: "serum",
   },

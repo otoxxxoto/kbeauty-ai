@@ -9,7 +9,10 @@ import {
   type OliveYoungProductMinimal,
 } from "@/lib/oliveyoung-products";
 import { CATEGORY_CONFIG } from "@/lib/category-config";
-import { scoreProductForCategory } from "@/lib/filter-products-by-category";
+import {
+  scoreProductForCategory,
+  productMatchesAnyThemeKeyword,
+} from "@/lib/filter-products-by-category";
 import { ProductDisplayImage } from "@/components/ProductDisplayImage";
 import { ProductCardCta } from "@/components/ProductCardCta";
 import { ProductAffiliateCtas } from "@/components/ProductAffiliateCtas";
@@ -407,17 +410,35 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
     ordered.sort((a, b) => a.rank - b.rank);
     items = ordered.slice(0, limitN);
   } else {
-    const filtered = data.items.filter(
-      (item) =>
-        scoreProductForCategory(
+    const themeKeywords = (spec.themeMatchKeywords ?? [])
+      .map((k) => k.trim())
+      .filter(Boolean);
+    const useThemeFilter = themeKeywords.length > 0;
+
+    const categoryPass = (item: RankingItemWithProduct) =>
+      scoreProductForCategory(
+        rankingItemToMinimalForCategoryScore(item),
+        categoryConfig
+      ) >= CATEGORY_SCORE_THRESHOLD;
+
+    let filtered = data.items.filter(categoryPass);
+
+    if (useThemeFilter) {
+      filtered = filtered.filter((item) =>
+        productMatchesAnyThemeKeyword(
           rankingItemToMinimalForCategoryScore(item),
-          categoryConfig
-        ) >= CATEGORY_SCORE_THRESHOLD
-    );
-    filtered.sort((a, b) => a.rank - b.rank);
-    const offset = spec.offset ?? 0;
-    safeOffset = filtered.length <= offset ? 0 : offset;
-    items = filtered.slice(safeOffset, safeOffset + limitN);
+          themeKeywords
+        )
+      );
+      filtered.sort((a, b) => a.rank - b.rank);
+      safeOffset = 0;
+      items = filtered.slice(0, limitN);
+    } else {
+      filtered.sort((a, b) => a.rank - b.rank);
+      const offset = spec.offset ?? 0;
+      safeOffset = filtered.length <= offset ? 0 : offset;
+      items = filtered.slice(safeOffset, safeOffset + limitN);
+    }
   }
 
   const seo = getArticleSeoBlocks(slug);
