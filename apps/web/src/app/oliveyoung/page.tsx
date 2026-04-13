@@ -184,6 +184,15 @@ export default async function OliveYoungEntryPage() {
               </Link>
             )}
           </div>
+          <p className="mt-4 text-sm text-zinc-600">
+            <Link
+              href="/oliveyoung/articles"
+              className="text-blue-600 hover:underline"
+            >
+              比較記事一覧
+            </Link>
+            <span className="text-zinc-400">（カテゴリ別の解説）</span>
+          </p>
         </section>
 
         {runDate ? (

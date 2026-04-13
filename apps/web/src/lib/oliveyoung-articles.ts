@@ -193,3 +193,54 @@ export function getArticleSpecBySlug(slug: string): OliveYoungArticleSpec | null
 export function getAllArticleSlugs(): string[] {
   return Object.keys(ARTICLES);
 }
+
+/** 一覧表示・内部リンク用：テーマキーワード / キュレート goodsNos / それ以外（総合） */
+export type OliveYoungArticleIndexKind = "総合" | "テーマ" | "キュレート";
+
+export function getArticleIndexKind(
+  spec: OliveYoungArticleSpec
+): OliveYoungArticleIndexKind {
+  if (spec.themeMatchKeywords && spec.themeMatchKeywords.length > 0) {
+    return "テーマ";
+  }
+  if (spec.goodsNos && spec.goodsNos.length > 0) {
+    return "キュレート";
+  }
+  return "総合";
+}
+
+/** 一覧ページ用：種別（総合→テーマ→キュレート）→ slug 順 */
+export function getArticleSlugsSortedForIndex(): string[] {
+  const kindOrder: Record<OliveYoungArticleIndexKind, number> = {
+    総合: 0,
+    テーマ: 1,
+    キュレート: 2,
+  };
+  return getAllArticleSlugs()
+    .map((slug) => {
+      const spec = getArticleSpecBySlug(slug);
+      return spec ? { slug, spec } : null;
+    })
+    .filter(
+      (x): x is { slug: string; spec: OliveYoungArticleSpec } => x !== null
+    )
+    .sort((a, b) => {
+      const d =
+        kindOrder[getArticleIndexKind(a.spec)] -
+        kindOrder[getArticleIndexKind(b.spec)];
+      if (d !== 0) return d;
+      return a.slug.localeCompare(b.slug);
+    })
+    .map((x) => x.slug);
+}
+
+/**
+ * 記事同士の内部リンク強化用（優先5本＋現在ページは除外して表示）
+ */
+export const ARTICLE_RELATED_NAV_SLUGS: readonly string[] = [
+  "korean-serum-ranking-compare",
+  "korean-serum-brightening-ranking-compare",
+  "korean-cream-ranking-compare",
+  "korean-cream-night-ranking-compare",
+  "korean-toner-ranking-compare",
+];

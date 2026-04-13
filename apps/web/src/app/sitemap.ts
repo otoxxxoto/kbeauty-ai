@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/oliveyoung/category", changeFrequency: "weekly" as const, priority: 0.85 },
     { path: "/oliveyoung/tags", changeFrequency: "weekly" as const, priority: 0.6 },
     { path: "/oliveyoung/ingredients", changeFrequency: "weekly" as const, priority: 0.6 },
+    { path: "/oliveyoung/articles", changeFrequency: "weekly" as const, priority: 0.76 },
   ];
 
   const articleSlugs = getAllArticleSlugs();

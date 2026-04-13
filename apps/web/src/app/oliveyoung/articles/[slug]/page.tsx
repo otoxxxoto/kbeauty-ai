@@ -34,6 +34,7 @@ import { OyListingCardDevDebug } from "@/components/OyListingCardDevDebug";
 import type { RankingItemWithProduct } from "@/lib/oliveyoung-rankings";
 import { notFound } from "next/navigation";
 import {
+  ARTICLE_RELATED_NAV_SLUGS,
   getAllArticleSlugs,
   getArticleSpecBySlug,
 } from "@/lib/oliveyoung-articles";
@@ -592,21 +593,59 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
         >
           関連ページ
         </h2>
-        <ul className="flex flex-col gap-2 text-sm">
-          <li>
-            <Link
-              href={`/oliveyoung/rankings/${runDate}`}
-              className="text-blue-600 hover:underline"
-            >
-              本日の全件ランキングを見る（{runDate}）
-            </Link>
-          </li>
-          <li>
-            <Link href="/oliveyoung" className="text-blue-600 hover:underline">
-              Olive Young トップページ
-            </Link>
-          </li>
-        </ul>
+        <div className="space-y-4">
+          <div>
+            <p className="mb-2 text-xs font-medium text-zinc-600">
+              おすすめ比較記事
+            </p>
+            <ul className="flex flex-col gap-2 text-sm">
+              {ARTICLE_RELATED_NAV_SLUGS.filter((s) => s !== slug).map(
+                (relatedSlug) => {
+                  const relatedSpec = getArticleSpecBySlug(relatedSlug);
+                  if (!relatedSpec) return null;
+                  return (
+                    <li key={relatedSlug}>
+                      <Link
+                        href={`/oliveyoung/articles/${relatedSlug}`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        {relatedSpec.title}
+                      </Link>
+                    </li>
+                  );
+                }
+              )}
+            </ul>
+          </div>
+          <div>
+            <p className="mb-2 text-xs font-medium text-zinc-600">
+              ランキング・入口
+            </p>
+            <ul className="flex flex-col gap-2 text-sm">
+              <li>
+                <Link
+                  href={`/oliveyoung/rankings/${runDate}`}
+                  className="text-blue-600 hover:underline"
+                >
+                  本日の全件ランキングを見る（{runDate}）
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/oliveyoung/articles"
+                  className="text-blue-600 hover:underline"
+                >
+                  比較記事一覧
+                </Link>
+              </li>
+              <li>
+                <Link href="/oliveyoung" className="text-blue-600 hover:underline">
+                  Olive Young トップページ
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
       </section>
     </div>
   );
