@@ -112,6 +112,27 @@ export default async function OliveYoungEntryPage() {
             <p className="mt-2 text-sm text-zinc-500">対象日: {runDate}（毎日更新）</p>
           )}
 
+          <Link
+            href="/oliveyoung/articles"
+            className="mt-5 block rounded-2xl border-2 border-violet-300 bg-gradient-to-br from-violet-50 to-white p-4 shadow-sm transition hover:border-violet-400 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
+          >
+            <p className="text-xs font-semibold uppercase tracking-wide text-violet-700">
+              カテゴリ別・読み比べ
+            </p>
+            <p className="mt-1 text-base font-bold text-zinc-900 md:text-lg">
+              人気比較ランキング一覧を見る
+            </p>
+            <p className="mt-1 text-sm text-zinc-600">
+              美容液・クリーム・化粧水など、解説付きの比較記事へ
+            </p>
+            <span className="mt-3 inline-flex items-center text-sm font-semibold text-violet-800">
+              記事一覧へ
+              <span aria-hidden className="ml-1">
+                →
+              </span>
+            </span>
+          </Link>
+
           {/* 人気カテゴリ（目立つ位置・主要3件） */}
           <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-4 sm:p-5" aria-labelledby="spotlight-categories-heading">
             <h2 id="spotlight-categories-heading" className="text-sm font-semibold text-zinc-800">
@@ -184,15 +205,6 @@ export default async function OliveYoungEntryPage() {
               </Link>
             )}
           </div>
-          <p className="mt-4 text-sm text-zinc-600">
-            <Link
-              href="/oliveyoung/articles"
-              className="text-blue-600 hover:underline"
-            >
-              比較記事一覧
-            </Link>
-            <span className="text-zinc-400">（カテゴリ別の解説）</span>
-          </p>
         </section>
 
         {runDate ? (
