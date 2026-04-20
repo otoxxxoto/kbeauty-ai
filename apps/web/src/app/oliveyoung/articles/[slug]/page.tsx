@@ -39,6 +39,7 @@ import {
   getArticleSpecBySlug,
 } from "@/lib/oliveyoung-articles";
 import { getPublicSiteBaseUrl } from "@/lib/public-site-base-url";
+import { KoreanSerumRankingComparePillarContent } from "../KoreanSerumRankingComparePillarContent";
 
 const BASE_URL = getPublicSiteBaseUrl();
 
@@ -503,6 +504,10 @@ export default async function OliveYoungArticlePage({ params }: PageProps) {
         <p className="mt-6 whitespace-pre-wrap text-sm leading-relaxed text-zinc-700">
           {spec.intro}
         </p>
+
+        {slug === "korean-serum-ranking-compare" ? (
+          <KoreanSerumRankingComparePillarContent />
+        ) : null}
 
         <section className="mt-10" aria-labelledby="article-ranking-heading">
           <div className="mb-6" aria-labelledby="article-for-whom-heading">
